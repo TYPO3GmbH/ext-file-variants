@@ -1,0 +1,6 @@
+sys_file,,,,,,,,,,,,,,,,,,
+,uid,pid,missing,storage,type,metadata,identifier,identifier_hash,folder_hash,extension,mime_type,name,sha1,size
+,1,0,0,1,2,0,first file,--,--,png,image/png,first_file.png,--,474600
+sys_file_metadata,,,,,,,,,,,,,,,,,,
+,uid,pid,cruser_id,sys_language_uid,l10n_parent,l10n_diffsource,file,title,,,,,,,,
+,1,0,1,0,0,--,1,title for first file,,,,,,,,
