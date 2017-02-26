@@ -52,6 +52,7 @@ class DataHandlerHookTest extends AbstractDataHandlerActionTestCase {
      */
     public function assertBehaviourPriorAnyChanges()
     {
+        $this->importScenarioDataSet('sysFileAndMetaDataToBuildUpon');
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         $this->assertAssertionDataSet('metadataTranslation');
     }
