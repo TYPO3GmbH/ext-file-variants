@@ -24,12 +24,11 @@ use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Description
  */
-class DataHandlerTest extends AbstractDataHandlerActionTestCase
+class PriorChangeBehaviorTest extends AbstractDataHandlerActionTestCase
 {
 
     protected $testExtensionsToLoad = ['typo3conf/ext/file_variants'];
@@ -55,6 +54,10 @@ class DataHandlerTest extends AbstractDataHandlerActionTestCase
         $this->importScenarioDataSet('initialSetup');
         $this->setUpFrontendRootPage(1);
         $this->backendUser->workspace = 0;
+
+        // done to prevent an error during processing
+        // it makes no difference here whether file filters apply to the data set
+        unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
     }
 
     /**
@@ -128,9 +131,7 @@ class DataHandlerTest extends AbstractDataHandlerActionTestCase
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file');
-        $files = $queryBuilder->select('*')->from('sys_file')->where(
-            $queryBuilder->expr()->eq('identifier', $queryBuilder->createNamedParameter('useFileInFalField'))
-        )->execute()->fetchAll();
+        $files = $queryBuilder->select('*')->from('sys_file')->execute()->fetchAll();
 
         $resourceFactory = ResourceFactory::getInstance();
         /** @var FileReference $reference */
@@ -139,44 +140,6 @@ class DataHandlerTest extends AbstractDataHandlerActionTestCase
         $ttContentUid = $reference->getReferenceProperty('uid_foreign');
         $this->assertEquals('new_file.png', $fileName);
         $this->assertEquals(1, $ttContentUid);
-    }
-
-    protected function prepareDataSet() {
-        $ttContentRecordId = $this->getUniqueId('NEW');
-        $ttContentRecord = [
-            $ttContentRecordId => [
-                'pid' => 1,
-                'title' => 'my awesome record',
-                'image' => '1'
-            ]
-        ];
-        $fileId = $this->getUniqueId('NEW');
-        $fileRecord = [
-            $fileId => [
-                'pid' => 0,
-                'missing' => 0,
-                'storage' => 1,
-                'identifier' => 'useFileInFalField',
-                'name' => 'new_file.png'
-            ]
-        ];
-        unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
-        $referenceRecord = [
-            $this->getUniqueId('NEW') => [
-                'uid_local' => $fileId,
-                'uid_foreign' => $ttContentRecordId,
-                'pid' => 1
-            ]
-        ];
-        $dataMap = [
-            'tt_content' => $ttContentRecord,
-            'sys_file' => $fileRecord,
-            'sys_file_reference' => $referenceRecord
-        ];
-        /** @var DataHandler $dataHandler */
-        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-        $dataHandler->start($dataMap, []);
-        $dataHandler->process_datamap();
     }
 
     /**
@@ -199,4 +162,43 @@ class DataHandlerTest extends AbstractDataHandlerActionTestCase
         $this->assertEquals(2, $references[0]['uid_foreign']);
     }
 
+    /**
+     * helper method to get new data into DB
+     */
+    protected function prepareDataSet() {
+        $ttContentRecordId = $this->getUniqueId('NEW');
+        $ttContentRecord = [
+            $ttContentRecordId => [
+                'pid' => 1,
+                'title' => 'my awesome record',
+                'image' => '1'
+            ]
+        ];
+        $fileId = $this->getUniqueId('NEW');
+        $fileRecord = [
+            $fileId => [
+                'pid' => 0,
+                'missing' => 0,
+                'storage' => 1,
+                'name' => 'new_file.png'
+            ]
+        ];
+
+        $referenceRecord = [
+            $this->getUniqueId('NEW') => [
+                'uid_local' => $fileId,
+                'uid_foreign' => $ttContentRecordId,
+                'pid' => 1
+            ]
+        ];
+        $dataMap = [
+            'tt_content' => $ttContentRecord,
+            'sys_file' => $fileRecord,
+            'sys_file_reference' => $referenceRecord
+        ];
+        /** @var DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start($dataMap, []);
+        $dataHandler->process_datamap();
+    }
 }
