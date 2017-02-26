@@ -1,8 +1,17 @@
-sys_language,,,,,,,,,,,,,,,,,,
-,uid,pid,hidden,title,flag,,,,,,,,,,,,,
-,1,0,0,dansk,dk,,,,,,,,,,,,,
-,2,0,0,deutsch,de,,,,,,,,,,,,,
-,3,0,0,spain,sp,,,,,,,,,,,,,
-pages,,,,,,,,,,,,,,,,,,
-,uid,pid,sorting,deleted,title,,,,,,,,,,,,,
-,1,0,256,0,FunctionalTest,,,,,,,,,,,,,
+pages,,,,,,
+,uid,pid,sorting,deleted,title
+,1,0,256,0,FunctionalTest
+,2,1,256,0,First Content
+sys_language,,,,,,
+,uid,pid,hidden,title,flag
+,1,0,0,deutsch,de
+,2,0,0,spain,sp
+,3,0,0,russian,ru
+pages_language_overlay,,,,,,
+,uid,pid,deleted,title,sys_language_uid
+,1,1,0,[DE] FunctionalTest,1
+,2,1,0,[SP] Functional Test,2
+,3,1,0,[RU] Functional Test,3
+,4,2,0,[DE] First Content,1
+,5,2,0,[SP] First Content,2
+,6,2,0,[RU] First Content,3

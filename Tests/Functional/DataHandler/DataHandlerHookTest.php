@@ -14,45 +14,19 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
-use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
-use TYPO3\CMS\Core\Tests\Functional\DataHandling\AbstractDataHandlerActionTestCase;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler\BaseTest;
 
 /**
   * Description
   */
-class DataHandlerHookTest extends AbstractDataHandlerActionTestCase {
-
-    protected $testExtensionsToLoad = ['typo3conf/ext/file_variants'];
-
-    /**
-     * @var string
-     */
-    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/';
-
-    /**
-     * @var string
-     */
-    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/Modify/DataSet/SysFileTranslatable/';
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
-        GeneralUtility::setSingletonInstance(FileMetadataPermissionsAspect::class, $fileMetadataPermissionAspect->reveal());
-
-        $this->importScenarioDataSet('initialSetup');
-        $this->setUpFrontendRootPage(1);
-        $this->backendUser->workspace = 0;
-    }
+class DataHandlerHookTest extends BaseTest {
 
     /**
      * @test
      */
     public function translationOfMetadataWithoutNewFileVariantCopiesAndRelatesDefaultFile()
     {
-        $this->importScenarioDataSet('sysFileAndMetaDataToBuildUpon');
+        $this->prepareDataSet();
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         $this->assertAssertionDataSet('metadataTranslationWithoutVariantUpload');
     }
@@ -61,10 +35,50 @@ class DataHandlerHookTest extends AbstractDataHandlerActionTestCase {
      * @test
      */
     public function translationOfMetaDataCreatesTranslatedSysFileRecord () {
-        $this->importScenarioDataSet('sysFileAndMetaDataToBuildUpon');
+        $this->prepareDataSet();
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
         $this->assertAssertionDataSet('metadataTranslationWithVariantUpload');
     }
 
+    public function translatedReferenceInConnectedModeRelatesToFileVariant()
+    {
+
+    }
+
+    public function translatedReferenceInConnectedModeRelatesToDefaultFileIfNoVariantExists()
+    {
+
+    }
+
+    public function translatedReferenceInFreeModeRelatesToDefaultFile()
+    {
+
+    }
+
+    public function providingFileVariantCausesUpdateOfAllConsumersInConnectedMode()
+    {
+
+    }
+
+    public function providingFileVariantDoesNotTouchAllConsumersInFreeMode()
+    {
+
+    }
+
+    public function deletionOfFileVariantResetsAllConsumersInConnectedModeToDefaultFile()
+    {
+
+    }
+
+    public function deletionOfFileVariantDoesNotTouchAllConsumersInConnectedMode()
+    {
+
+    }
+
+    public function deletionOfDefaultFileCausesResetToDefaultFileForAllTranslations()
+    {
+        // remove default file -> remove variants -> update consumers to relate to default file
+        // leads to broken relations, this is the case already before the change.
+    }
 }
