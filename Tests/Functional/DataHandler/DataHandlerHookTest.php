@@ -33,7 +33,7 @@ class DataHandlerHookTest extends AbstractDataHandlerActionTestCase {
     /**
      * @var string
      */
-    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/Modify/DataSet/';
+    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/Modify/DataSet/SysFileTranslatable/';
 
     protected function setUp()
     {
@@ -50,9 +50,21 @@ class DataHandlerHookTest extends AbstractDataHandlerActionTestCase {
     /**
      * @test
      */
-    public function dummyTest()
+    public function translationOfMetadataWithoutNewFileVariantCopiesAndRelatesDefaultFile()
     {
-        $this->assertTrue(true);
+        $this->importScenarioDataSet('sysFileAndMetaDataToBuildUpon');
+        $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        $this->assertAssertionDataSet('metadataTranslationWithoutVariantUpload');
+    }
+
+    /**
+     * @test
+     */
+    public function translationOfMetaDataCreatesTranslatedSysFileRecord () {
+        $this->importScenarioDataSet('sysFileAndMetaDataToBuildUpon');
+        $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
+        $this->assertAssertionDataSet('metadataTranslationWithVariantUpload');
     }
 
 }
