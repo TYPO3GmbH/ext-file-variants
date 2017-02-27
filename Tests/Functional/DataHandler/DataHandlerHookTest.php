@@ -14,11 +14,83 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
+use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
   * Description
   */
-class DataHandlerHookTest extends BaseTest {
+class DataHandlerHookTest extends FunctionalTestCase {
+
+
+    /**
+     * @var ActionService
+     */
+    protected $actionService;
+
+    /**
+     * @var \TYPO3\CMS\Core\Authentication\BackendUserAuthentication
+     */
+    protected $backendUser;
+
+    protected $testExtensionsToLoad = ['typo3conf/ext/file_variants'];
+
+    /**
+     * @var string
+     */
+    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/';
+
+    /**
+     * @var string
+     */
+    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/Modify/DataSet/SysFileTranslatable/';
+
+    protected function setUp()
+    {
+        parent::setUp();
+        \TYPO3\CMS\Core\Core\Bootstrap::getInstance()->initializeLanguageObject();
+
+        $this->backendUser = $this->setUpBackendUserFromFixture(1);
+        $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
+        GeneralUtility::setSingletonInstance(FileMetadataPermissionsAspect::class, $fileMetadataPermissionAspect->reveal());
+
+        $this->importCsvScenario('initialSetup');
+        $this->setUpFrontendRootPage(1);
+
+        $this->actionService = new ActionService();
+
+        // done to prevent an error during processing
+        // it makes no difference here whether file filters apply to the data set
+        unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->actionService);
+        parent::tearDown();
+    }
+
+    /**
+     * @param string $scenarioName
+     */
+    protected function importCsvScenario(string $scenarioName = '')
+    {
+        $scenarioFileName = $this->scenarioDataSetDirectory . $scenarioName . '.csv';
+        $scenarioFileName = GeneralUtility::getFileAbsFileName($scenarioFileName);
+        $this->importCSVDataSet($scenarioFileName);
+    }
+
+    /**
+     * @param string $scenarioName
+     */
+    protected function importAssertCSVScenario(string $scenarioName = '')
+    {
+        $scenarioFileName = $this->assertionDataSetDirectory . $scenarioName . '.csv';
+        $scenarioFileName = GeneralUtility::getFileAbsFileName($scenarioFileName);
+        $this->assertCSVDataSet($scenarioFileName);
+    }
 
     /**
      * @test
@@ -26,7 +98,7 @@ class DataHandlerHookTest extends BaseTest {
     public function translationOfMetadataWithoutNewFileVariantCopiesAndRelatesDefaultFile()
     {
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
-        $this->assertAssertionDataSet('metadataTranslationWithoutVariantUpload');
+        $this->importAssertCSVScenario('metadataTranslationWithoutVariantUpload');
     }
 
     /**
@@ -35,7 +107,7 @@ class DataHandlerHookTest extends BaseTest {
     public function translationOfMetaDataCreatesTranslatedSysFileRecord () {
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
-        $this->assertAssertionDataSet('metadataTranslationWithVariantUpload');
+        $this->importAssertCSVScenario('metadataTranslationWithVariantUpload');
     }
 
     /**
@@ -46,7 +118,7 @@ class DataHandlerHookTest extends BaseTest {
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
         $this->actionService->modifyRecord('sys_file_metadata', 2, []);
-        $this->assertAssertionDataSet('metadataTranslationReplacedVariantUpload');
+        $this->importAssertCSVScenario('metadataTranslationReplacedVariantUpload');
     }
 
     /**
@@ -57,7 +129,7 @@ class DataHandlerHookTest extends BaseTest {
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
         $this->actionService->modifyRecord('sys_file_metadata', 2, []);
-        $this->assertAssertionDataSet('metadataTranslationCreatesVariantUpload');
+        $this->importAssertCSVScenario('metadataTranslationCreatesVariantUpload');
     }
 
     /**
@@ -68,7 +140,7 @@ class DataHandlerHookTest extends BaseTest {
         $this->actionService->localizeRecord('sys_file', 1, 1);
         $this->actionService->localizeRecord('sys_file_metadata', 1 ,1);
         $this->actionService->localizeRecord('tt_content', 1, 1);
-        $this->assertAssertionDataSet('ttContentTranslatedConnectedMode');
+        $this->importAssertCSVScenario('ttContentTranslatedConnectedMode');
     }
 
     /**
@@ -77,7 +149,7 @@ class DataHandlerHookTest extends BaseTest {
     public function translatedReferenceInConnectedModeRelatesToDefaultFileIfNoVariantExists()
     {
         $this->actionService->localizeRecord('tt_content', 1, 1);
-        $this->assertAssertionDataSet('ttContentTranslatedConnectedModeNoFileVariant');
+        $this->importAssertCSVScenario('ttContentTranslatedConnectedModeNoFileVariant');
     }
 
     /**
@@ -88,7 +160,7 @@ class DataHandlerHookTest extends BaseTest {
         $this->actionService->localizeRecord('sys_file', 1, 1);
         $this->actionService->localizeRecord('sys_file_metadata', 1 ,1);
         $this->actionService->copyRecordToLanguage('tt_content', 1, 1);
-        $this->assertAssertionDataSet('ttContentTranslatedFreeMode');
+        $this->importAssertCSVScenario('ttContentTranslatedFreeMode');
     }
 
     public function providingFileVariantCausesUpdateOfAllConsumersInConnectedMode()

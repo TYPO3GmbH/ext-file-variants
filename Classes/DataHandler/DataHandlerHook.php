@@ -31,10 +31,10 @@ class DataHandlerHook {
      */
     public function processDatamap_postProcessFieldArray( string $status, string $table, $id, array $fieldArray, DataHandler &$pObj ) {
 
-        //DebuggerUtility::var_dump($table, $status, 8, true);
-//        if ($table === 'sys_file_metadata' && $status === 'update') {
-//            DebuggerUtility::var_dump($fieldArray, 'fieldArray');
-//        }
+        //DebuggerUtility::var_dump($table, $status);
+        //if ($table === 'tt_content') {
+       //     DebuggerUtility::var_dump($fieldArray, 'fieldArray');
+        //}
     }
 
     public function processCmdmap_postProcess(string $command, string $table, $id, $value, DataHandler &$pObj, $pasteUpdate, array $pasteDatamap)
