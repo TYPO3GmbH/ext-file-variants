@@ -1,4 +1,4 @@
 sys_file_metadata,,,,,,,,,,,,,,,,,
-,uid,pid,cruser_id,sys_language_uid,l10n_parent,l10n_diffsource,file,title,,,,,,,,
-,1,0,1,0,0,--,1,title for first file,,,,,,,,
-,2,0,1,1,1,--,1,[Translate to deutsch:] title for first file,,,,,,,,
+,uid,pid,cruser_id,sys_language_uid,l10n_parent,file,title,,,,,,,,
+,1,0,1,0,0,1,title for first file,,,,,,,,
+,2,0,1,1,1,1,[Translate to deutsch:] title for first file,,,,,,,,

@@ -38,9 +38,15 @@ class DataHandlerHookTest extends BaseTest {
         $this->assertAssertionDataSet('metadataTranslationWithVariantUpload');
     }
 
+    /**
+     * @test
+     */
     public function translatedReferenceInConnectedModeRelatesToFileVariant()
     {
-
+        $this->actionService->localizeRecord('sys_file', 1, 1);
+        $this->actionService->localizeRecord('sys_file_metadata', 1 ,1);
+        $this->actionService->localizeRecord('tt_content', 1, 1);
+        $this->assertAssertionDataSet('ttContentTranslatedConnectedMode');
     }
 
     public function translatedReferenceInConnectedModeRelatesToDefaultFileIfNoVariantExists()

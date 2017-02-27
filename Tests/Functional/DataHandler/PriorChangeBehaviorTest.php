@@ -80,7 +80,6 @@ class PriorChangeBehaviorTest extends BaseTest
      */
     public function useFileInTranslatedRecord()
     {
-
         $this->actionService->localizeRecord('tt_content', 1, 1);
 
         /** @var QueryBuilder $queryBuilder */

@@ -50,4 +50,5 @@ call_user_func(function () {
     $GLOBALS['TCA']['sys_file']['ctrl']['languageField'] = 'sys_language_uid';
     $GLOBALS['TCA']['sys_file']['ctrl']['transOrigPointerField'] = 'l10n_parent';
     $GLOBALS['TCA']['sys_file']['ctrl']['transOrigDiffSourceField'] = 'l10n_diffsource';
+    $GLOBALS['TCA']['sys_file']['columns']['name']['l10n_mode'] ='prefixLangTitle';
 });

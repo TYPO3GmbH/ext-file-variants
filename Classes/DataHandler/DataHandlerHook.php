@@ -14,10 +14,33 @@ namespace T3G\AgencyPack\FileVariants\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
- 
- /**
+use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+
+/**
   * Description
   */
 class DataHandlerHook {
+
+    /**
+     * @param string $status
+     * @param string $table
+     * @param int $id
+     * @param array $fieldArray
+     * @param DataHandler $pObj
+     */
+    public function processDatamap_postProcessFieldArray( string $status, string $table, $id, array $fieldArray, DataHandler &$pObj ) {
+
+        //DebuggerUtility::var_dump($table, $status, 8, true);
+//        if ($table === 'sys_file_metadata' && $status === 'update') {
+//            DebuggerUtility::var_dump($fieldArray, 'fieldArray');
+//        }
+    }
+
+    public function processCmdmap_postProcess(string $command, string $table, $id, $value, DataHandler &$pObj, $pasteUpdate, array $pasteDatamap)
+    {
+        //DebuggerUtility::var_dump($table, $command, 8, true);
+
+    }
 
 }
