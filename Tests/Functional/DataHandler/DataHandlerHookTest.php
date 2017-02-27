@@ -41,6 +41,28 @@ class DataHandlerHookTest extends BaseTest {
     /**
      * @test
      */
+    public function changingFileVariantInTranslatedMetadataRecordReplacesFormerVariant()
+    {
+        $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
+        $this->actionService->modifyRecord('sys_file_metadata', 2, []);
+        $this->assertAssertionDataSet('metadataTranslationReplacedVariantUpload');
+    }
+
+    /**
+     * @test
+     */
+    public function providingFileVariantInTranslatedMetadataRecordCreatesVariant()
+    {
+        $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
+        $this->actionService->modifyRecord('sys_file_metadata', 2, []);
+        $this->assertAssertionDataSet('metadataTranslationCreatesVariantUpload');
+    }
+
+    /**
+     * @test
+     */
     public function translatedReferenceInConnectedModeRelatesToFileVariant()
     {
         $this->actionService->localizeRecord('sys_file', 1, 1);
