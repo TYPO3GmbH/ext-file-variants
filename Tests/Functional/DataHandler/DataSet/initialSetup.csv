@@ -1,17 +1,32 @@
-pages,,,,,,
-,uid,pid,sorting,deleted,title
-,1,0,256,0,FunctionalTest
-,2,1,256,0,First Content
-sys_language,,,,,,
-,uid,pid,hidden,title,flag
-,1,0,0,deutsch,de
-,2,0,0,spain,sp
-,3,0,0,russian,ru
-pages_language_overlay,,,,,,
-,uid,pid,deleted,title,sys_language_uid
-,1,1,0,[DE] FunctionalTest,1
-,2,1,0,[SP] Functional Test,2
-,3,1,0,[RU] Functional Test,3
-,4,2,0,[DE] First Content,1
-,5,2,0,[SP] First Content,2
-,6,2,0,[RU] First Content,3
+pages,,,,,,,,,,,,,
+,uid,pid,sorting,deleted,title,,,,,,,,
+,1,0,256,0,FunctionalTest,,,,,,,,
+,2,1,256,0,First Content,,,,,,,,
+sys_language,,,,,,,,,,,,,
+,uid,pid,hidden,title,flag,,,,,,,,
+,1,0,0,deutsch,de,,,,,,,,
+,2,0,0,spain,sp,,,,,,,,
+,3,0,0,russian,ru,,,,,,,,
+pages_language_overlay,,,,,,,,,,,,,
+,uid,pid,deleted,title,sys_language_uid,,,,,,,,
+,1,1,0,[DE] FunctionalTest,1,,,,,,,,
+,2,1,0,[SP] Functional Test,2,,,,,,,,
+,3,1,0,[RU] Functional Test,3,,,,,,,,
+,4,2,0,[DE] First Content,1,,,,,,,,
+,5,2,0,[SP] First Content,2,,,,,,,,
+,6,2,0,[RU] First Content,3,,,,,,,,
+sys_file_storage,,,,,,,,,,,,,
+,uid,pid,deleted,name,description,driver,configuration,,,,,,
+,1,0,0,fileadmin,local storage,Local,,,,,,,
+sys_file,,,,,,,,,,,,,
+,uid,pid,missing,storage,type,metadata,identifier,mime_type,name,size,sys_language_uid,l10n_parent,sha1
+,1,0,0,1,2,0,first file,image/png,first_file.png,474600,0,0,--
+sys_file_metadata,,,,,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,l10n_diffsource,file,title,cruser_id,,,,,
+,1,0,0,0,--,1,title for first file,1,,,,,
+tt_content,,,,,,,,,,,,,
+,uid,pid,image,,,,,,,,,,
+,1,1,1,,,,,,,,,,
+sys_file_reference,,,,,,,,,,,,,
+,uid,pid,uid_local,uid_foreign,fieldname,tablenames,sys_language_uid,l10n_parent,l10n_diffsource,,,,
+,1,1,1,1,image,tt_content,0,0,--,,,,

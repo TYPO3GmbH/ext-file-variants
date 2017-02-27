@@ -14,7 +14,6 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
-use T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler\BaseTest;
 
 /**
   * Description
@@ -26,7 +25,6 @@ class DataHandlerHookTest extends BaseTest {
      */
     public function translationOfMetadataWithoutNewFileVariantCopiesAndRelatesDefaultFile()
     {
-        $this->prepareDataSet();
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         $this->assertAssertionDataSet('metadataTranslationWithoutVariantUpload');
     }
@@ -35,7 +33,6 @@ class DataHandlerHookTest extends BaseTest {
      * @test
      */
     public function translationOfMetaDataCreatesTranslatedSysFileRecord () {
-        $this->prepareDataSet();
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
         $this->assertAssertionDataSet('metadataTranslationWithVariantUpload');

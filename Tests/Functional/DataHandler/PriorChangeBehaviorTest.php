@@ -17,8 +17,6 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\FileReference;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -39,8 +37,6 @@ class PriorChangeBehaviorTest extends BaseTest
     public function createNewSysFileRecordAndMetadataRecord()
     {
 
-        $this->prepareDataSet();
-
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file');
@@ -60,7 +56,6 @@ class PriorChangeBehaviorTest extends BaseTest
      */
     public function localizeMetaData()
     {
-        $this->prepareDataSet();
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         $this->assertAssertionDataSet('metadataTranslation');
     }
@@ -70,20 +65,14 @@ class PriorChangeBehaviorTest extends BaseTest
      */
     public function useFileInFalField()
     {
-        $this->prepareDataSet();
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('sys_file');
-        $files = $queryBuilder->select('*')->from('sys_file')->execute()->fetchAll();
+            ->getQueryBuilderForTable('sys_file_reference');
+        $references = $queryBuilder->select('*')->from('sys_file_reference')->execute()->fetchAll();
 
-        $resourceFactory = ResourceFactory::getInstance();
-        /** @var FileReference $reference */
-        $reference = $resourceFactory->getFileReferenceObject($files[0]['uid']);
-        $fileName = $reference->getOriginalFile()->getName();
-        $ttContentUid = $reference->getReferenceProperty('uid_foreign');
-        $this->assertEquals('first_file.png', $fileName);
-        $this->assertEquals(1, $ttContentUid);
+        $this->assertEquals(1, $references[0]['uid_local']);
+        $this->assertEquals(1, $references[0]['uid_foreign']);
     }
 
     /**
@@ -91,7 +80,6 @@ class PriorChangeBehaviorTest extends BaseTest
      */
     public function useFileInTranslatedRecord()
     {
-        $this->prepareDataSet();
 
         $this->actionService->localizeRecord('tt_content', 1, 1);
 
