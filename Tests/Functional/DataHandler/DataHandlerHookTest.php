@@ -49,14 +49,24 @@ class DataHandlerHookTest extends BaseTest {
         $this->assertAssertionDataSet('ttContentTranslatedConnectedMode');
     }
 
+    /**
+     * @test
+     */
     public function translatedReferenceInConnectedModeRelatesToDefaultFileIfNoVariantExists()
     {
-
+        $this->actionService->localizeRecord('tt_content', 1, 1);
+        $this->assertAssertionDataSet('ttContentTranslatedConnectedModeNoFileVariant');
     }
 
+    /**
+     * @test
+     */
     public function translatedReferenceInFreeModeRelatesToDefaultFile()
     {
-
+        $this->actionService->localizeRecord('sys_file', 1, 1);
+        $this->actionService->localizeRecord('sys_file_metadata', 1 ,1);
+        $this->actionService->copyRecordToLanguage('tt_content', 1, 1);
+        $this->assertAssertionDataSet('ttContentTranslatedFreeMode');
     }
 
     public function providingFileVariantCausesUpdateOfAllConsumersInConnectedMode()
