@@ -31,6 +31,9 @@ translated. The metadata record will relate to that new file record, which in tu
 5. Do so for all the record you wish to translate. If no translation is provided, the content language fallback chain will
 be in place as before.
 
+An extra storage will be provided by the extension, that serves as destination for the language variants. A fallback to 
+default storage is in place.
+
 Data Example
 ,,,,,,,,,,,,
 
@@ -139,6 +142,10 @@ available.
 -- Figure out how to upload without creating sys_file_references. Existing file records are no options, we need to create own one.
 Otherwise I would translate a file using another one by manipulating sys_language_uid. It would fail if the file was in use
 elsewhere as a default language item.
+
+- Setup
+-- provide non browseable filestorage
+
 
 Limits:
 

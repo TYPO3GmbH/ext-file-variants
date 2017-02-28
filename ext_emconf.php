@@ -19,7 +19,7 @@ $EM_CONF[$_EXTKEY] = array(
     ),
     'state' => 'stable',
     'uploadfolder' => 0,
-    'createDirs' => '',
+    'createDirs' => 'uploads/tx_filevariants',
     'clearCacheOnLoad' => 1,
     'author' => 'Anja Leichsenring',
     'author_email' => 'anja.leichsenring@typo3.com',

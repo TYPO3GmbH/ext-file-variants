@@ -7,3 +7,7 @@ CREATE TABLE sys_file (
 
 	KEY language (l10n_parent,sys_language_uid)
 );
+
+CREATE TABLE sys_file_metadata (
+	language_variant VARCHAR(240) DEFAULT '' NOT NULL
+);
