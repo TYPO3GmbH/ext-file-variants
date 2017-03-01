@@ -144,7 +144,7 @@ Otherwise I would translate a file using another one by manipulating sys_languag
 elsewhere as a default language item.
 
 - Setup
--- provide non browseable filestorage
+-- provide non browseable filestorage (https://docs.typo3.org/typo3cms/FileAbstractionLayerReference/Administration/Storages/Index.html)
 
 
 Limits:

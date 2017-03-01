@@ -14,16 +14,19 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
   * Description
   */
 class DataHandlerHookTest extends FunctionalTestCase {
-
+    protected $expectedErrorLogEntries = 0;
 
     /**
      * @var ActionService
@@ -68,8 +71,68 @@ class DataHandlerHookTest extends FunctionalTestCase {
 
     protected function tearDown()
     {
+        $this->cleanUpFilesAndRelatedRecords();
         unset($this->actionService);
+        $this->assertErrorLogEntries();
         parent::tearDown();
+
+    }
+
+    /**
+     * remove files and related records (sys_file, sys_file_metadata) from environment
+     */
+    protected function cleanUpFilesAndRelatedRecords() {
+        // find files in storage
+        $storage = ResourceFactory::getInstance()->getDefaultStorage();
+        $folder = $storage->getFolder('languageVariants');
+        $files = $storage->getFilesInFolder($folder);
+        $recordsToDelete = ['sys_file' =>[], 'sys_file_metadata' => []];
+        foreach ($files as $file) {
+            $storage->deleteFile($file);
+            $recordsToDelete['sys_file'][] = $file->getUid();
+            $metadata = $file->_getMetaData();
+            $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
+        }
+        $this->actionService->deleteRecords($recordsToDelete);
+    }
+
+    /**
+     * Asserts correct number of warning and error log entries.
+     *
+     * @return void
+     */
+    protected function assertErrorLogEntries()
+    {
+        if ($this->expectedErrorLogEntries === null) {
+            return;
+        }
+
+        $queryBuilder = $this->getConnectionPool()
+            ->getQueryBuilderForTable('sys_log');
+        $queryBuilder->getRestrictions()->removeAll();
+        $statement = $queryBuilder
+            ->select('*')
+            ->from('sys_log')
+            ->where(
+                $queryBuilder->expr()->in(
+                    'error',
+                    $queryBuilder->createNamedParameter([1, 2], Connection::PARAM_INT_ARRAY)
+                )
+            )
+            ->execute();
+
+        $actualErrorLogEntries = $statement->rowCount();
+        if ($actualErrorLogEntries === $this->expectedErrorLogEntries) {
+            $this->assertSame($this->expectedErrorLogEntries, $actualErrorLogEntries);
+        } else {
+            $failureMessage = 'Expected ' . $this->expectedErrorLogEntries . ' entries in sys_log, but got ' . $actualErrorLogEntries . LF;
+            while ($entry = $statement->fetch()) {
+                $entryData = unserialize($entry['log_data']);
+                $entryMessage = vsprintf($entry['details'], $entryData);
+                $failureMessage .= '* ' . $entryMessage . LF;
+            }
+            $this->fail($failureMessage);
+        }
     }
 
     /**
@@ -105,8 +168,11 @@ class DataHandlerHookTest extends FunctionalTestCase {
      * @test
      */
     public function translationOfMetaDataCreatesTranslatedSysFileRecord () {
-        $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
-        //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.JPG';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
+
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
         $this->importAssertCSVScenario('metadataTranslationWithVariantUpload');
     }
 
@@ -127,8 +193,28 @@ class DataHandlerHookTest extends FunctionalTestCase {
     public function providingFileVariantInTranslatedMetadataRecordCreatesVariant()
     {
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+
+        $testFile = GeneralUtility::getFileAbsFileName('EXT:file_variant/Tests/Functional/Fixture/TestFiles/cat_1.JPG');
+        $copyFileName = pathinfo($testFile, PATHINFO_FILENAME) . '_01.' . pathinfo($testFile, PATHINFO_EXTENSION) ;
+        $copyFilePath = pathinfo($testFile, PATHINFO_DIRNAME) . '/' . $copyFileName;
+        if (file_exists($testFile) && !file_exists($copyFilePath)) {
+                copy($testFile, $copyFilePath);
+        }
+        $filename = pathinfo($copyFilePath, PATHINFO_BASENAME);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $type = $finfo->file($copyFilePath);
+        $size = filesize($copyFilePath);
+        $GLOBALS['_FILES'] = [
+            [
+                'tmp_name' => $copyFilePath,
+                'name' => $filename,
+                'size' => $size,
+                'type' => $type
+            ]
+        ];
+
         //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
-        $this->actionService->modifyRecord('sys_file_metadata', 2, []);
+        $this->actionService->modifyRecord('sys_file_metadata', 2, ['language_variant' => $filename]);
         $this->importAssertCSVScenario('metadataTranslationCreatesVariantUpload');
     }
 
@@ -188,4 +274,6 @@ class DataHandlerHookTest extends FunctionalTestCase {
         // remove default file -> remove variants -> update consumers to relate to default file
         // leads to broken relations, this is the case already before the change.
     }
+
+
 }
