@@ -192,29 +192,11 @@ class DataHandlerHookTest extends FunctionalTestCase {
      */
     public function providingFileVariantInTranslatedMetadataRecordCreatesVariant()
     {
-        $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
 
-        $testFile = GeneralUtility::getFileAbsFileName('EXT:file_variant/Tests/Functional/Fixture/TestFiles/cat_1.JPG');
-        $copyFileName = pathinfo($testFile, PATHINFO_FILENAME) . '_01.' . pathinfo($testFile, PATHINFO_EXTENSION) ;
-        $copyFilePath = pathinfo($testFile, PATHINFO_DIRNAME) . '/' . $copyFileName;
-        if (file_exists($testFile) && !file_exists($copyFilePath)) {
-                copy($testFile, $copyFilePath);
-        }
-        $filename = pathinfo($copyFilePath, PATHINFO_BASENAME);
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $type = $finfo->file($copyFilePath);
-        $size = filesize($copyFilePath);
-        $GLOBALS['_FILES'] = [
-            [
-                'tmp_name' => $copyFilePath,
-                'name' => $filename,
-                'size' => $size,
-                'type' => $type
-            ]
-        ];
-
-        //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
-        $this->actionService->modifyRecord('sys_file_metadata', 2, ['language_variant' => $filename]);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
         $this->importAssertCSVScenario('metadataTranslationCreatesVariantUpload');
     }
 
