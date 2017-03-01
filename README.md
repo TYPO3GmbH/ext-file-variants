@@ -146,6 +146,10 @@ elsewhere as a default language item.
 - Setup
 -- provide non browseable filestorage (https://docs.typo3.org/typo3cms/FileAbstractionLayerReference/Administration/Storages/Index.html)
 
+- History
+-- sys_file_metadata keeps track about changing input fields, but it seems not about changing files. Check that.
+-- File records must not be replaced, but rather soft deleted in order to provide rollback. Check that.
+
 
 Limits:
 
