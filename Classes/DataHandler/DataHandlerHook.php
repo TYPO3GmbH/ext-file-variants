@@ -18,11 +18,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use T3G\AgencyPack\FileVariants\Service\FileHandlingService;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
-use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\Folder;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
@@ -79,9 +75,6 @@ class DataHandlerHook
 
         }
     }
-
-
-
 
 
     public function processCmdmap_postProcess(
@@ -146,17 +139,18 @@ class DataHandlerHook
             ->where(
                 $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($variantFileUid, \PDO::PARAM_INT))
             )->execute();
+
         $variantMetaData = $file->_getMetaData();
         $variantMetaDataUid = $variantMetaData['uid'];
+
         /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->update('sys_file_metadata')
-            ->set('sys_language_uid', $sys_language_uid)
-            ->set('l10n_parent', $id)
+        $queryBuilder->delete('sys_file_metadata')
             ->where(
                 $queryBuilder->expr()->eq('uid',
                     $queryBuilder->createNamedParameter($variantMetaDataUid, \PDO::PARAM_INT))
             )->execute();
+
     }
 
     /**

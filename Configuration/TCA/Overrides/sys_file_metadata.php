@@ -15,7 +15,7 @@ call_user_func(function () {
                         'disabled' => true,
                     ],
                 ],
-                'uploadfolder' => 'uploads/tx_filevariants',
+                'uploadfolder' => 'typo3temp/uploads',
                 'size' => 1,
                 'maxsize' => 50000,
                 'maxitems' => 1,
