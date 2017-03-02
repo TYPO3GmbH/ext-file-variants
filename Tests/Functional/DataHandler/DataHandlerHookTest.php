@@ -203,18 +203,6 @@ class DataHandlerHookTest extends FunctionalTestCase {
         $this->importAssertCSVScenario('metadataTranslationReplacedVariantUpload');
     }
 
-    /**
-     * @test
-     */
-    public function providingFileVariantInTranslatedMetadataRecordCreatesVariant()
-    {
-        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg';
-        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
-
-        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
-        $this->importAssertCSVScenario('metadataTranslationCreatesVariantUpload');
-    }
 
     /**
      * @test
