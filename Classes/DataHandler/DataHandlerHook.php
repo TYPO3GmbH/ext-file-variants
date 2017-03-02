@@ -111,9 +111,9 @@ class DataHandlerHook
      * @param string $command
      * @param string $table
      * @param string|int $id recordUid
-     * @param $value Command Value
+     * @param mixed $value Command Value
      * @param DataHandler $pObj
-     * @param $pasteUpdate
+     * @param mixed $pasteUpdate
      * @param array $pasteDatamap
      */
     public function processCmdmap_postProcess(

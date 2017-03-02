@@ -94,7 +94,7 @@ class DataHandlerHookTest extends FunctionalTestCase {
                 $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
             }
         } catch (\Exception $exception) {
-            echo $exception->getMessage();
+            // sometimes, there is no folder to empty. Let's ignore that.
         }
         $this->actionService->deleteRecords($recordsToDelete);
 
