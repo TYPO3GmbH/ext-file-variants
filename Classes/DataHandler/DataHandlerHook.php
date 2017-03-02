@@ -20,44 +20,12 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Description
  */
 class DataHandlerHook
 {
-
-    /**
-     * used to add language information to file variant records
-     *
-     * @param string $status
-     * @param string $table
-     * @param int $id
-     * @param array $fieldArray
-     */
-    public function processDatamap_postProcessFieldArray(
-        string $status,
-        string $table,
-        $id,
-        array $fieldArray
-    ) {
-        if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('language_variant',
-                $fieldArray)
-        ) {
-            /** @var FileHandlingService $fileHandlingService */
-            $fileHandlingService = GeneralUtility::makeInstance(FileHandlingService::class);
-
-            $file = $fileHandlingService->moveUploadedFileAndCreateFileObject($fieldArray['language_variant']);
-
-            if ($file instanceof File && $file->getUid() > 0) {
-                $sys_language_uid = $this->retrieveCurrentSysLanguageUid((int)$id);
-                $currentFileUid = $this->retrieveCurrentSysFile((int)$id);
-                $this->updateFileVariantRecordsWithLanguageInformation($id, $file, $sys_language_uid, $currentFileUid);
-                $this->updateMetadataWithFileVariant((int)$id, (int)$file->getUid());
-            }
-        }
-    }
 
     /**
      * used to remove unusable information from metadata record
@@ -70,12 +38,23 @@ class DataHandlerHook
      */
     public function processDatamap_afterDatabaseOperations(string $status, string $table, $id, array $fieldArray)
     {
-        if ($table === 'sys_file_metadata' && $status === 'update' && $fieldArray['language_variant']) {
-            $this->removeFileVariantStringFromRecord((int)$id);
+        if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('language_variant',
+                $fieldArray) && ((int)$fieldArray['language_variant'] !== '') && !array_key_exists('file', $fieldArray)
+        ) {
+            /** @var FileHandlingService $fileHandlingService */
+            $fileHandlingService = GeneralUtility::makeInstance(FileHandlingService::class);
 
+            $file = $fileHandlingService->moveUploadedFileAndCreateFileObject($fieldArray['language_variant']);
+
+            if ($file instanceof File && $file->getUid() > 0) {
+                $sys_language_uid = $this->retrieveCurrentSysLanguageUid((int)$id);
+                $currentFileUid = $this->retrieveCurrentSysFile((int)$id);
+                $this->updateFileVariantRecordsWithLanguageInformation($file, $sys_language_uid, $currentFileUid);
+                $this->updateMetadataWithFileVariant((int)$id, (int)$file->getUid());
+            }
+            $this->removeFileVariantStringFromRecord((int)$id);
         }
     }
-
 
     public function processCmdmap_postProcess(
         string $command,
@@ -123,34 +102,40 @@ class DataHandlerHook
     }
 
     /**
-     * @param int $id
      * @param File $file
      * @param int $sys_language_uid
      * @param int $currentFileUid
      */
-    protected function updateFileVariantRecordsWithLanguageInformation(int $id, File $file, int $sys_language_uid, int $currentFileUid)
-    {
+    protected function updateFileVariantRecordsWithLanguageInformation(
+        File $file,
+        int $sys_language_uid,
+        int $currentFileUid
+    ) {
+        $changeData = [];
         $variantFileUid = $file->getUid();
-        /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-        $queryBuilder->update('sys_file')
-            ->set('sys_language_uid', $sys_language_uid)
-            ->set('l10n_parent', $currentFileUid)
-            ->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($variantFileUid, \PDO::PARAM_INT))
-            )->execute();
+        $changeData['sys_file'][$variantFileUid] = [
+            'sys_language_uid' => $sys_language_uid,
+            'l10n_parent' => $currentFileUid
+        ];
 
+        /** @var DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start($changeData, []);
+        $dataHandler->process_datamap();
+
+        // this record is not needed, because the variant file is bound to the translated metadata record of the original file.
         $variantMetaData = $file->_getMetaData();
-        $variantMetaDataUid = $variantMetaData['uid'];
+        if (isset($variantMetaData['uid']) && $variantMetaData['uid'] > 0) {
+            $variantMetaDataUid = $variantMetaData['uid'];
 
-        /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->delete('sys_file_metadata')
-            ->where(
-                $queryBuilder->expr()->eq('uid',
-                    $queryBuilder->createNamedParameter($variantMetaDataUid, \PDO::PARAM_INT))
-            )->execute();
-
+            /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+            $queryBuilder->delete('sys_file_metadata')
+                ->where(
+                    $queryBuilder->expr()->eq('uid',
+                        $queryBuilder->createNamedParameter($variantMetaDataUid, \PDO::PARAM_INT))
+                )->execute();
+        }
     }
 
     /**
@@ -159,18 +144,22 @@ class DataHandlerHook
      */
     protected function updateMetadataWithFileVariant(int $id, int $fileUid)
     {
-        /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->update('sys_file_metadata')
-            ->set('file', $fileUid)
-            ->set('language_variant', '')
-            ->where(
-                $queryBuilder->expr()->eq('uid',
-                    $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
-            )->execute();
+        $changeData = [];
+        $changeData['sys_file_metadata'][$id] = [
+            'file' => $fileUid,
+        ];
+
+        /** @var DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start($changeData, []);
+        $dataHandler->process_datamap();
+
     }
 
     /**
+     * While using DataHandler to empty the field, it tries to delete the linked file
+     * this is already moved, so the operation fails. Hard removing the field value is needed here.
+     *
      * @param int $id
      */
     protected function removeFileVariantStringFromRecord(int $id)
