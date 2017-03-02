@@ -36,8 +36,59 @@ class DataHandlerHook
      * @param $id
      * @param array $fieldArray
      */
-    public function processDatamap_afterDatabaseOperations(string $status, string $table, $id, array $fieldArray)
+    public function processDatamap_afterDatabaseOperations(string $status, string $table, $id, array $fieldArray, DataHandler $pObj)
     {
+
+        // [AL 1-2] a translated sys_file record comes in - this results from a localize sys_file_metadata action.
+        // see @[AL 1-1]
+        // the file needs to be related to the language record of that metadata record (yet unknown) and the
+        // files own metadata record (if exists) needs to be removed.
+        if ($table === 'sys_file' && $status === 'new' && isset($fieldArray['sys_language_uid']) && $fieldArray['sys_language_uid'] > 0) {
+
+            // get localized metadata record from language parent of this file
+            /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+            $parentFileMetadataRecordUid = (int)$queryBuilder->select('uid')->from('sys_file_metadata')->where(
+                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fieldArray['l10n_parent'], \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($fieldArray['sys_language_uid'], \PDO::PARAM_INT))
+            )->execute()->fetchColumn();
+
+            // relate that new file record to metadata translation
+            $fileUid = $pObj->substNEWwithIDs[$id];
+            $datamap = [
+                'sys_file_metadata' => [
+                    $parentFileMetadataRecordUid => [
+                        'file' => $fileUid,
+                    ],
+                ],
+            ];
+            /** @var DataHandler $dataHandler */
+            $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+            $dataHandler->start($datamap, []);
+            $dataHandler->process_datamap();
+
+            // remove the metadata record for the translated file, if there is any
+            /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+            $metaDataRecordToDelete = $queryBuilder->select('uid')->from('sys_file_metadata')->where(
+                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT))
+            )->execute()->fetchColumn();
+
+            if ((int)$metaDataRecordToDelete > 0) {
+                $commandMap = [
+                    'sys_file_metadata' => [
+                        $metaDataRecordToDelete => 'delete',
+                    ],
+                ];
+                $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+                $dataHandler->start([], $commandMap);
+                $dataHandler->process_cmdmap();
+            }
+
+        }
+
+        // [AL 2-1] a metadata record receives a new file to be used as language variant
         if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('language_variant',
                 $fieldArray) && ((int)$fieldArray['language_variant'] !== '') && !array_key_exists('file', $fieldArray)
         ) {
@@ -56,6 +107,15 @@ class DataHandlerHook
         }
     }
 
+    /**
+     * @param string $command
+     * @param string $table
+     * @param string|int $id recordUid
+     * @param $value Command Value
+     * @param DataHandler $pObj
+     * @param $pasteUpdate
+     * @param array $pasteDatamap
+     */
     public function processCmdmap_postProcess(
         string $command,
         string $table,
@@ -65,8 +125,33 @@ class DataHandlerHook
         $pasteUpdate,
         array $pasteDatamap
     ) {
-        //DebuggerUtility::var_dump($table, $command, 8, true);
+        if ($table === 'sys_file_metadata' && $command === 'localize') {
 
+            // get the complete record for processed uid
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+            $metadata = $queryBuilder->select('file', 'sys_language_uid')->from($table)->where(
+                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
+            )->execute()->fetch();
+
+            // localize the related file record from language parent
+            $fileUid = $metadata['file'];
+            $commandMap = [
+                'sys_file' => [
+                    $fileUid => [
+                        'localize' => $value
+                    ],
+                ],
+            ];
+            /** @var DataHandler $dataHandler */
+            $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+            $dataHandler->start([], $commandMap);
+            $dataHandler->process_cmdmap();
+
+            // [AL 1-1] this leads to a new process_datamap call in DataHandler, that is again hooked into.
+            // see @[AL 1-2]
+            // the resulting new file record is related with the newly created metadata record.
+        }
     }
 
     /**
@@ -94,11 +179,20 @@ class DataHandlerHook
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file_metadata');
-        $metaDataRecord = $queryBuilder->select('*')->from('sys_file_metadata')->where(
+        $metadataParent = (int)$queryBuilder->select('l10n_parent')->from('sys_file_metadata')->where(
             $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
-        )->execute()->fetchAll();
+        )->execute()->fetchColumn();
 
-        return (int)$metaDataRecord[0]['file'];
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable('sys_file_metadata');
+        $file = $queryBuilder->select('*')->from('sys_file_metadata')->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($metadataParent, \PDO::PARAM_INT)),
+            $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT))
+        )->execute()->fetch();
+
+        return (int)$file['file'];
     }
 
     /**
@@ -111,16 +205,15 @@ class DataHandlerHook
         int $sys_language_uid,
         int $currentFileUid
     ) {
-        $changeData = [];
         $variantFileUid = $file->getUid();
-        $changeData['sys_file'][$variantFileUid] = [
+        $dataMap['sys_file'][$variantFileUid] = [
             'sys_language_uid' => $sys_language_uid,
             'l10n_parent' => $currentFileUid
         ];
 
         /** @var DataHandler $dataHandler */
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-        $dataHandler->start($changeData, []);
+        $dataHandler->start($dataMap, []);
         $dataHandler->process_datamap();
 
         // this record is not needed, because the variant file is bound to the translated metadata record of the original file.
@@ -144,16 +237,25 @@ class DataHandlerHook
      */
     protected function updateMetadataWithFileVariant(int $id, int $fileUid)
     {
-        $changeData = [];
-        $changeData['sys_file_metadata'][$id] = [
+        // delete the currently related file record
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $currentFileUid = (int)$queryBuilder->select('file')->from('sys_file_metadata')->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
+        )->execute()->fetchColumn();
+
+        $commandMap = [];
+        $commandMap['sys_file'][$currentFileUid] = ['delete' => true];
+
+        $dataMap = [];
+        $dataMap['sys_file_metadata'][$id] = [
             'file' => $fileUid,
         ];
 
         /** @var DataHandler $dataHandler */
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-        $dataHandler->start($changeData, []);
+        $dataHandler->start($dataMap, $commandMap);
+        $dataHandler->process_cmdmap();
         $dataHandler->process_datamap();
-
     }
 
     /**

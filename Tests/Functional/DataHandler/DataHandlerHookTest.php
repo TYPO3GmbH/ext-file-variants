@@ -19,7 +19,6 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
@@ -84,16 +83,21 @@ class DataHandlerHookTest extends FunctionalTestCase {
     protected function cleanUpFilesAndRelatedRecords() {
         // find files in storage
         $storage = ResourceFactory::getInstance()->getDefaultStorage();
-        $folder = $storage->getFolder('languageVariants');
-        $files = $storage->getFilesInFolder($folder);
-        $recordsToDelete = ['sys_file' =>[], 'sys_file_metadata' => []];
-        foreach ($files as $file) {
-            $storage->deleteFile($file);
-            $recordsToDelete['sys_file'][] = $file->getUid();
-            $metadata = $file->_getMetaData();
-            $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
+        $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
+        try {
+            $folder = $storage->getFolder('languageVariants');
+            $files = $storage->getFilesInFolder($folder);
+            foreach ($files as $file) {
+                $storage->deleteFile($file);
+                $recordsToDelete['sys_file'][] = $file->getUid();
+                $metadata = $file->_getMetaData();
+                $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
+            }
+        } catch (\Exception $exception) {
+            echo $exception->getMessage();
         }
         $this->actionService->deleteRecords($recordsToDelete);
+
     }
 
     /**
@@ -156,6 +160,7 @@ class DataHandlerHookTest extends FunctionalTestCase {
     }
 
     /**
+     * see DataHandlerHook scenario [AL 1]
      * @test
      */
     public function translationOfMetadataWithoutNewFileVariantCopiesAndRelatesDefaultFile()
@@ -165,6 +170,8 @@ class DataHandlerHookTest extends FunctionalTestCase {
     }
 
     /**
+     * see DataHandlerHook scenario [AL 2]
+     *
      * @test
      */
     public function translationOfMetaDataCreatesTranslatedSysFileRecord () {

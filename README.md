@@ -149,6 +149,8 @@ elsewhere as a default language item.
 - History
 -- sys_file_metadata keeps track about changing input fields, but it seems not about changing files. Check that.
 -- File records must not be replaced, but rather soft deleted in order to provide rollback. Check that.
+-- probably no ressurection of file records possible. sys_file accepts no soft delete, the driver immediately does an unlink to the file.
+There is something about the recycler, maybe this can be used. Investigate.
 
 
 Limits:
