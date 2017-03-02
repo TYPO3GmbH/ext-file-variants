@@ -184,13 +184,22 @@ class DataHandlerHookTest extends FunctionalTestCase {
     }
 
     /**
+     *
      * @test
      */
     public function changingFileVariantInTranslatedMetadataRecordReplacesFormerVariant()
     {
-        $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
-        //@todo simulate upload of new file into translated metadata record (will end up in sys_file)
-        $this->actionService->modifyRecord('sys_file_metadata', 2, []);
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        // first time providing a variant
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+
+        // replacing that variant with another one
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_4.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+
         $this->importAssertCSVScenario('metadataTranslationReplacedVariantUpload');
     }
 
