@@ -19,12 +19,13 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
   * Description
   */
-class DataHandlerHookTest extends FunctionalTestCase {
+class FileVariantsHandlingTest extends FunctionalTestCase {
     protected $expectedErrorLogEntries = 0;
 
     /**
@@ -42,12 +43,12 @@ class DataHandlerHookTest extends FunctionalTestCase {
     /**
      * @var string
      */
-    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/';
+    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/FileVariantsHandling/';
 
     /**
      * @var string
      */
-    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/Modify/DataSet/SysFileTranslatable/';
+    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/FileVariantsHandling/';
 
     protected function setUp()
     {
@@ -204,35 +205,7 @@ class DataHandlerHookTest extends FunctionalTestCase {
     }
 
 
-    /**
-     * @test
-     */
-    public function translatedReferenceInConnectedModeRelatesToFileVariant()
-    {
-        $this->actionService->localizeRecord('sys_file', 1, 1);
-        $this->actionService->localizeRecord('sys_file_metadata', 1 ,1);
-        $this->actionService->localizeRecord('tt_content', 1, 1);
-        $this->importAssertCSVScenario('ttContentTranslatedConnectedMode');
-    }
 
-    /**
-     * @test
-     */
-    public function translatedReferenceInConnectedModeRelatesToDefaultFileIfNoVariantExists()
-    {
-        $this->actionService->localizeRecord('tt_content', 1, 1);
-        $this->importAssertCSVScenario('ttContentTranslatedConnectedModeNoFileVariant');
-    }
-
-    /**
-     * @test
-     */
-    public function translatedReferenceInFreeModeRelatesToDefaultFile()
-    {
-        $this->actionService->localizeRecord('sys_file_metadata', 1 ,1);
-        $this->actionService->copyRecordToLanguage('tt_content', 1, 1);
-        $this->importAssertCSVScenario('ttContentTranslatedFreeMode');
-    }
 
     public function providingFileVariantCausesUpdateOfAllConsumersInConnectedMode()
     {
