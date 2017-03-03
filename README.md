@@ -142,6 +142,7 @@ available.
 -- Figure out how to upload without creating sys_file_references. Existing file records are no options, we need to create own one.
 Otherwise I would translate a file using another one by manipulating sys_language_uid. It would fail if the file was in use
 elsewhere as a default language item.
+-- Exclude languageVariant Storage / Folder from search
 
 - Setup
 -- provide non browseable filestorage (https://docs.typo3.org/typo3cms/FileAbstractionLayerReference/Administration/Storages/Index.html)
