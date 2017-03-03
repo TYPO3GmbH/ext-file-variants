@@ -229,7 +229,6 @@ class DataHandlerHookTest extends FunctionalTestCase {
      */
     public function translatedReferenceInFreeModeRelatesToDefaultFile()
     {
-        $this->actionService->localizeRecord('sys_file', 1, 1);
         $this->actionService->localizeRecord('sys_file_metadata', 1 ,1);
         $this->actionService->copyRecordToLanguage('tt_content', 1, 1);
         $this->importAssertCSVScenario('ttContentTranslatedFreeMode');

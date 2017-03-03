@@ -1,8 +1,0 @@
-sys_file,,,,,,,,,,,,,
-,uid,pid,missing,storage,type,metadata,identifier,mime_type,name,sha1,size,sys_language_uid,l10n_parent
-,1,0,0,1,2,0,first file,image/png,first_file.png,--,474600,0,0
-,2,0,0,1,2,0,translated second file,image/png,second_file_de.png,--,474600,1,1
-sys_file_metadata,,,,,,,,,,,,,
-,uid,pid,cruser_id,sys_language_uid,l10n_parent,file,title,,,,,,
-,1,0,1,0,0,1,title for first file,,,,,,
-,2,0,1,1,1,3,[Translate to deutsch:] title for second file,,,,,,
