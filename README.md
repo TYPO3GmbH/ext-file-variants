@@ -159,3 +159,4 @@ Limits:
 - no upload possibility in CEs or other FormEngine provided sources anymore. File upload only in file module.
 - sys_language_uid = -1 is not supported. Remove from the system.
 - file variants will only take effect in connected mode.
+- pages receives no support for file variants. If you can come up with a valid use case, that might change.

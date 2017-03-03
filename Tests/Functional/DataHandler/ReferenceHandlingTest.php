@@ -173,4 +173,5 @@ class ReferenceHandlingTest extends FunctionalTestCase {
         $this->actionService->copyRecordToLanguage('tt_content', 1, 1);
         $this->importAssertCSVScenario($scenarioName);
     }
+
 }
