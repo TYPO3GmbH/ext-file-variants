@@ -38,8 +38,6 @@ class FileVariantsHandlingTest extends FunctionalTestCase {
      */
     protected $backendUser;
 
-    protected $testExtensionsToLoad = ['typo3conf/ext/file_variants'];
-
     /**
      * @var string
      */
@@ -52,6 +50,7 @@ class FileVariantsHandlingTest extends FunctionalTestCase {
 
     protected function setUp()
     {
+        $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
         parent::setUp();
         \TYPO3\CMS\Core\Core\Bootstrap::getInstance()->initializeLanguageObject();
 
