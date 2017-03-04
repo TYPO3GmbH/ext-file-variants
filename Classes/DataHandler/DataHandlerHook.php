@@ -121,8 +121,8 @@ class DataHandlerHook
         // if a language variant for any referenced file exists, the reference record needs to link to that variant file record
         // if no variant exists, the record links to the default file
 
-        // forget about sys_file_reference here
-        if ($table !== 'sys_file_reference') {
+        // forget about sys_file_reference and pages here
+        if ($table !== 'sys_file_reference' && $table !== 'pages') {
 
             // find out, whether there is a FAL field in this table
             $tcaColumns = $GLOBALS['TCA'][$table]['columns'];
