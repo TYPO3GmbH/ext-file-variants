@@ -50,10 +50,9 @@ class ReferenceHandlingTest extends FunctionalTestCase {
     protected function setUp()
     {
 
-        parent::setUp();
         $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
 
-
+        parent::setUp();
         \TYPO3\CMS\Core\Core\Bootstrap::getInstance()->initializeLanguageObject();
 
         $this->backendUser = $this->setUpBackendUserFromFixture(1);
@@ -65,6 +64,7 @@ class ReferenceHandlingTest extends FunctionalTestCase {
         // done to prevent an error during processing
         // it makes no difference here whether file filters apply to the data set
         //unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
+
     }
 
     protected function tearDown()
