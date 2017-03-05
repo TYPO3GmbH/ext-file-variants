@@ -37,8 +37,6 @@ class ReferenceHandlingTest extends FunctionalTestCase {
      */
     protected $backendUser;
 
-    protected $testExtensionsToLoad = ['typo3conf/ext/file_variants'];
-
     /**
      * @var string
      */
@@ -51,7 +49,11 @@ class ReferenceHandlingTest extends FunctionalTestCase {
 
     protected function setUp()
     {
+
         parent::setUp();
+        $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
+
+
         \TYPO3\CMS\Core\Core\Bootstrap::getInstance()->initializeLanguageObject();
 
         $this->backendUser = $this->setUpBackendUserFromFixture(1);
