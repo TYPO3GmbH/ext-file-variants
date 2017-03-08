@@ -176,7 +176,7 @@ class FileVariantsHandlingTest extends FunctionalTestCase {
      */
     public function translationOfMetaDataCreatesTranslatedSysFileRecord () {
         $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.JPG';
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_1.JPG';
         list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
 
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
@@ -191,12 +191,12 @@ class FileVariantsHandlingTest extends FunctionalTestCase {
     {
         $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         // first time providing a variant
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg';
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_3.jpg';
         list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
 
         // replacing that variant with another one
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_4.jpg';
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_4.jpg';
         list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
 

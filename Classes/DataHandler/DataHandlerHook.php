@@ -53,49 +53,8 @@ class DataHandlerHook
         // the file needs to be related to the language record of that metadata record (yet unknown) and the
         // files own metadata record (if exists) needs to be removed.
         if ($table === 'sys_file' && $status === 'new' && isset($fieldArray['sys_language_uid']) && $fieldArray['sys_language_uid'] > 0) {
+            $this->linkTranslatedFileToTranslatedSysFileMetadataRecord($id, $fieldArray, $pObj);
 
-            // get localized metadata record from language parent of this file
-            /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-            $parentFileMetadataRecordUid = (int)$queryBuilder->select('uid')->from('sys_file_metadata')->where(
-                $queryBuilder->expr()->eq('file',
-                    $queryBuilder->createNamedParameter($fieldArray['l10n_parent'], \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('sys_language_uid',
-                    $queryBuilder->createNamedParameter($fieldArray['sys_language_uid'], \PDO::PARAM_INT))
-            )->execute()->fetchColumn();
-
-            // relate that new file record to metadata translation
-            $fileUid = $pObj->substNEWwithIDs[$id];
-            $datamap = [
-                'sys_file_metadata' => [
-                    $parentFileMetadataRecordUid => [
-                        'file' => $fileUid,
-                    ],
-                ],
-            ];
-            /** @var DataHandler $dataHandler */
-            $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-            $dataHandler->start($datamap, []);
-            $dataHandler->process_datamap();
-
-            // remove the metadata record for the translated file, if there is any
-            /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-            $metaDataRecordToDelete = $queryBuilder->select('uid')->from('sys_file_metadata')->where(
-                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT))
-            )->execute()->fetchColumn();
-
-            if ((int)$metaDataRecordToDelete > 0) {
-                $commandMap = [
-                    'sys_file_metadata' => [
-                        $metaDataRecordToDelete => 'delete',
-                    ],
-                ];
-                $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-                $dataHandler->start([], $commandMap);
-                $dataHandler->process_cmdmap();
-            }
 
         }
 
@@ -122,102 +81,9 @@ class DataHandlerHook
         // if no variant exists, the record links to the default file
 
         // forget about sys_file_reference and pages here
-        if ($table !== 'sys_file_reference' && $table !== 'pages') {
-
-            // find out, whether there is a FAL field in this table
-            $tcaColumns = $GLOBALS['TCA'][$table]['columns'];
-            $tableFalFields = [];
-            foreach ($tcaColumns as $fieldName => $fieldConfig) {
-                if ($fieldConfig['config']['foreign_table'] === 'sys_file_reference') {
-                    $tableFalFields[] = $fieldName;
-                }
-            }
-
-            // find out, whether this record is sys_language_uid > 0 and connected mode
-            $languageField = $GLOBALS['TCA'][$table]['ctrl']['languageField'];
-            $languageParentField = $GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'];
-            // is the table translatable at all?
-            if (isset($languageField, $languageParentField)) {
-                if (isset($pObj->substNEWwithIDs[$id])) {
-                    $id = $pObj->substNEWwithIDs[$id];
-                }
-                /** @var QueryBuilder $queryBuilder */
-                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-                // the record might be set disabled in this operation, then we still must update the references
-                $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
-                $record = $queryBuilder->select($languageField, $languageParentField, ...
-                    $tableFalFields)->from($table)->where(
-                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
-                )->execute()->fetch();
-
-                // if free mode, no parent is set
-                $sys_language_uid = $record[$languageField];
-                if (isset($sys_language_uid) && $sys_language_uid > 0 && $record[$languageParentField] > 0) {
-                    // get the references
-                    foreach ($tableFalFields as $falField) {
-                        // I will not rely on the refindex here. Just check the references table
-                        /** @var QueryBuilder $queryBuilder */
-                        $queryBuilder = $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
-                        $references = $queryBuilder->select('uid', 'uid_local')->from('sys_file_reference')->where(
-                            $queryBuilder->expr()->eq('uid_foreign',
-                                $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)),
-                            $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['columns'][$falField]['config']['foreign_table_field'],
-                                $queryBuilder->createNamedParameter($table, \PDO::PARAM_STR)),
-                            $queryBuilder->expr()->eq('fieldname',
-                                $queryBuilder->createNamedParameter($GLOBALS['TCA'][$table]['columns'][$falField]['config']['foreign_match_fields']['fieldname'],
-                                    \PDO::PARAM_STR)),
-                            $queryBuilder->expr()->eq('sys_language_uid',
-                                $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT))
-                        )->execute()->fetchAll();
-                        if (count($references) > 0) {
-                            foreach ($references as $reference) {
-                                $referencedFile = $reference['uid_local'];
-                                if (isset($referencedFile) && $referencedFile > 0) {
-                                    $referenceUid = $reference['uid'];
-                                    // check the file and its variants
-                                    /** @var QueryBuilder $queryBuilder */
-                                    $queryBuilder = $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-                                    $fileLanguage = $queryBuilder->select('sys_language_uid')->from('sys_file')->where(
-                                        $queryBuilder->expr()->eq('uid',
-                                            $queryBuilder->createNamedParameter($referencedFile, \PDO::PARAM_INT))
-                                    )->execute()->fetchColumn();
-                                    if (isset($fileLanguage) && $fileLanguage !== $sys_language_uid) {
-                                        /** @var QueryBuilder $queryBuilder */
-                                        $queryBuilder = $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-                                        $tranlatedFileUid = $queryBuilder->select('uid')->from('sys_file')->where(
-                                            $queryBuilder->expr()->eq('sys_language_uid',
-                                                $queryBuilder->createNamedParameter($sys_language_uid,
-                                                    \PDO::PARAM_INT)),
-                                            $queryBuilder->expr()->eq('l10n_parent',
-                                                $queryBuilder->createNamedParameter($referencedFile, \PDO::PARAM_INT))
-                                        )->execute()->fetchColumn();
-                                        if ($tranlatedFileUid > 0) {
-                                            $datamap = [
-                                                'sys_file_reference' => [
-                                                    $referenceUid => [
-                                                        'uid_local' => $tranlatedFileUid
-                                                    ]
-                                                ],
-                                            ];
-                                            /** @var DataHandler $dataHandler */
-                                            $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-                                            $dataHandler->start($datamap, []);
-                                            $dataHandler->process_datamap();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        if ($table !== 'sys_file_reference' && $table !== 'pages' && $table !== 'pages_language_overlay') {
+            $this->relateTranslatedFileToTranslatedSysFileReference($table, $id, $pObj);
         }
-
-
-        // check the availability of a variant for this language
-
-        // update the record if necessary
-
     }
 
     /**
@@ -225,18 +91,12 @@ class DataHandlerHook
      * @param string $table
      * @param string|int $id recordUid
      * @param mixed $value Command Value
-     * @param DataHandler $pObj
-     * @param mixed $pasteUpdate
-     * @param array $pasteDatamap
      */
     public function processCmdmap_postProcess(
         string $command,
         string $table,
         $id,
-        $value,
-        DataHandler &$pObj,
-        $pasteUpdate,
-        array $pasteDatamap
+        $value
     ) {
         if ($table === 'sys_file_metadata' && $command === 'localize') {
 
@@ -350,7 +210,6 @@ class DataHandlerHook
      */
     protected function updateMetadataWithFileVariant(int $id, int $fileUid)
     {
-        // delete the currently related file record
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
         $currentFileUid = (int)$queryBuilder->select('file')->from('sys_file_metadata')->where(
             $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
@@ -387,6 +246,192 @@ class DataHandlerHook
                 $queryBuilder->expr()->eq('uid',
                     $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
             )->execute();
+    }
+
+    /**
+     * @param string|int $id
+     * @param array $fieldArray
+     * @param DataHandler $pObj
+     * @return array
+     */
+    protected function linkTranslatedFileToTranslatedSysFileMetadataRecord(
+        $id, array $fieldArray, DataHandler $pObj
+    )
+    {
+        // get localized metadata record from language parent of this file
+        /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $parentFileMetadataRecordUid = (int)$queryBuilder->select('uid')->from('sys_file_metadata')->where(
+            $queryBuilder->expr()->eq('file',
+                $queryBuilder->createNamedParameter($fieldArray['l10n_parent'], \PDO::PARAM_INT)),
+            $queryBuilder->expr()->eq('sys_language_uid',
+                $queryBuilder->createNamedParameter($fieldArray['sys_language_uid'], \PDO::PARAM_INT))
+        )->execute()->fetchColumn();
+
+        // relate that new file record to metadata translation
+        $fileUid = $pObj->substNEWwithIDs[$id];
+        $datamap = [
+            'sys_file_metadata' => [
+                $parentFileMetadataRecordUid => [
+                    'file' => $fileUid,
+                ],
+            ],
+        ];
+        /** @var DataHandler $dataHandler */
+        $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+        $dataHandler->start($datamap, []);
+        $dataHandler->process_datamap();
+
+        // remove the metadata record for the translated file, if there is any
+        /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $metaDataRecordToDelete = (int)$queryBuilder->select('uid')->from('sys_file_metadata')->where(
+            $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)),
+            $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter(0, \PDO::PARAM_INT))
+        )->execute()->fetchColumn();
+
+        if ($metaDataRecordToDelete > 0) {
+            $commandMap = [
+                'sys_file_metadata' => [
+                    $metaDataRecordToDelete => 'delete',
+                ],
+            ];
+            $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+            $dataHandler->start([], $commandMap);
+            $dataHandler->process_cmdmap();
+        }
+    }
+
+    /**
+     * @param string $table
+     * @param $id
+     * @param DataHandler $pObj
+     */
+    protected function relateTranslatedFileToTranslatedSysFileReference(string $table, $id, DataHandler $pObj)
+    {
+        // find out, whether there is a FAL field in this table
+        $tcaColumns = $GLOBALS['TCA'][$table]['columns'];
+        $tableFalFields = [];
+        foreach ($tcaColumns as $fieldName => $fieldConfig) {
+            if ($fieldConfig['config']['foreign_table'] === 'sys_file_reference') {
+                $tableFalFields[] = $fieldName;
+            }
+        }
+
+        // find out, whether this record is sys_language_uid > 0 and connected mode
+        $languageField = $GLOBALS['TCA'][$table]['ctrl']['languageField'];
+        $languageParentField = $GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'];
+        // is the table translatable at all?
+        if (isset($languageField, $languageParentField)) {
+            if (isset($pObj->substNEWwithIDs[$id])) {
+                $id = $pObj->substNEWwithIDs[$id];
+            }
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+            // the record might be set disabled in this operation, then we still must update the references
+            $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+            $record = $queryBuilder->select($languageField, $languageParentField, ...
+                $tableFalFields)->from($table)->where(
+                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
+            )->execute()->fetch();
+
+            $sys_language_uid = $record[$languageField];
+            // if free mode, no parent is set. Ignore
+            if (isset($sys_language_uid) && $sys_language_uid > 0 && $record[$languageParentField] > 0) {
+                // get the references
+                foreach ($tableFalFields as $falField) {
+                    $this->checkFalFieldsInRecordForNeededUpdate($table, $id, $falField, $sys_language_uid);
+
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $sys_language_uid
+     * @param $referencedFile
+     * @param $referenceUid
+     */
+    protected function linkTranslatedFileToSysFileReference(
+        $sys_language_uid,
+        $referencedFile,
+        $referenceUid
+    ) {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
+        $translatedFileUid = (int)$queryBuilder->select('uid')->from('sys_file')->where(
+            $queryBuilder->expr()->eq('sys_language_uid',
+                $queryBuilder->createNamedParameter($sys_language_uid,
+                    \PDO::PARAM_INT)),
+            $queryBuilder->expr()->eq('l10n_parent',
+                $queryBuilder->createNamedParameter($referencedFile, \PDO::PARAM_INT))
+        )->execute()->fetchColumn();
+        if ($translatedFileUid > 0) {
+            $datamap = [
+                'sys_file_reference' => [
+                    $referenceUid => [
+                        'uid_local' => $translatedFileUid
+                    ]
+                ],
+            ];
+            /** @var DataHandler $dataHandler */
+            $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
+            $dataHandler->start($datamap, []);
+            $dataHandler->process_datamap();
+        }
+    }
+
+    /**
+     * @param $reference
+     * @param $sys_language_uid
+     */
+    protected function updateSysFileReference($reference, $sys_language_uid)
+    {
+        $referencedFile = (int)$reference['uid_local'];
+        if (isset($referencedFile) && $referencedFile > 0) {
+            $referenceUid = $reference['uid'];
+            // check the file and its variants
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
+            $fileLanguage = $queryBuilder->select('sys_language_uid')->from('sys_file')->where(
+                $queryBuilder->expr()->eq('uid',
+                    $queryBuilder->createNamedParameter($referencedFile, \PDO::PARAM_INT))
+            )->execute()->fetchColumn();
+            if (isset($fileLanguage) && (int)$fileLanguage !== $sys_language_uid) {
+                $this->linkTranslatedFileToSysFileReference($sys_language_uid,
+                    $referencedFile, $referenceUid);
+
+            }
+        }
+    }
+
+    /**
+     * @param string $table
+     * @param $id
+     * @param $falField
+     * @param $sys_language_uid
+     */
+    protected function checkFalFieldsInRecordForNeededUpdate(string $table, $id, $falField, $sys_language_uid)
+    {
+// I will not rely on the refindex here. Just check the references table
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+        $references = $queryBuilder->select('uid', 'uid_local')->from('sys_file_reference')->where(
+            $queryBuilder->expr()->eq('uid_foreign',
+                $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)),
+            $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['columns'][$falField]['config']['foreign_table_field'],
+                $queryBuilder->createNamedParameter($table, \PDO::PARAM_STR)),
+            $queryBuilder->expr()->eq('fieldname',
+                $queryBuilder->createNamedParameter($GLOBALS['TCA'][$table]['columns'][$falField]['config']['foreign_match_fields']['fieldname'],
+                    \PDO::PARAM_STR)),
+            $queryBuilder->expr()->eq('sys_language_uid',
+                $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT))
+        )->execute()->fetchAll();
+        if (count($references) > 0) {
+            foreach ($references as $reference) {
+                $this->updateSysFileReference($reference, $sys_language_uid);
+            }
+        }
     }
 
 }
