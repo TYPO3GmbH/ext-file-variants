@@ -10,7 +10,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\Service;
 
 
 use T3G\AgencyPack\FileVariants\Service\FileHandlingService;
-use TYPO3\CMS\Core\Resource\File;
+use T3G\AgencyPack\FileVariants\Service\PersistenceService;
 
 
 class FileHandlingServiceTest extends \PHPUnit_Framework_TestCase
@@ -22,7 +22,9 @@ class FileHandlingServiceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->subject = new FileHandlingService();
+        /** @var PersistenceService $persistenceService */
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $this->subject = new FileHandlingService($persistenceService->reveal());
     }
 
     /**
@@ -37,11 +39,28 @@ class FileHandlingServiceTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @dataProvider getFileNames
      */
-    public function moveUploadedFileAndCreateFileObjectCreatesFileObjectFromGivenFilename()
+    public function calculateFullPathToUploadedFileReturnsSanitizedFilePath($filename)
     {
-        $result = $this->subject->moveUploadedFileAndCreateFileObject('foo');
-        $this->assertInstanceOf(File::class, $result);
+        $result = $this->subject->calculateFullPathToUploadedFile($filename);
+        $expected = PATH_site . 'typo3temp/uploads/foo.pdf';
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function getFileNames(): array
+    {
+        return [
+            'one file given during upload' => [
+                'foo.pdf',
+            ],
+            'two files given during upload' => [
+                'bar.txt,foo.pdf',
+            ],
+        ];
     }
 
 }

@@ -14,7 +14,6 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
@@ -26,6 +25,24 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
   * Description
   */
 class FileHandlingService {
+
+    /**
+     * @var PersistenceService
+     */
+    protected $persistenceService;
+
+    /**
+     * FileHandlingService constructor.
+     * @param PersistenceService $persistenceService
+     */
+    public function __construct($persistenceService = null)
+    {
+        $this->persistenceService = $persistenceService;
+        if ($this->persistenceService === null) {
+            $this->persistenceService = GeneralUtility::makeInstance(PersistenceService::class);
+        }
+    }
+
 
     /**
      * @param string $fileName
@@ -49,7 +66,7 @@ class FileHandlingService {
      * @param string $fileName
      * @return string filePath
      */
-    protected function calculateFullPathToUploadedFile(string $fileName): string
+    public function calculateFullPathToUploadedFile(string $fileName): string
     {
         $sourceFolder = PATH_site . 'typo3temp/uploads/';
         if (strpos($fileName, ',') !== false) {
@@ -63,29 +80,13 @@ class FileHandlingService {
      */
     protected function findStorageDestination(): Folder
     {
-        /** @var \TYPO3\CMS\Core\Database\Query\QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_storage');
-        $customStorage = $queryBuilder->select('*')->from('sys_file_storage')
-            ->where(
-                $queryBuilder->expr()->eq(
-                    'name', $queryBuilder->createNamedParameter('language_variants')
-                ),
-                $queryBuilder->expr()->eq(
-                    'is_online',
-                    $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)
-                ),
-                $queryBuilder->expr()->eq(
-                    'is_writable',
-                    $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)
-                )
-            )->execute()->fetchAll();
-        if ($customStorage[0]['uid'] > 0) {
-            $storage = ResourceFactory::getInstance()->getStorageObject($customStorage[0]['uid']);
-        } else {
+        $fileStorageRecordUid = $this->persistenceService->getFileStorageRecordUid('language_variants');
 
+        if ($fileStorageRecordUid > 0) {
+            $storage = ResourceFactory::getInstance()->getStorageObject($fileStorageRecordUid);
+        } else {
             $storage = ResourceFactory::getInstance()->getDefaultStorage();
         }
-
         return $this->ensureAvailableFolder($storage);
     }
 
@@ -104,5 +105,7 @@ class FileHandlingService {
         }
         return $folder;
     }
+
+
 
 }
