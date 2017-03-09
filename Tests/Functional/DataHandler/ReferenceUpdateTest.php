@@ -14,6 +14,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
@@ -23,7 +24,7 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 /**
   * Description
   */
-class ReferenceHandlingTest extends FunctionalTestCase {
+class ReferenceUpdateTest extends FunctionalTestCase {
 
     /**
      * @var int
@@ -43,20 +44,20 @@ class ReferenceHandlingTest extends FunctionalTestCase {
     /**
      * @var string
      */
-    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/ReferenceHandling/Initial/';
+    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/ReferenceUpdate/';
 
     /**
      * @var string
      */
-    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/ReferenceHandling/Result/';
+    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/ReferenceUpdate/';
 
     protected function setUp()
     {
-
         $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
+        $this->testExtensionsToLoad[] = 'typo3conf/ext/news';
 
         parent::setUp();
-        \TYPO3\CMS\Core\Core\Bootstrap::getInstance()->initializeLanguageObject();
+        Bootstrap::getInstance()->initializeLanguageObject();
 
         $this->backendUser = $this->setUpBackendUserFromFixture(1);
         $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
@@ -64,6 +65,9 @@ class ReferenceHandlingTest extends FunctionalTestCase {
 
         $this->actionService = new ActionService();
 
+        $scenarioName = 'Initial';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
     }
 
     protected function tearDown()
@@ -136,43 +140,66 @@ class ReferenceHandlingTest extends FunctionalTestCase {
     /**
      * @test
      */
-    public function translatedReferenceInConnectedModeRelatesToFileVariant()
+    public function providingFileVariantCausesUpdateOfAllCEsInConnectedMode()
     {
-        // setup
-        $scenarioName = 'connectedWithVariant';
-        $this->importCsvScenario($scenarioName);
-        $this->setUpFrontendRootPage(1);
 
-        $this->actionService->localizeRecord('tt_content', 1, 1);
-        $this->importAssertCSVScenario($scenarioName);
     }
 
     /**
      * @test
      */
-    public function translatedReferenceInConnectedModeRelatesToDefaultFileIfNoVariantExists()
+    public function providingFileVariantDoesNotTouchAllCEsInFreeMode()
     {
-        // setup
-        $scenarioName = 'connectedWithoutVariant';
-        $this->importCsvScenario($scenarioName);
-        $this->setUpFrontendRootPage(1);
 
-        $this->actionService->localizeRecord('tt_content', 3, 1);
-        $this->importAssertCSVScenario($scenarioName);
     }
 
     /**
+     * use tx_news records to test for non pages|tt_content records
+     *
      * @test
      */
-    public function translatedReferenceInFreeModeRelatesToDefaultFile()
+    public function providingFileVariantCausesUpdateOfOtherTableItems()
     {
-        // setup
-        $scenarioName = 'freeMode';
-        $this->importCsvScenario($scenarioName);
-        $this->setUpFrontendRootPage(1);
+        // according initial scenario following references are affected: 5, 28, 30, 32
 
-        $this->actionService->copyRecordToLanguage('tt_content', 1, 1);
-        $this->importAssertCSVScenario($scenarioName);
+        // after localisation to 1, 28 needs to have changed
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
+        // file 1 features cat_5
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/nature_5.jpg';
+        $germanTranslatedMetadata = (int)$ids['sys_file_metadata'][1];
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata',
+            $germanTranslatedMetadata, $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+
+        // after localisation to 2, 30 needs to have changed
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 2);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/business_5.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+
+        // after localisation to 3, 32 needs to have changed
+        // this takes localisation from translations into account
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', $germanTranslatedMetadata, 3);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/business_5.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][$germanTranslatedMetadata], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+
+        $this->importAssertCSVScenario('TxNews');
     }
 
+    public function deletionOfFileVariantResetsAllConsumersInConnectedModeToDefaultFile()
+    {
+
+    }
+
+    public function deletionOfFileVariantDoesNotTouchAllConsumersInConnectedMode()
+    {
+
+    }
+
+    public function deletionOfDefaultFileCausesResetToDefaultFileForAllTranslations()
+    {
+        // remove default file -> remove variants -> update consumers to relate to default file
+        // leads to broken relations, this is the case already before the change.
+    }
 }

@@ -74,7 +74,6 @@ class FileVariantsHandlingTest extends FunctionalTestCase {
         unset($this->actionService);
         $this->assertErrorLogEntries();
         parent::tearDown();
-
     }
 
     /**
@@ -202,35 +201,5 @@ class FileVariantsHandlingTest extends FunctionalTestCase {
 
         $this->importAssertCSVScenario('metadataTranslationReplacedVariantUpload');
     }
-
-
-
-
-    public function providingFileVariantCausesUpdateOfAllConsumersInConnectedMode()
-    {
-
-    }
-
-    public function providingFileVariantDoesNotTouchAllConsumersInFreeMode()
-    {
-
-    }
-
-    public function deletionOfFileVariantResetsAllConsumersInConnectedModeToDefaultFile()
-    {
-
-    }
-
-    public function deletionOfFileVariantDoesNotTouchAllConsumersInConnectedMode()
-    {
-
-    }
-
-    public function deletionOfDefaultFileCausesResetToDefaultFileForAllTranslations()
-    {
-        // remove default file -> remove variants -> update consumers to relate to default file
-        // leads to broken relations, this is the case already before the change.
-    }
-
 
 }

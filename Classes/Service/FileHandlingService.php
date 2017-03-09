@@ -20,6 +20,7 @@ use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
   * Description
@@ -99,7 +100,7 @@ class FileHandlingService {
         $folder = null;
         $folderName = 'languageVariants';
         if ($storage->hasFolder($folderName) === false) {
-            $folder = $storage->createFolder($folderName, $storage->getFolder('/'));
+            $folder = $storage->createFolder($folderName);
         } else {
             $folder = $storage->getFolder($folderName);
         }
