@@ -14,7 +14,6 @@ namespace T3G\AgencyPack\FileVariants\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
-use T3G\AgencyPack\FileVariants\Service\DataCollectionService;
 use T3G\AgencyPack\FileVariants\Service\FileHandlingService;
 use T3G\AgencyPack\FileVariants\Service\PersistenceService;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -37,19 +36,12 @@ class DataHandlerHook
     protected $persistenceService;
 
     /**
-     * @var DataCollectionService
-     */
-    protected $dataCollectionService;
-
-    /**
      * @param FileHandlingService|null $fileHandlingService
      * @param PersistenceService|null $persistenceService
-     * @param DataCollectionService|null $dataCollectionService
      */
     public function initializeServices(
         $fileHandlingService = null,
-        $persistenceService = null,
-        $dataCollectionService = null
+        $persistenceService = null
     ) {
         $this->fileHandlingService = $fileHandlingService;
         if ($this->fileHandlingService === null) {
@@ -58,10 +50,6 @@ class DataHandlerHook
         $this->persistenceService = $persistenceService;
         if ($this->persistenceService === null) {
             $this->persistenceService = GeneralUtility::makeInstance(PersistenceService::class);
-        }
-        $this->dataCollectionService = $dataCollectionService;
-        if ($this->dataCollectionService === null) {
-            $this->dataCollectionService = GeneralUtility::makeInstance(DataCollectionService::class);
         }
     }
 
@@ -219,7 +207,7 @@ class DataHandlerHook
 
 
     /**
-     * @param string|int $id
+     * @param string|int $id this can be a uid or a NEW<uid> placeholder.
      * @param array $fieldArray
      * @param DataHandler $pObj
      * @return array
