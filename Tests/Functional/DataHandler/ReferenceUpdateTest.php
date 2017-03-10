@@ -137,17 +137,12 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->assertCSVDataSet($scenarioFileName);
     }
 
-    /**
-     * @test
-     */
     public function providingFileVariantCausesUpdateOfAllCEsInConnectedMode()
     {
 
     }
 
-    /**
-     * @test
-     */
+
     public function providingFileVariantDoesNotTouchAllCEsInFreeMode()
     {
 
@@ -166,9 +161,8 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         // file 1 features cat_5
         $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/nature_5.jpg';
-        $germanTranslatedMetadata = (int)$ids['sys_file_metadata'][1];
         list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata',
-            $germanTranslatedMetadata, $testFilePath);
+            (int)$ids['sys_file_metadata'][1], $testFilePath);
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
 
         // after localisation to 2, 30 needs to have changed
@@ -178,10 +172,9 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
 
         // after localisation to 3, 32 needs to have changed
-        // this takes localisation from translations into account
-        $ids = $this->actionService->localizeRecord('sys_file_metadata', $germanTranslatedMetadata, 3);
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/business_5.jpg';
-        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][$germanTranslatedMetadata], $testFilePath);
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 3);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/city_5.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
 
         $this->importAssertCSVScenario('TxNews');
