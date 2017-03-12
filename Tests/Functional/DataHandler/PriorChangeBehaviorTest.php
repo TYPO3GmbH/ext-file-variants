@@ -122,7 +122,7 @@ class PriorChangeBehaviorTest extends FunctionalTestCase
      */
     public function localizeMetaData()
     {
-        $this->markTestSkipped('this is now broken, thanks to DataHandlerHook Scenario 1');
+        //$this->markTestSkipped('this is now broken, thanks to DataHandlerHook Scenario 1');
         $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
         $this->importAssertCSVScenario('metadataTranslation');
     }

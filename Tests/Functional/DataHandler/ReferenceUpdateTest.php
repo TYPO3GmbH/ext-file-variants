@@ -16,9 +16,11 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional\DataHandler;
  */
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
@@ -44,12 +46,12 @@ class ReferenceUpdateTest extends FunctionalTestCase {
     /**
      * @var string
      */
-    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/ReferenceUpdate/';
+    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/ReferenceUpdate/Initial/';
 
     /**
      * @var string
      */
-    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/ReferenceUpdate/';
+    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataHandler/DataSet/ReferenceUpdate/AfterOperation/';
 
     protected function setUp()
     {
@@ -65,16 +67,40 @@ class ReferenceUpdateTest extends FunctionalTestCase {
 
         $this->actionService = new ActionService();
 
-        $scenarioName = 'Initial';
-        $this->importCsvScenario($scenarioName);
-        $this->setUpFrontendRootPage(1);
+        // done to prevent an error during processing
+        // it makes no difference here whether file filters apply to the data set
+        unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
     }
 
     protected function tearDown()
     {
+        $this->cleanUpFilesAndRelatedRecords();
         unset($this->actionService);
         $this->assertErrorLogEntries();
         parent::tearDown();
+
+    }
+
+    /**
+     * remove files and related records (sys_file, sys_file_metadata) from environment
+     */
+    protected function cleanUpFilesAndRelatedRecords() {
+        // find files in storage
+        $storage = ResourceFactory::getInstance()->getDefaultStorage();
+        $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
+        try {
+            $folder = $storage->getFolder('languageVariants');
+            $files = $storage->getFilesInFolder($folder);
+            foreach ($files as $file) {
+                $storage->deleteFile($file);
+                $recordsToDelete['sys_file'][] = $file->getUid();
+                $metadata = $file->_getMetaData();
+                $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
+            }
+        } catch (\Exception $exception) {
+            // sometimes, there is no folder to empty. Let's ignore that.
+        }
+        $this->actionService->deleteRecords($recordsToDelete);
 
     }
 
@@ -137,21 +163,66 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->assertCSVDataSet($scenarioFileName);
     }
 
+    /**
+     * @test
+     */
     public function providingFileVariantCausesUpdateOfAllCEsInConnectedMode()
     {
+        $scenarioName = 'ConnectedMode_ProvideFileVariants';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
+
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 2);
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 3);
+
+        $this->importAssertCSVScenario($scenarioName);
 
     }
 
-
+    /**
+     * @test
+     */
     public function providingFileVariantDoesNotTouchAllCEsInFreeMode()
     {
+        $scenarioName = 'FreeMode_ProvideFileVariants';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
 
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 2);
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 3);
+
+        $this->importAssertCSVScenario($scenarioName);
+
+    }
+
+    /**
+     * @test
+     */
+    public function providingFileVariantWithFileReplacementDoesNotChangeTheReferencedFile()
+    {
+
+        $scenarioName = 'ConnectedMode_ProvideFileVariantsWithReplacement';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
+
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_2.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
+        //DebuggerUtility::var_dump($postFiles, $filename, 8, true);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
+
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 2);
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 3);
+
+        $this->importAssertCSVScenario($scenarioName);
     }
 
     /**
      * use tx_news records to test for non pages|tt_content records
      *
-     * @test
+     *
      */
     public function providingFileVariantCausesUpdateOfOtherTableItems()
     {
@@ -171,11 +242,11 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
 
-        // after localisation to 3, 32 needs to have changed
-        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 3);
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/city_5.jpg';
-        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
-        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+//        // after localisation to 3, 32 needs to have changed
+//        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 3);
+//        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/city_5.jpg';
+//        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
+//        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
 
         $this->importAssertCSVScenario('TxNews');
     }
