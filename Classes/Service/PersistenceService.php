@@ -18,7 +18,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Bundles all requests to the database
@@ -100,30 +99,99 @@ class PersistenceService
     }
 
     /**
-     * @param int $oldFileUid
-     * @param int $newFileUid
+     * @param int $fileUid
      * @param int $sys_language_uid
+     * @return array
      */
-    public function updateReferences(int $oldFileUid, int $newFileUid, int $sys_language_uid)
+    public function collectAffectedReferences(int $fileUid, int $sys_language_uid): array
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
         $queryBuilder->select('uid')->from('sys_file_reference')->where(
             $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)),
-            $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($oldFileUid, \PDO::PARAM_INT))
+            $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
         );
-        $dataMap = ['sys_file_references' => []];
-        $change = ['uid_local' => $newFileUid];
-        $affectedReferences = $queryBuilder->execute()->fetchAll();
-        foreach ($affectedReferences as $affectedReference) {
-            $uid = (int)$affectedReference['uid'];
-            if ($uid < 1) {
-                continue;
+        return $queryBuilder->execute()->fetchAll();
+
+    }
+
+    /**
+     * @param $references
+     * @return array
+     */
+    public function filterValidReferences($references): array
+    {
+        $filteredReferences = [];
+        foreach ($references as $reference) {
+            $uid = $reference['uid'];
+            if ($this->isValidReference($uid)) {
+                $filteredReferences[] = $uid;
             }
-            $dataMap['sys_file_reference'][$uid] = $change;
+        }
+        return $filteredReferences;
+    }
+
+    /**
+     * @param int $uid
+     * @return bool
+     */
+    protected function isValidReference(int $uid): bool
+    {
+        $isValid = true;
+        $sysFileReferenceRecord = $this->getSysFileReferenceRecord($uid);
+        $irrelevantTableNames = ['pages', 'pages_language_overlay', 'sys_file_metadata', 'sys_file'];
+        if (in_array($sysFileReferenceRecord['tablenames'], $irrelevantTableNames)) {
+            return false;
+        }
+        $foreignRecord = $this->getRecord($sysFileReferenceRecord['tablenames'], $sysFileReferenceRecord['uid_foreign']);
+        if ($sysFileReferenceRecord['tablenames'] === 'tt_content' && $foreignRecord['l18n_parent'] === 0) {
+            $isValid = false;
+        }
+        return $isValid;
+    }
+
+    /**
+     * @param array $references
+     * @param int $newFileUid
+     */
+    public function updateReferences(array $references, int $newFileUid)
+    {
+        $change = ['uid_local' => $newFileUid];
+        $dataMap = ['sys_file_reference' => []];
+        foreach ($references as $reference) {
+            $dataMap['sys_file_reference'][$reference] = $change;
         }
         $this->process_dataMap($dataMap);
     }
 
+    /**
+     * @param int $uid
+     * @return array
+     */
+    protected function getSysFileReferenceRecord(int $uid): array
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+        $queryBuilder->select('*')->from('sys_file_reference')->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+        );
+        return $queryBuilder->execute()->fetch();
+    }
+
+    /**
+     * @param string $table
+     * @param int $uid
+     * @return array
+     */
+    protected function getRecord(string $table, int $uid): array
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder->select('*')->from($table)->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+        );
+
+        return $queryBuilder->execute()->fetch();
+    }
 
 }

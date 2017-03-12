@@ -53,6 +53,9 @@ class ReferenceRecordService
         if ($sys_language_uid < 1) {
             throw new \InvalidArgumentException('can not handle invalid language', 1489335148);
         }
-        $this->persistenceService->updateReferences($oldFileUid, $newFileUid, $sys_language_uid);
+        $references = $this->persistenceService->collectAffectedReferences($oldFileUid, $sys_language_uid);
+        $references = $this->persistenceService->filterValidReferences($references);
+        $this->persistenceService->updateReferences($references, $newFileUid);
     }
+
 }

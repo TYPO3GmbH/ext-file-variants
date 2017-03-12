@@ -69,4 +69,21 @@ class ReferenceRecordServiceTest extends TestCase
         $this->subject->updateReferences(1, 1, 0);
     }
 
+    /**
+     * @test
+     */
+    public function updateReferencesHandlesAffectedReferences()
+    {
+        $references = [
+            ['uid' => 7],
+            ['uid' => 14],
+            ['uid' => 21],
+        ];
+        $this->persistenceService->collectAffectedReferences(1, 3)->willReturn($references);
+        $filteredReferences = [7,21];
+        $this->persistenceService->filterValidReferences($references)->willReturn($filteredReferences);
+        $this->persistenceService->updateReferences($filteredReferences, 2)->shouldBeCalled();
+        $this->subject->updateReferences(1, 2, 3);
+    }
+
 }
