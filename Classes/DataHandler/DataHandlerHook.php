@@ -58,7 +58,6 @@ class DataHandlerHook
 
         // sys_file_metadata record is updated with file_variants set
         if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('file_variant', $fieldArray)) {
-
             $this->fileRecordService->relateFileVariantToSysFileMetadataRecord();
         }
 

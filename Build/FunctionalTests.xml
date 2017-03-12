@@ -23,9 +23,9 @@
 	verbose="false"
 >
 	<testsuites>
-		<testsuite name="Core tests">
-			<directory>../../../../typo3/sysext/*/Tests/Functional/</directory>
-		</testsuite>
+		<!--<testsuite name="Core tests">-->
+			<!--<directory>../../../../typo3/sysext/*/Tests/Functional/</directory>-->
+		<!--</testsuite>-->
 		<testsuite name="File Variants Tests">
 			<directory>../Tests/Functional/</directory>
 		</testsuite>
