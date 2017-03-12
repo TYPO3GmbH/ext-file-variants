@@ -1,6 +1,7 @@
 <?php
 declare(strict_types = 1);
 namespace T3G\AgencyPack\FileVariants\DataHandler;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -14,6 +15,7 @@ namespace T3G\AgencyPack\FileVariants\DataHandler;
  * The TYPO3 project - inspiring people to share!
  */
 use T3G\AgencyPack\FileVariants\Service\FileRecordService;
+use T3G\AgencyPack\FileVariants\Service\PersistenceService;
 use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -34,17 +36,28 @@ class DataHandlerHook
     protected $referenceRecordService;
 
     /**
-     * @param FileRecordService $fileRecordService
+     * @var PersistenceService;
      */
-    protected function initializeServices($fileRecordService = null, $referenceRecordService = null)
+    protected $persistenceService;
+
+    /**
+     * @param FileRecordService $fileRecordService
+     * @param ReferenceRecordService $referenceRecordService
+     * @param PersistenceService $persistenceService
+     */
+    protected function initializeServices($fileRecordService = null, $referenceRecordService = null, $persistenceService = null)
     {
-        $this->fileRecordService = $fileRecordService;
-        if ($this->fileRecordService === null) {
-            $this->fileRecordService = GeneralUtility::makeInstance(FileRecordService::class);
+        $this->persistenceService = $persistenceService;
+        if ($this->persistenceService === null) {
+            $this->persistenceService = GeneralUtility::makeInstance(PersistenceService::class);
         }
         $this->referenceRecordService = $referenceRecordService;
         if ($this->referenceRecordService === null) {
-            $this->referenceRecordService = GeneralUtility::makeInstance(ReferenceRecordService::class);
+            $this->referenceRecordService = GeneralUtility::makeInstance(ReferenceRecordService::class, $this->persistenceService);
+        }
+        $this->fileRecordService = $fileRecordService;
+        if ($this->fileRecordService === null) {
+            $this->fileRecordService = GeneralUtility::makeInstance(FileRecordService::class, $this->persistenceService);
         }
     }
 
@@ -55,6 +68,9 @@ class DataHandlerHook
      * @param int|string $id
      * @param array $fieldArray
      * @param DataHandler $pObj
+     * @param FileRecordService $fileRecordService
+     * @param ReferenceRecordService $referenceRecordService
+     * @param PersistenceService $persistenceService
      */
     public function processDatamap_afterDatabaseOperations(
         string $status,
@@ -63,11 +79,12 @@ class DataHandlerHook
         array $fieldArray,
         DataHandler $pObj,
         $fileRecordService = null,
-        $referenceRecordService = null
+        $referenceRecordService = null,
+        $persistenceService = null
+    )
+    {
 
-    ) {
-
-        $this->initializeServices($fileRecordService, $referenceRecordService);
+        $this->initializeServices($fileRecordService, $referenceRecordService, $persistenceService);
 
         // sys_file_metadata record is updated with file_variant set
         // related file must be replaced (preserve the uid)!
@@ -85,6 +102,9 @@ class DataHandlerHook
      * @param DataHandler $pObj
      * @param $pasteUpdate
      * @param array $pasteDatamap
+     * @param FileRecordService $fileRecordService
+     * @param ReferenceRecordService $referenceRecordService
+     * @param PersistenceService $persistenceService
      */
     public function processCmdmap_postProcess(
         string $command,
@@ -95,18 +115,30 @@ class DataHandlerHook
         $pasteUpdate,
         array $pasteDatamap,
         $fileRecordService = null,
-        $referenceRecordService = null
+        $referenceRecordService = null,
+        $persistenceService = null
+    )
+    {
 
-    ) {
-
-        $this->initializeServices($fileRecordService, $referenceRecordService);
+        $this->initializeServices($fileRecordService, $referenceRecordService, $persistenceService);
 
         // translation of metadata record
         // results in copied sys_file and relation of record to new file
         // all references need to be updated to the new file
         if ($table === 'sys_file_metadata' && $command === 'localize') {
-            $this->fileRecordService->copySysFileRecord();
-            $this->referenceRecordService->updateReferences();
+
+            if (is_string($id) && strpos($id, 'NEW') >= 0) {
+                $id = $pObj->substNEWwithIDs[$id];
+            }
+            if ((int)$id === 0) {
+                throw new \RuntimeException('can\'t retrieve valid id', 1489332067);
+            }
+            $handledMetaDataRecord = $this->persistenceService->getSysFileMetaDataRecord((int)$id, (int)$value);
+            $fileUid = (int)$handledMetaDataRecord['file'];
+            $translatedFileUid = $this->fileRecordService->copySysFileRecord($fileUid, $value);
+            $this->fileRecordService->updateSysFileMetadata($handledMetaDataRecord['uid'], $translatedFileUid);
+            $this->referenceRecordService->updateReferences($fileUid, $translatedFileUid, $value);
+
         }
 
         // if a consuming table receives the localize command, check the references for available variants

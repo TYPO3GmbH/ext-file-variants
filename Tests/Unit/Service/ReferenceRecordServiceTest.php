@@ -15,6 +15,8 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Prophecy\Prophecy\ObjectProphecy;
+use T3G\AgencyPack\FileVariants\Service\PersistenceService;
 use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 use PHPUnit\Framework\TestCase;
 
@@ -26,17 +28,45 @@ class ReferenceRecordServiceTest extends TestCase
      */
     protected $subject;
 
+    /**
+     * @var PersistenceService|ObjectProphecy
+     */
+    protected $persistenceService;
+
     protected function setUp()
     {
-        $this->subject = new ReferenceRecordService();
+        $this->persistenceService = $this->prophesize(PersistenceService::class);
+        $this->subject = new ReferenceRecordService($this->persistenceService->reveal());
     }
 
     /**
      * @test
      */
-    public function dummy()
+    public function updateReferencesThrowsExceptionForInvalidFileToLookFor()
     {
-        $this->assertTrue(true);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionCode(1489335146);
+        $this->subject->updateReferences(0, 1, 1);
+    }
+
+    /**
+     * @test
+     */
+    public function updateReferencesThrowsExceptionForInvalidFileToReplaceWith()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionCode(1489335147);
+        $this->subject->updateReferences(1, 0, 1);
+    }
+
+    /**
+     * @test
+     */
+    public function updateReferencesThrowsExceptionForDefaultLanguage()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionCode(1489335148);
+        $this->subject->updateReferences(1, 1, 0);
     }
 
 }

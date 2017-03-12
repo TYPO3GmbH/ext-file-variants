@@ -23,8 +23,36 @@ namespace T3G\AgencyPack\FileVariants\Service;
  */
 class ReferenceRecordService
 {
+    /**
+     * @var PersistenceService
+     */
+    protected $persistenceService;
 
-    public function updateReferences()
+    /**
+     * ReferenceRecordService constructor.
+     * @param PersistenceService $persistenceService
+     */
+    public function __construct($persistenceService)
     {
+        $this->persistenceService = $persistenceService;
+    }
+
+    /**
+     * @param int $oldFileUid
+     * @param int $newFileUid
+     * @param int $sys_language_uid
+     */
+    public function updateReferences(int $oldFileUid, int $newFileUid, int $sys_language_uid)
+    {
+        if ($oldFileUid < 1) {
+            throw new \InvalidArgumentException('can not find invalid file references', 1489335146);
+        }
+        if ($newFileUid < 1) {
+            throw new \InvalidArgumentException('can not replace with invalid file references', 1489335147);
+        }
+        if ($sys_language_uid < 1) {
+            throw new \InvalidArgumentException('can not handle invalid language', 1489335148);
+        }
+        $this->persistenceService->updateReferences($oldFileUid, $newFileUid, $sys_language_uid);
     }
 }
