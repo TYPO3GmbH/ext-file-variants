@@ -55,8 +55,18 @@ class DataHandlerHookTest extends TestCase
     public function uponSysFileMetadataLocalisationDependingSysFileRecordGetsCopiedAndRelated()
     {
         $this->subject->processCmdmap_postProcess('localize', 'sys_file_metadata', 42, 1, $this->prophesize(DataHandler::class)->reveal(), [], [], $this->fileRecordService->reveal(), $this->referenceRecordService->reveal());
-        $this->fileRecordService->copyFileRecord()->shouldBeCalled();
+        $this->fileRecordService->copySysFileRecord()->shouldBeCalled();
         $this->referenceRecordService->updateReferences()->shouldBeCalled();
+    }
+
+    /**
+     * @test
+     */
+    public function cmdMapHookDoesNotReactOnUnrelatedTable()
+    {
+        $this->subject->processCmdmap_postProcess('localize', 'tt_content', 42, 1, $this->prophesize(DataHandler::class)->reveal(), [], [], $this->fileRecordService->reveal(), $this->referenceRecordService->reveal());
+        $this->fileRecordService->copySysFileRecord()->shouldNotBeCalled();
+        $this->referenceRecordService->updateReferences()->shouldNotBeCalled();
     }
 
     /**

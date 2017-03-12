@@ -24,7 +24,7 @@ namespace T3G\AgencyPack\FileVariants\Service;
 class FileRecordService
 {
 
-    public function copyFileRecord()
+    public function copySysFileRecord()
     {
     }
 

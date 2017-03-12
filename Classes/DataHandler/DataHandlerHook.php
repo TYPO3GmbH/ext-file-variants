@@ -105,7 +105,7 @@ class DataHandlerHook
         // results in copied sys_file and relation of record to new file
         // all references need to be updated to the new file
         if ($table === 'sys_file_metadata' && $command === 'localize') {
-            $this->fileRecordService->copyFileRecord();
+            $this->fileRecordService->copySysFileRecord();
             $this->referenceRecordService->updateReferences();
         }
 

@@ -15,20 +15,20 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
-use T3G\AgencyPack\FileVariants\Service\FileRecordService;
+use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 use PHPUnit\Framework\TestCase;
 
-class FileRecordServiceTest extends TestCase
+class ReferenceRecordServiceTest extends TestCase
 {
 
     /**
-     * @var FileRecordService
+     * @var ReferenceRecordService
      */
     protected $subject;
 
     protected function setUp()
     {
-        $this->subject = new FileRecordService();
+        $this->subject = new ReferenceRecordService();
     }
 
     /**
@@ -38,4 +38,5 @@ class FileRecordServiceTest extends TestCase
     {
         $this->assertTrue(true);
     }
+
 }
