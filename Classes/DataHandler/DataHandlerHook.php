@@ -13,13 +13,31 @@ namespace T3G\AgencyPack\FileVariants\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use T3G\AgencyPack\FileVariants\Service\FileRecordService;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Description
  */
 class DataHandlerHook
 {
+    /**
+     * @var FileRecordService
+     */
+    protected $fileRecordService;
+
+    /**
+     * @param FileRecordService $fileRecordService
+     */
+    public function initializeServices($fileRecordService = null)
+    {
+        $this->fileRecordService = $fileRecordService;
+        if ($this->fileRecordService === null) {
+            $this->fileRecordService = GeneralUtility::makeInstance(FileRecordService::class);
+        }
+    }
+
     /**
      *
      * @param string $status
@@ -35,6 +53,14 @@ class DataHandlerHook
         array $fieldArray,
         DataHandler $pObj
     ) {
+
+        $this->initializeServices();
+
+        // sys_file_metadata record is updated with file_variants set
+        if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('file_variant', $fieldArray)) {
+
+            $this->fileRecordService->relateFileVariantToSysFileMetadataRecord();
+        }
 
     }
 
