@@ -15,20 +15,16 @@ namespace T3G\AgencyPack\FileVariants\Service;
  */
 
 /**
- * Manipulation of records from tables sys_file and sys_file_metadata
- * used from DataHandlerHook
+ * Manipulation of records from table sys_file_reference
+ * Used from DataHandlerHook
  *
- * Class FileRecordService
+ * Class ReferenceRecordService
  * @package T3G\AgencyPack\FileVariants\Service
  */
-class FileRecordService
+class ReferenceRecordService
 {
 
-    public function copyFileRecord()
-    {
-    }
-
-    public function updateSysFileRecord()
+    public function updateReferences()
     {
     }
 }

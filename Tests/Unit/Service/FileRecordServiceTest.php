@@ -1,6 +1,7 @@
 <?php
 declare(strict_types = 1);
-namespace T3G\AgencyPack\FileVariants\Service;
+namespace T3G\AgencyPack\FileVariants\Tests\Unit\Service;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -14,21 +15,21 @@ namespace T3G\AgencyPack\FileVariants\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
-/**
- * Manipulation of records from tables sys_file and sys_file_metadata
- * used from DataHandlerHook
- *
- * Class FileRecordService
- * @package T3G\AgencyPack\FileVariants\Service
- */
-class FileRecordService
+use T3G\AgencyPack\FileVariants\Service\FileRecordService;
+use PHPUnit\Framework\TestCase;
+
+class FileRecordServiceTest extends TestCase
 {
 
-    public function copyFileRecord()
+    /**
+     * @var FileRecordService
+     */
+    protected $subject;
+
+    protected function setUp()
     {
+        $this->subject = new FileRecordService();
     }
 
-    public function updateSysFileRecord()
-    {
-    }
+
 }

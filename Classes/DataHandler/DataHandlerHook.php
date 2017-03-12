@@ -14,6 +14,7 @@ namespace T3G\AgencyPack\FileVariants\DataHandler;
  * The TYPO3 project - inspiring people to share!
  */
 use T3G\AgencyPack\FileVariants\Service\FileRecordService;
+use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -28,13 +29,22 @@ class DataHandlerHook
     protected $fileRecordService;
 
     /**
+     * @var ReferenceRecordService
+     */
+    protected $referenceRecordService;
+
+    /**
      * @param FileRecordService $fileRecordService
      */
-    public function initializeServices($fileRecordService = null)
+    protected function initializeServices($fileRecordService = null, $referenceRecordService = null)
     {
         $this->fileRecordService = $fileRecordService;
         if ($this->fileRecordService === null) {
             $this->fileRecordService = GeneralUtility::makeInstance(FileRecordService::class);
+        }
+        $this->referenceRecordService = $referenceRecordService;
+        if ($this->referenceRecordService === null) {
+            $this->referenceRecordService = GeneralUtility::makeInstance(ReferenceRecordService::class);
         }
     }
 
@@ -51,14 +61,18 @@ class DataHandlerHook
         string $table,
         $id,
         array $fieldArray,
-        DataHandler $pObj
+        DataHandler $pObj,
+        $fileRecordService = null,
+        $referenceRecordService = null
+
     ) {
 
-        $this->initializeServices();
+        $this->initializeServices($fileRecordService, $referenceRecordService);
 
-        // sys_file_metadata record is updated with file_variants set
+        // sys_file_metadata record is updated with file_variant set
+        // related file must be replaced (preserve the uid)!
         if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('file_variant', $fieldArray)) {
-            $this->fileRecordService->relateFileVariantToSysFileMetadataRecord();
+            $this->fileRecordService->updateSysFileRecord();
         }
 
     }
@@ -68,13 +82,35 @@ class DataHandlerHook
      * @param string $table
      * @param string|int $id recordUid
      * @param mixed $value Command Value
+     * @param DataHandler $pObj
+     * @param $pasteUpdate
+     * @param array $pasteDatamap
      */
     public function processCmdmap_postProcess(
         string $command,
         string $table,
         $id,
-        $value
+        $value,
+        DataHandler $pObj,
+        $pasteUpdate,
+        array $pasteDatamap,
+        $fileRecordService = null,
+        $referenceRecordService = null
+
     ) {
+
+        $this->initializeServices($fileRecordService, $referenceRecordService);
+
+        // translation of metadata record
+        // results in copied sys_file and relation of record to new file
+        // all references need to be updated to the new file
+        if ($table === 'sys_file_metadata' && $command === 'localize') {
+            $this->fileRecordService->copyFileRecord();
+            $this->referenceRecordService->updateReferences();
+        }
+
+        // if a consuming table receives the localize command, check the references for available variants
+
     }
 
 }
