@@ -70,6 +70,9 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         // done to prevent an error during processing
         // it makes no difference here whether file filters apply to the data set
         unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
+
+        mkdir(PATH_site . 'languageVariants/languageVariants', 0777, true);
+        mkdir(PATH_site . 'languageVariants/_processed_', 0777, true);
     }
 
     protected function tearDown()
@@ -78,7 +81,7 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         unset($this->actionService);
         $this->assertErrorLogEntries();
         parent::tearDown();
-
+        rmdir(PATH_site . 'languageVariants');
     }
 
     /**
@@ -172,6 +175,8 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
+        copy(PATH_site .'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_1.JPG', PATH_site . 'fileadmin/cat_1.jpg');
+
         $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
         $this->actionService->localizeRecord('sys_file_metadata', 11, 2);
         $this->actionService->localizeRecord('sys_file_metadata', 11, 3);
@@ -210,7 +215,6 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $ids = $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
         $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_2.jpg';
         list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
-        //DebuggerUtility::var_dump($postFiles, $filename, 8, true);
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
 
         $this->actionService->localizeRecord('sys_file_metadata', 11, 2);

@@ -43,7 +43,7 @@ class FileRecordService
      * @param int $sys_language_uid
      * @return int
      */
-    public function copySysFileRecord(int $parentUid, int $sys_language_uid): int
+    public function translateSysFileRecord(int $parentUid, int $sys_language_uid): int
     {
         if ($sys_language_uid < 1) {
             throw new \InvalidArgumentException('can not translate to default language', 1489334111);
@@ -51,18 +51,21 @@ class FileRecordService
         if ($parentUid < 1) {
             throw new \InvalidArgumentException('can not translate from invalid file', 1489334112);
         }
-        $cmdMap = [
+        $parentFile = $this->persistenceService->getFileObject($parentUid);
+        $folder = $this->persistenceService->findStorageDestination();
+        $translatedFileUid = $this->persistenceService->copyFileObject($parentFile, $folder);
+
+        $dataMap = [
             'sys_file' => [
-                $parentUid => [
-                    'localize' => $sys_language_uid
+                $translatedFileUid => [
+                    'sys_language_uid' => $sys_language_uid,
+                    'l10n_parent' => $parentUid
                 ]
             ]
         ];
-        $this->persistenceService->process_cmdMap($cmdMap);
+        $this->persistenceService->process_dataMap($dataMap);
 
-
-        $sysFileRecord = $this->persistenceService->getSysFileRecord($parentUid, $sys_language_uid);
-        return $sysFileRecord['uid'];
+        return $translatedFileUid;
     }
 
     /**
@@ -87,8 +90,35 @@ class FileRecordService
         $this->persistenceService->process_dataMap($dataMap);
     }
 
-    public function updateSysFileRecord()
+    /**
+     * @param $metadataUid
+     * @param $fileName
+     */
+    public function replaceFileContentOfRelatedFile(int $metadataUid, string $fileName)
     {
+        if ($metadataUid < 1) {
+            throw new \InvalidArgumentException('no metadata uid given', 1489398159);
+        }
+        $localFilePath = $this->calculateFullPathToUploadedFile($fileName);
+        if (!file_exists($localFilePath)) {
+            throw new \RuntimeException('file ' . $fileName . ' was not uploaded', 1489398160);
+        }
+
+        $metadataRecord = $this->persistenceService->getSysFileMetaDataRecordByUid($metadataUid);
+        $this->persistenceService->replaceFile($metadataRecord['file'], $fileName, $localFilePath);
+    }
+
+    /**
+     * @param string $fileName
+     * @return string filePath
+     */
+    protected function calculateFullPathToUploadedFile(string $fileName): string
+    {
+        $sourceFolder = PATH_site . 'typo3temp/uploads/';
+        if (strpos($fileName, ',') !== false) {
+            $fileName = substr($fileName, strrpos($fileName, ',') + 1);
+        }
+        return $sourceFolder . $fileName;
     }
 
 

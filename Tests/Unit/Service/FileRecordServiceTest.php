@@ -15,6 +15,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use T3G\AgencyPack\FileVariants\Service\FileRecordService;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +47,7 @@ class FileRecordServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1489334111);
-        $this->subject->copySysFileRecord(22, 0);
+        $this->subject->translateSysFileRecord(22, 0);
     }
 
     /**
@@ -56,7 +57,7 @@ class FileRecordServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1489334112);
-        $this->subject->copySysFileRecord(0, 1);
+        $this->subject->translateSysFileRecord(0, 1);
     }
 
     /**
@@ -84,18 +85,25 @@ class FileRecordServiceTest extends TestCase
      */
     public function copyFileReturnsUidOfCopiedFileRecord()
     {
-        $cmdMap = [
+        $this->persistenceService->getFileObject(28)->shouldBeCalled();
+        $this->persistenceService->findStorageDestination()->shouldBeCalled();
+        $this->persistenceService->copyFileObject(Argument::cetera())->willReturn(30);
+        $dataMap = [
             'sys_file' => [
-                28 => [
-                    'localize' => 1
+                30 => [
+                    'sys_language_uid' => 1,
+                    'l10n_parent' => 28
                 ]
             ]
         ];
-        $this->persistenceService->process_cmdMap($cmdMap)->shouldBeCalled();
-        $this->persistenceService->getSysFileRecord(28, 1)->willReturn(['uid' => 30]);
-        $result = $this->subject->copySysFileRecord(28, 1);
+        $this->persistenceService->process_dataMap($dataMap)->shouldBeCalled();
+        $result = $this->subject->translateSysFileRecord(28, 1);
         $this->assertSame(30, $result);
     }
 
+    public function updateSysFileRecordReplacesFile()
+    {
+
+    }
 
 }

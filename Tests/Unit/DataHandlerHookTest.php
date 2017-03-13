@@ -63,7 +63,7 @@ class DataHandlerHookTest extends TestCase
     public function uponSysFileMetadataLocalisationDependingSysFileRecordGetsCopiedAndRelated()
     {
         $this->persistenceService->getSysFileMetaDataRecord(42, 1)->willReturn(['file' => 28, 'uid' => 11]);
-        $this->fileRecordService->copySysFileRecord(28,1)->willReturn(30);
+        $this->fileRecordService->translateSysFileRecord(28,1)->willReturn(30);
         $this->fileRecordService->updateSysFileMetadata(11, 30)->shouldBeCalled();
         $this->subject->processCmdmap_postProcess('localize', 'sys_file_metadata', 42, 1, $this->prophesize(DataHandler::class)->reveal(), [], [], $this->fileRecordService->reveal(), $this->referenceRecordService->reveal(), $this->persistenceService->reveal());
         $this->referenceRecordService->updateReferences(28, 30, 1)->shouldBeCalled();
@@ -86,7 +86,7 @@ class DataHandlerHookTest extends TestCase
     public function uponSysFileMetadataLocalisationRealUidIsUsed()
     {
         $this->persistenceService->getSysFileMetaDataRecord(21, 1)->willReturn(['file' => 28, 'uid' => 11]);
-        $this->fileRecordService->copySysFileRecord(Argument::cetera())->shouldBeCalled();
+        $this->fileRecordService->translateSysFileRecord(Argument::cetera())->shouldBeCalled();
         $this->fileRecordService->updateSysFileMetadata(Argument::cetera())->shouldBeCalled();
         /** @var DataHandler $pObj */
         $pObj = $this->prophesize(DataHandler::class)->reveal();
@@ -101,7 +101,7 @@ class DataHandlerHookTest extends TestCase
     public function cmdMapHookDoesNotReactOnUnrelatedTable()
     {
         $this->subject->processCmdmap_postProcess('localize', 'tt_content', 42, 1, $this->prophesize(DataHandler::class)->reveal(), [], [], $this->fileRecordService->reveal(), $this->referenceRecordService->reveal(), $this->persistenceService->reveal());
-        $this->fileRecordService->copySysFileRecord()->shouldNotBeCalled();
+        $this->fileRecordService->translateSysFileRecord()->shouldNotBeCalled();
         $this->referenceRecordService->updateReferences()->shouldNotBeCalled();
     }
 
@@ -110,8 +110,8 @@ class DataHandlerHookTest extends TestCase
      */
     public function uponSysFileMetadataUpdateWithFileVariantSetTheRelatedSysFileRecordGetsUpdated()
     {
-        $this->subject->processDatamap_afterDatabaseOperations('update', 'sys_file_metadata', 42, ['file_variant' => 'foo'], $this->prophesize(DataHandler::class)->reveal(), $this->fileRecordService->reveal(), $this->referenceRecordService->reveal(), $this->persistenceService->reveal());
-        $this->fileRecordService->updateSysFileRecord()->shouldBeCalled();
+        $this->subject->processDatamap_afterDatabaseOperations('update', 'sys_file_metadata', 42, ['language_variant' => 'foo'], $this->prophesize(DataHandler::class)->reveal(), $this->fileRecordService->reveal(), $this->referenceRecordService->reveal(), $this->persistenceService->reveal());
+        $this->fileRecordService->replaceFileContentOfRelatedFile(Argument::cetera())->shouldBeCalled();
     }
 
 }

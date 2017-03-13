@@ -19,6 +19,7 @@ use T3G\AgencyPack\FileVariants\Service\PersistenceService;
 use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Description
@@ -88,8 +89,10 @@ class DataHandlerHook
 
         // sys_file_metadata record is updated with file_variant set
         // related file must be replaced (preserve the uid)!
-        if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('file_variant', $fieldArray)) {
-            $this->fileRecordService->updateSysFileRecord();
+        if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('language_variant', $fieldArray)) {
+            $id = $this->substNewWithId($id, $pObj);
+            $this->fileRecordService->replaceFileContentOfRelatedFile($id, $fieldArray['language_variant']);
+            $this->persistenceService->emptyLanguageVariantsField($id);
         }
 
     }
@@ -127,22 +130,35 @@ class DataHandlerHook
         // all references need to be updated to the new file
         if ($table === 'sys_file_metadata' && $command === 'localize') {
 
-            if (is_string($id) && strpos($id, 'NEW') >= 0) {
-                $id = $pObj->substNEWwithIDs[$id];
-            }
-            if ((int)$id === 0) {
+            $id = $this->substNewWithId($id, $pObj);
+            if ($id < 1) {
                 throw new \RuntimeException('can\'t retrieve valid id', 1489332067);
             }
             $handledMetaDataRecord = $this->persistenceService->getSysFileMetaDataRecord((int)$id, (int)$value);
             $fileUid = (int)$handledMetaDataRecord['file'];
-            $translatedFileUid = $this->fileRecordService->copySysFileRecord($fileUid, $value);
+            $translatedFileUid = $this->fileRecordService->translateSysFileRecord($fileUid, (int)$value);
             $this->fileRecordService->updateSysFileMetadata($handledMetaDataRecord['uid'], $translatedFileUid);
-            $this->referenceRecordService->updateReferences($fileUid, $translatedFileUid, $value);
-
+            $this->referenceRecordService->updateReferences($fileUid, $translatedFileUid, (int)$value);
         }
 
         // if a consuming table receives the localize command, check the references for available variants
 
+    }
+
+    /**
+     * @param string|int $id
+     * @param DataHandler $pObj
+     * @return int
+     */
+    protected function substNewWithId($id, DataHandler $pObj): int
+    {
+        if (is_string($id) && strpos($id, 'NEW') >= 0) {
+            $id = $pObj->substNEWwithIDs[$id];
+        }
+        if ($id === null) {
+            $id = -1;
+        }
+        return $id;
     }
 
 }

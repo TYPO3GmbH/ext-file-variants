@@ -17,7 +17,12 @@ namespace T3G\AgencyPack\FileVariants\Service;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Bundles all requests to the database
@@ -58,7 +63,7 @@ class PersistenceService
      * @param int $sys_language_uid
      * @return array
      */
-    public function getSysFileRecord(int $parentUid, int $sys_language_uid): array
+    public function getSysFileRecord(int $parentUid, int $sys_language_uid)
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
@@ -194,4 +199,123 @@ class PersistenceService
         return $queryBuilder->execute()->fetch();
     }
 
+    /**
+     * @param int $metadataUid
+     * @return array
+     */
+    public function getSysFileMetaDataRecordByUid(int $metadataUid): array
+    {
+         /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder->select('*')->from('sys_file_metadata')
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'uid',
+                    $queryBuilder->createNamedParameter($metadataUid, \PDO::PARAM_INT)
+                )
+            );
+        return $queryBuilder->execute()->fetch();
+    }
+
+    /**
+     * @param $storageName
+     * @return int
+     */
+    public function getFileStorageRecordUid(string $storageName): int
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_storage');
+        return (int)$queryBuilder->select('uid')->from('sys_file_storage')
+            ->where(
+                $queryBuilder->expr()->eq(
+                    'name', $queryBuilder->createNamedParameter($storageName)
+                ),
+                $queryBuilder->expr()->eq(
+                    'is_online',
+                    $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)
+                ),
+                $queryBuilder->expr()->eq(
+                    'is_writable',
+                    $queryBuilder->createNamedParameter(1, \PDO::PARAM_INT)
+                )
+            )->execute()->fetchColumn();
+    }
+
+    /**
+     * @param int $uid
+     * @return File
+     */
+    public function getFileObject(int $uid): File
+    {
+        return ResourceFactory::getInstance()->getFileObject($uid);
+    }
+
+    /**
+     * @return Folder
+     */
+    public function findStorageDestination(): Folder
+    {
+        $fileStorageRecordUid = $this->getFileStorageRecordUid('language_variants');
+
+        if ($fileStorageRecordUid > 0) {
+            $storage = ResourceFactory::getInstance()->getStorageObject($fileStorageRecordUid);
+        } else {
+            $storage = ResourceFactory::getInstance()->getDefaultStorage();
+        }
+        return $this->ensureAvailableFolder($storage);
+    }
+
+    /**
+     * @param ResourceStorage $storage
+     * @return Folder
+     */
+    protected function ensureAvailableFolder(ResourceStorage $storage): Folder
+    {
+        $folder = null;
+        $folderName = 'languageVariants';
+        if ($storage->hasFolder($folderName) === false) {
+            $folder = $storage->createFolder($folderName);
+        } else {
+            $folder = $storage->getFolder($folderName);
+        }
+        return $folder;
+    }
+
+    /**
+     * @param File $parentFile
+     * @param Folder $folder
+     * @return int
+     */
+    public function copyFileObject($parentFile, $folder): int
+    {
+        return $parentFile->copyTo($folder)->getUid();
+    }
+
+    /**
+     * @param int $fileUid
+     * @param string $localFilePath
+     */
+    public function replaceFile(int $fileUid, string $filename, string $localFilePath)
+    {
+        $file = ResourceFactory::getInstance()->getFileObject($fileUid);
+        $file->getStorage()->replaceFile($file, $localFilePath);
+        $file->rename($filename);
+    }
+
+    /**
+     * @param int $id
+     */
+    public function emptyLanguageVariantsField(int $id)
+    {
+        if ($id < 1) {
+            throw new \InvalidArgumentException('no metadata uid given', 1489398161);
+        }
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder->update('sys_file_metadata')->set('language_variant', '')->where(
+            $queryBuilder->expr()->eq(
+                'uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)
+            )
+        );
+
+    }
 }
