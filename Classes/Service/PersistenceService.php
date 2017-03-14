@@ -16,13 +16,13 @@ namespace T3G\AgencyPack\FileVariants\Service;
  */
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Bundles all requests to the database
@@ -163,7 +163,8 @@ class PersistenceService
             $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
         );
 
-        return $queryBuilder->execute()->fetch();
+        $result = $queryBuilder->execute()->fetch();
+        return is_array($result) ? $result : [];
     }
 
     /**
@@ -303,6 +304,8 @@ class PersistenceService
         }
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        // get rid of all but deleted constraint, we need to update disabled record references as well
+        $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
         $queryBuilder->select('*')->from($table)->where(
             $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['ctrl']['languageField'], $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)),
             $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'], $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
@@ -320,8 +323,8 @@ class PersistenceService
     public function findReferencesByUidForeignAndSysLanguageUid(int $uid_foreign, int $sys_language_uid, string $tableName)
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_references');
-        $queryBuilder->select('*')->from('sys_file_references')->where(
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+        $queryBuilder->select('*')->from('sys_file_reference')->where(
             $queryBuilder->expr()->eq('uid_foreign', $queryBuilder->createNamedParameter($uid_foreign, \PDO::PARAM_INT)),
             $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)),
             $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter($tableName))

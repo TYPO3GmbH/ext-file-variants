@@ -158,7 +158,7 @@ class FileRecordService
                     $languageVariantUid = $this->getFileVariantUidForFile((int)$reference['uid_local'],
                         (int)$value);
                     if ($languageVariantUid > 0) {
-                        $this->persistenceService->updateReferences([$reference], $languageVariantUid);
+                        $this->persistenceService->updateReferences([(int)$reference['uid']], (int)$languageVariantUid);
                     }
                 }
             }

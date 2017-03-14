@@ -79,7 +79,14 @@ class ReferenceRecordService
         if ($sys_language_uid < 1) {
             throw new \InvalidArgumentException('value for sys_language_uid is no valid language id', 1489498931);
         }
-        return $this->persistenceService->findReferencesByUidForeignAndSysLanguageUid($uid_foreign, $sys_language_uid, $tableName);
+        $references = $this->persistenceService->findReferencesByUidForeignAndSysLanguageUid($uid_foreign, $sys_language_uid, $tableName);
+        $validReferenceUids = $this->recordService->filterValidReferences($references);
+        foreach ($references as $index => $reference) {
+            if (!in_array($reference['uid'], $validReferenceUids)) {
+                unset($references[$index]);
+            }
+        }
+        return $references;
     }
 
 }
