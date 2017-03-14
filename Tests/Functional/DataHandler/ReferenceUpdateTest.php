@@ -59,6 +59,13 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->testExtensionsToLoad[] = 'typo3conf/ext/news';
 
         parent::setUp();
+
+        // make sure there are no leftover files from earlier tests
+        // done in setup because teardown is called only once per file
+        if (file_exists(PATH_site . 'languageVariants')) {
+            system('rm -rf ' . escapeshellarg(PATH_site . 'languageVariants'));
+        }
+
         Bootstrap::getInstance()->initializeLanguageObject();
 
         $this->backendUser = $this->setUpBackendUserFromFixture(1);
@@ -81,7 +88,6 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         unset($this->actionService);
         $this->assertErrorLogEntries();
         parent::tearDown();
-        rmdir(PATH_site . 'languageVariants');
     }
 
     /**
@@ -89,7 +95,7 @@ class ReferenceUpdateTest extends FunctionalTestCase {
      */
     protected function cleanUpFilesAndRelatedRecords() {
         // find files in storage
-        $storage = ResourceFactory::getInstance()->getDefaultStorage();
+        $storage = ResourceFactory::getInstance()->getStorageObject(2);
         $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
         try {
             $folder = $storage->getFolder('languageVariants');
@@ -194,6 +200,8 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
+        copy(PATH_site .'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_1.JPG', PATH_site . 'fileadmin/cat_1.jpg');
+
         $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
         $this->actionService->localizeRecord('sys_file_metadata', 11, 2);
         $this->actionService->localizeRecord('sys_file_metadata', 11, 3);
@@ -212,13 +220,22 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
+        copy(PATH_site .'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_1.JPG', PATH_site . 'fileadmin/cat_1.jpg');
+
         $ids = $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_2.jpg';
-        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/nature_1.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][11], $testFilePath);
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
 
-        $this->actionService->localizeRecord('sys_file_metadata', 11, 2);
-        $this->actionService->localizeRecord('sys_file_metadata', 11, 3);
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 11, 2);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/business_1.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][11], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
+
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 11, 3);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/city_1.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][11], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
 
         $this->importAssertCSVScenario($scenarioName);
     }
