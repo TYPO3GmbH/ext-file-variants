@@ -31,6 +31,7 @@ use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
  *
  * Class PersistenceService
  * @package T3G\AgencyPack\FileVariants\DataHandler
+ * @internal
  */
 class PersistenceService
 {
@@ -63,7 +64,7 @@ class PersistenceService
      * @param int $sys_language_uid
      * @return array
      */
-    public function getSysFileRecord(int $parentUid, int $sys_language_uid)
+    public function getSysFileRecord(int $parentUid, int $sys_language_uid): array
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
@@ -78,7 +79,8 @@ class PersistenceService
                     $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)
                 )
             );
-        return $queryBuilder->execute()->fetch();
+        $result = $queryBuilder->execute()->fetch();
+        return is_array($result) ? $result : [];
     }
 
     /**
@@ -121,41 +123,6 @@ class PersistenceService
     }
 
     /**
-     * @param $references
-     * @return array
-     */
-    public function filterValidReferences($references): array
-    {
-        $filteredReferences = [];
-        foreach ($references as $reference) {
-            $uid = $reference['uid'];
-            if ($this->isValidReference($uid)) {
-                $filteredReferences[] = $uid;
-            }
-        }
-        return $filteredReferences;
-    }
-
-    /**
-     * @param int $uid
-     * @return bool
-     */
-    protected function isValidReference(int $uid): bool
-    {
-        $isValid = true;
-        $sysFileReferenceRecord = $this->getSysFileReferenceRecord($uid);
-        $irrelevantTableNames = ['pages', 'pages_language_overlay', 'sys_file_metadata', 'sys_file'];
-        if (in_array($sysFileReferenceRecord['tablenames'], $irrelevantTableNames)) {
-            return false;
-        }
-        $foreignRecord = $this->getRecord($sysFileReferenceRecord['tablenames'], $sysFileReferenceRecord['uid_foreign']);
-        if ($sysFileReferenceRecord['tablenames'] === 'tt_content' && $foreignRecord['l18n_parent'] === 0) {
-            $isValid = false;
-        }
-        return $isValid;
-    }
-
-    /**
      * @param array $references
      * @param int $newFileUid
      */
@@ -173,7 +140,7 @@ class PersistenceService
      * @param int $uid
      * @return array
      */
-    protected function getSysFileReferenceRecord(int $uid): array
+    public function getSysFileReferenceRecord(int $uid): array
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
@@ -188,7 +155,7 @@ class PersistenceService
      * @param int $uid
      * @return array
      */
-    protected function getRecord(string $table, int $uid): array
+    public function getRecord(string $table, int $uid): array
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
@@ -317,5 +284,48 @@ class PersistenceService
             )
         );
 
+    }
+
+    /**
+     * @param string $table
+     * @param int $id
+     * @param int $sys_language_uid
+     * @return array
+     */
+    public function getTranslatedRecord(string $table, int $id, int $sys_language_uid): array
+    {
+        if ($id < 1) {
+            throw new \InvalidArgumentException('no valid uid given', 1489497807);
+        }
+
+        if ($sys_language_uid < 1) {
+            throw new \InvalidArgumentException('no valid language uid given', 1489497808);
+        }
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder->select('*')->from($table)->where(
+            $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['ctrl']['languageField'], $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)),
+            $queryBuilder->expr()->eq($GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'], $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
+        );
+        $result = $queryBuilder->execute()->fetch();
+        return is_array($result) ? $result : [];
+    }
+
+    /**
+     * @param int $uid_foreign
+     * @param int $sys_language_uid
+     * @param string $tableName
+     * @return array
+     */
+    public function findReferencesByUidForeignAndSysLanguageUid(int $uid_foreign, int $sys_language_uid, string $tableName)
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_references');
+        $queryBuilder->select('*')->from('sys_file_references')->where(
+            $queryBuilder->expr()->eq('uid_foreign', $queryBuilder->createNamedParameter($uid_foreign, \PDO::PARAM_INT)),
+            $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)),
+            $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter($tableName))
+        );
+        return $queryBuilder->execute()->fetchAll();
     }
 }

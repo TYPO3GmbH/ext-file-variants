@@ -30,12 +30,19 @@ class FileRecordService
     protected $persistenceService;
 
     /**
+     * @var ReferenceRecordService
+     */
+    protected $referenceRecordService;
+
+    /**
      * FileRecordService constructor.
      * @param PersistenceService $persistenceService
+     * @param ReferenceRecordService $referenceRecordService
      */
-    public function __construct($persistenceService)
+    public function __construct($persistenceService, $referenceRecordService)
     {
         $this->persistenceService = $persistenceService;
+        $this->referenceRecordService = $referenceRecordService;
     }
 
     /**
@@ -121,5 +128,40 @@ class FileRecordService
         return $sourceFolder . $fileName;
     }
 
+    /**
+     * @param int $parentFileUid
+     * @param int $sys_language_uid
+     * @return int
+     */
+    public function getFileVariantUidForFile(int $parentFileUid, int $sys_language_uid): int
+    {
+        if ($parentFileUid < 1) {
+            throw new \InvalidArgumentException('file uid not valid', 1489503021);
+        }
+        $result = $this->persistenceService->getSysFileRecord($parentFileUid, $sys_language_uid);
+        return isset($result['uid']) ? (int)$result['uid'] : 0;
+    }
 
+    /**
+     * @param string $table
+     * @param $id
+     * @param $value
+     */
+    public function adjustTranslatedReferencesToFileVariants(string $table, $id, $value)
+    {
+        $handledRecord = $this->persistenceService->getTranslatedRecord($table, $id, $value);
+        if (isset($handledRecord['uid']) && (int)$handledRecord['uid'] > 0) {
+            $references = $this->referenceRecordService->findReferencesByUidForeignAndSysLanguageUid((int)$handledRecord['uid'],
+                (int)$value, $table);
+            if ($references) {
+                foreach ($references as $reference) {
+                    $languageVariantUid = $this->getFileVariantUidForFile((int)$reference['uid_local'],
+                        (int)$value);
+                    if ($languageVariantUid > 0) {
+                        $this->persistenceService->updateReferences([$reference], $languageVariantUid);
+                    }
+                }
+            }
+        }
+    }
 }

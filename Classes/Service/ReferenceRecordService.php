@@ -29,12 +29,19 @@ class ReferenceRecordService
     protected $persistenceService;
 
     /**
+     * @var RecordService
+     */
+    protected $recordService;
+
+    /**
      * ReferenceRecordService constructor.
      * @param PersistenceService $persistenceService
+     * @param RecordService $recordService
      */
-    public function __construct($persistenceService)
+    public function __construct($persistenceService, $recordService)
     {
         $this->persistenceService = $persistenceService;
+        $this->recordService = $recordService;
     }
 
     /**
@@ -54,8 +61,25 @@ class ReferenceRecordService
             throw new \InvalidArgumentException('can not handle invalid language', 1489335148);
         }
         $references = $this->persistenceService->collectAffectedReferences($oldFileUid, $sys_language_uid);
-        $references = $this->persistenceService->filterValidReferences($references);
+        $references = $this->recordService->filterValidReferences($references);
         $this->persistenceService->updateReferences($references, $newFileUid);
+    }
+
+    /**
+     * @param int $uid_foreign
+     * @param int $sys_language_uid
+     * @param string $tableName
+     * @return array
+     */
+    public function findReferencesByUidForeignAndSysLanguageUid(int $uid_foreign, int $sys_language_uid, string $tableName): array
+    {
+        if ($uid_foreign < 1) {
+            throw new \InvalidArgumentException('value for uid_foreign is no valid id', 1489498930);
+        }
+        if ($sys_language_uid < 1) {
+            throw new \InvalidArgumentException('value for sys_language_uid is no valid language id', 1489498931);
+        }
+        return $this->persistenceService->findReferencesByUidForeignAndSysLanguageUid($uid_foreign, $sys_language_uid, $tableName);
     }
 
 }

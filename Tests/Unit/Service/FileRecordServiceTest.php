@@ -15,11 +15,12 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\Service;
  * The TYPO3 project - inspiring people to share!
  */
 
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use T3G\AgencyPack\FileVariants\Service\FileRecordService;
-use PHPUnit\Framework\TestCase;
 use T3G\AgencyPack\FileVariants\Service\PersistenceService;
+use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 
 class FileRecordServiceTest extends TestCase
 {
@@ -34,10 +35,16 @@ class FileRecordServiceTest extends TestCase
      */
     protected $persistenceService;
 
+    /**
+     * @var ReferenceRecordService|ObjectProphecy
+     */
+    protected $referenceRecordService;
+
     protected function setUp()
     {
         $this->persistenceService = $this->prophesize(PersistenceService::class);
-        $this->subject = new FileRecordService($this->persistenceService->reveal());
+        $this->referenceRecordService = $this->prophesize(ReferenceRecordService::class);
+        $this->subject = new FileRecordService($this->persistenceService->reveal(), $this->referenceRecordService->reveal());
     }
 
     /**
@@ -101,9 +108,14 @@ class FileRecordServiceTest extends TestCase
         $this->assertSame(30, $result);
     }
 
-    public function updateSysFileRecordReplacesFile()
+    /**
+     * @test
+     */
+    public function getFileVariantUidForFileReturnsZeroForNotExisingVariant()
     {
-
+        $this->persistenceService->getSysFileRecord(1, 1)->willReturn([]);
+        $result = $this->subject->getFileVariantUidForFile(1, 1);
+        $this->assertSame(0, $result);
     }
 
 }

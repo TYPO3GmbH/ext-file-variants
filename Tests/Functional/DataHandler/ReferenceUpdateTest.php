@@ -249,8 +249,6 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
-        //copy(PATH_site .'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_1.JPG', PATH_site . 'fileadmin/cat_1.jpg');
-
         $this->actionService->copyRecordToLanguage('tt_content', 4, 1);
         $this->actionService->copyRecordToLanguage('tt_content', 4, 2);
         $this->actionService->copyRecordToLanguage('tt_content', 4, 3);
@@ -259,35 +257,67 @@ class ReferenceUpdateTest extends FunctionalTestCase {
     }
 
     /**
+     * @test
+     */
+    public function translatingInConnectedModeUsesVariants()
+    {
+        $scenarioName = 'ConnectedMode_TranslateCEs';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
+
+        $this->actionService->localizeRecord('tt_content', 4, 1);
+        $this->actionService->localizeRecord('tt_content', 4, 2);
+        $this->actionService->localizeRecord('tt_content', 4, 3);
+
+        $this->importAssertCSVScenario($scenarioName);
+    }
+
+    /**
      * use tx_news records to test for non pages|tt_content records
      *
-     *
+     * @test
      */
-    public function providingFileVariantCausesUpdateOfOtherTableItems()
+    public function providingFileVariantCausesUpdateOfFALConsumingTableItemReferences()
     {
-        // according initial scenario following references are affected: 5, 28, 30, 32
+        $scenarioName = 'FALConsumingTable_ProvideFileVariants';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(2);
 
-        // after localisation to 1, 28 needs to have changed
-        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 1);
-        // file 1 features cat_5
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/nature_5.jpg';
-        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata',
-            (int)$ids['sys_file_metadata'][1], $testFilePath);
-        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+        copy(PATH_site .'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_1.JPG', PATH_site . 'fileadmin/cat_1.jpg');
 
-        // after localisation to 2, 30 needs to have changed
-        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 2);
-        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/business_5.jpg';
-        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
-        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/nature_1.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][11], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
 
-//        // after localisation to 3, 32 needs to have changed
-//        $ids = $this->actionService->localizeRecord('sys_file_metadata', 1, 3);
-//        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/city_5.jpg';
-//        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][1], $testFilePath);
-//        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][1], ['language_variant' => $filename], null, $postFiles);
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 11, 2);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/business_1.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][11], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
 
-        $this->importAssertCSVScenario('TxNews');
+        $ids = $this->actionService->localizeRecord('sys_file_metadata', 11, 3);
+        $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/city_1.jpg';
+        list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][11], $testFilePath);
+        $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
+
+
+        $this->importAssertCSVScenario($scenarioName);
+    }
+
+    /**
+     * @test
+     */
+    public function translatingOfFALConsumingTableItemsUsesVariants()
+    {
+        $scenarioName = 'FALConsumingTable_Translate';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(2);
+
+        $this->actionService->localizeRecord('tx_news_domain_model_news', 1, 1);
+        $this->actionService->localizeRecord('tx_news_domain_model_news', 1, 2);
+        $this->actionService->localizeRecord('tx_news_domain_model_news', 1, 3);
+
+        $this->importAssertCSVScenario($scenarioName);
     }
 
     public function deletionOfFileVariantResetsAllConsumersInConnectedModeToDefaultFile()
@@ -295,7 +325,7 @@ class ReferenceUpdateTest extends FunctionalTestCase {
 
     }
 
-    public function deletionOfFileVariantDoesNotTouchAllConsumersInConnectedMode()
+    public function deletionOfFileVariantDoesNotTouchAllConsumersInFreeMode()
     {
 
     }
@@ -304,5 +334,20 @@ class ReferenceUpdateTest extends FunctionalTestCase {
     {
         // remove default file -> remove variants -> update consumers to relate to default file
         // leads to broken relations, this is the case already before the change.
+    }
+
+    public function additionOfReferenceToTranslatedConnectedModeCEUsesVariant()
+    {
+
+    }
+
+    public function additionOfReferenceToTranslatedFreeModeCEDoesNotUseVariant()
+    {
+
+    }
+
+    public function additionOfReferenceToFALConsumingTableItemUsesVariantsInTranslations()
+    {
+
     }
 }
