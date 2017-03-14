@@ -241,6 +241,24 @@ class ReferenceUpdateTest extends FunctionalTestCase {
     }
 
     /**
+     * @test
+     */
+    public function translatingInFreeModeDoesNotUseVariants()
+    {
+        $scenarioName = 'FreeMode_TranslateCEs';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
+
+        //copy(PATH_site .'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/cat_1.JPG', PATH_site . 'fileadmin/cat_1.jpg');
+
+        $this->actionService->copyRecordToLanguage('tt_content', 4, 1);
+        $this->actionService->copyRecordToLanguage('tt_content', 4, 2);
+        $this->actionService->copyRecordToLanguage('tt_content', 4, 3);
+
+        $this->importAssertCSVScenario($scenarioName);
+    }
+
+    /**
      * use tx_news records to test for non pages|tt_content records
      *
      *

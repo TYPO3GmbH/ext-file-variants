@@ -94,7 +94,6 @@ class DataHandlerHook
             $this->fileRecordService->replaceFileContentOfRelatedFile($id, $fieldArray['language_variant']);
             $this->persistenceService->emptyLanguageVariantsField($id);
         }
-
     }
 
     /**
