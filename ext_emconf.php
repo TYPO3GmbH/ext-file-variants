@@ -19,10 +19,10 @@ $EM_CONF[$_EXTKEY] = array(
     ),
     'state' => 'stable',
     'uploadfolder' => 0,
-    'createDirs' => '',
+    'createDirs' => 'typo3temp/uploads',
     'clearCacheOnLoad' => 1,
     'author' => 'Anja Leichsenring',
     'author_email' => 'anja.leichsenring@typo3.com',
     'author_company' => 'TYPO3 GmbH',
-    'version' => '1.0.0',
+    'version' => '0.5.0',
 );
