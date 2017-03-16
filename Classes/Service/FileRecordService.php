@@ -149,7 +149,7 @@ class FileRecordService
      */
     public function adjustTranslatedReferencesToFileVariants(string $table, $id, $value)
     {
-        $handledRecord = $this->persistenceService->getTranslatedRecord($table, $id, $value);
+        $handledRecord = $this->persistenceService->getTranslatedRecord($table, (int)$id, (int)$value);
         if (isset($handledRecord['uid']) && (int)$handledRecord['uid'] > 0) {
             $references = $this->referenceRecordService->findReferencesByUidForeignAndSysLanguageUid((int)$handledRecord['uid'],
                 (int)$value, $table);
