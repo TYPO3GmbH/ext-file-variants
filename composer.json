@@ -1,27 +1,33 @@
 {
-    "name": "t3g/file_variants",
-    "description": "Files can present their language variants and use them",
-    "minimum-stability": "dev",
-    "type": "typo3-cms-extension",
-    "license": "GPL-2.0+",
-    "repositories": {
-        "0": {
-            "type": "composer",
-            "url": "https://composer.typo3.org/"
-        }
-    },
-    "authors": [
-        {
-            "name": "TYPO3 GmbH",
-            "role": "Developer",
-            "homepage": "https://typo3.com/"
-        }
-    ],
-    "require": {
-    },
-    "autoload": {
-        "psr-4": {
-            "T3G\\AgencyPack\\FileVariants\\": "Classes/"
-        }
-    }
+	"name": "t3g/file_variants",
+	"description": "Files can present their language variants and use them",
+	"minimum-stability": "dev",
+	"type": "typo3-cms-extension",
+	"license": "GPL-2.0+",
+	"repositories": {
+		"0": {
+			"type": "composer",
+			"url": "https://composer.typo3.org/"
+		}
+	},
+	"authors": [
+		{
+			"name": "TYPO3 GmbH",
+			"role": "Developer",
+			"homepage": "https://typo3.com/"
+		}
+	],
+	"require": {
+		"typo3/cms-core": "^8"
+	},
+	"autoload": {
+		"psr-4": {
+			"T3G\\AgencyPack\\FileVariants\\": "Classes/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"T3G\\AgencyPack\\FileVariants\\Tests\\": "Tests/"
+		}
+	}
 }
