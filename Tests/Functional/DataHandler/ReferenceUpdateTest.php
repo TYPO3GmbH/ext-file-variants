@@ -78,6 +78,7 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         // it makes no difference here whether file filters apply to the data set
         unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
 
+        // set up the second file storage
         mkdir(PATH_site . 'languageVariants/languageVariants', 0777, true);
         mkdir(PATH_site . 'languageVariants/_processed_', 0777, true);
     }
@@ -110,7 +111,6 @@ class ReferenceUpdateTest extends FunctionalTestCase {
             // sometimes, there is no folder to empty. Let's ignore that.
         }
         $this->actionService->deleteRecords($recordsToDelete);
-
     }
 
     /**
@@ -123,7 +123,6 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         if ($this->expectedErrorLogEntries === null) {
             return;
         }
-
         $queryBuilder = $this->getConnectionPool()
             ->getQueryBuilderForTable('sys_log');
         $queryBuilder->getRestrictions()->removeAll();
@@ -299,7 +298,6 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $testFilePath = 'typo3conf/ext/file_variants/Tests/Fixture/TestFiles/city_1.jpg';
         list($filename, $postFiles) = $this->actionService->simulateUploadedFileArray('sys_file_metadata', (int)$ids['sys_file_metadata'][11], $testFilePath);
         $this->actionService->modifyRecord('sys_file_metadata', (int)$ids['sys_file_metadata'][11], ['language_variant' => $filename], null, $postFiles);
-
 
         $this->importAssertCSVScenario($scenarioName);
     }

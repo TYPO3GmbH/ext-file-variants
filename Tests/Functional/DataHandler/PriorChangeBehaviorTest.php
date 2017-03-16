@@ -39,7 +39,6 @@ class PriorChangeBehaviorTest extends FunctionalTestCase
      */
     protected $backendUser;
 
-
     /**
      * @var string
      */
@@ -69,12 +68,6 @@ class PriorChangeBehaviorTest extends FunctionalTestCase
         // done to prevent an error during processing
         // it makes no difference here whether file filters apply to the data set
         unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->actionService);
-        parent::tearDown();
     }
 
     /**
@@ -132,7 +125,6 @@ class PriorChangeBehaviorTest extends FunctionalTestCase
      */
     public function useFileInFalField()
     {
-
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file_reference');
