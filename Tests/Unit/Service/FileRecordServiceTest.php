@@ -16,7 +16,6 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\Service;
  */
 
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use T3G\AgencyPack\FileVariants\Service\FileRecordService;
 use T3G\AgencyPack\FileVariants\Service\PersistenceService;
@@ -24,29 +23,6 @@ use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 
 class FileRecordServiceTest extends TestCase
 {
-
-    /**
-     * @var FileRecordService
-     */
-    protected $subject;
-
-    /**
-     * @var PersistenceService|ObjectProphecy
-     */
-    protected $persistenceService;
-
-    /**
-     * @var ReferenceRecordService|ObjectProphecy
-     */
-    protected $referenceRecordService;
-
-    protected function setUp()
-    {
-        $this->persistenceService = $this->prophesize(PersistenceService::class);
-        $this->referenceRecordService = $this->prophesize(ReferenceRecordService::class);
-        $this->subject = new FileRecordService($this->persistenceService->reveal(), $this->referenceRecordService->reveal());
-    }
-
     /**
      * @test
      */
@@ -54,7 +30,11 @@ class FileRecordServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1489334111);
-        $this->subject->translateSysFileRecord(22, 0);
+
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $referenceRecordService = $this->prophesize(ReferenceRecordService::class);
+        $subject = new FileRecordService($persistenceService->reveal(), $referenceRecordService->reveal());
+        $subject->translateSysFileRecord(22, 0);
     }
 
     /**
@@ -64,7 +44,11 @@ class FileRecordServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1489334112);
-        $this->subject->translateSysFileRecord(0, 1);
+
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $referenceRecordService = $this->prophesize(ReferenceRecordService::class);
+        $subject = new FileRecordService($persistenceService->reveal(), $referenceRecordService->reveal());
+        $subject->translateSysFileRecord(0, 1);
     }
 
     /**
@@ -74,7 +58,11 @@ class FileRecordServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1489334113);
-        $this->subject->updateSysFileMetadata(0, 18);
+
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $referenceRecordService = $this->prophesize(ReferenceRecordService::class);
+        $subject = new FileRecordService($persistenceService->reveal(), $referenceRecordService->reveal());
+        $subject->updateSysFileMetadata(0, 18);
     }
 
     /**
@@ -84,38 +72,10 @@ class FileRecordServiceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(1489334114);
-        $this->subject->updateSysFileMetadata(18, -1);
-    }
 
-    /**
-     * @test
-     */
-    public function copyFileReturnsUidOfCopiedFileRecord()
-    {
-        $this->persistenceService->getFileObject(28)->shouldBeCalled();
-        $this->persistenceService->findStorageDestination()->shouldBeCalled();
-        $this->persistenceService->copyFileObject(Argument::cetera())->willReturn(30);
-        $dataMap = [
-            'sys_file' => [
-                30 => [
-                    'sys_language_uid' => 1,
-                    'l10n_parent' => 28
-                ]
-            ]
-        ];
-        $this->persistenceService->process_dataMap($dataMap)->shouldBeCalled();
-        $result = $this->subject->translateSysFileRecord(28, 1);
-        $this->assertSame(30, $result);
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $referenceRecordService = $this->prophesize(ReferenceRecordService::class);
+        $subject = new FileRecordService($persistenceService->reveal(), $referenceRecordService->reveal());
+        $subject->updateSysFileMetadata(18, -1);
     }
-
-    /**
-     * @test
-     */
-    public function getFileVariantUidForFileReturnsZeroForNotExisingVariant()
-    {
-        $this->persistenceService->getSysFileRecord(1, 1)->willReturn([]);
-        $result = $this->subject->getFileVariantUidForFile(1, 1);
-        $this->assertSame(0, $result);
-    }
-
 }

@@ -16,34 +16,18 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\Service;
  */
 
 use PHPUnit\Framework\TestCase;
-use Prophecy\Prophecy\ObjectProphecy;
 use T3G\AgencyPack\FileVariants\Service\PersistenceService;
 use T3G\AgencyPack\FileVariants\Service\RecordService;
 
 class RecordServiceTest extends TestCase
 {
-
-    /**
-     * @var RecordService
-     */
-    protected $subject;
-
-    /**
-     * @var PersistenceService|ObjectProphecy
-     */
-    protected $persistenceService;
-
-    protected function setUp()
-    {
-        $this->persistenceService = $this->prophesize(PersistenceService::class);
-        $this->subject = new RecordService($this->persistenceService->reveal());
-    }
-
     /**
      * @test
      */
     public function filterValidReferencesRemovesIrrelevantTables()
     {
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $subject = new RecordService($persistenceService->reveal());
 
         $references = [
             ['uid' => 7],
@@ -51,13 +35,13 @@ class RecordServiceTest extends TestCase
             ['uid' => 21],
         ];
 
-        $this->persistenceService->getSysFileReferenceRecord(7)->willReturn(['tablenames' => 'tt_content', 'uid_foreign' => 42]);
-        $this->persistenceService->getRecord('tt_content', 42)->willReturn(['l18n_parent' => 21]);
+        $persistenceService->getSysFileReferenceRecord(7)->willReturn(['tablenames' => 'tt_content', 'uid_foreign' => 42]);
+        $persistenceService->getRecord('tt_content', 42)->willReturn(['l18n_parent' => 21]);
 
-        $this->persistenceService->getSysFileReferenceRecord(14)->willReturn(['tablenames' => 'pages', 'uid_foreign' => 42]);
-        $this->persistenceService->getSysFileReferenceRecord(21)->willReturn(['tablenames' => 'sys_file', 'uid_foreign' => 42]);
+        $persistenceService->getSysFileReferenceRecord(14)->willReturn(['tablenames' => 'pages', 'uid_foreign' => 42]);
+        $persistenceService->getSysFileReferenceRecord(21)->willReturn(['tablenames' => 'sys_file', 'uid_foreign' => 42]);
 
-        $result = $this->subject->filterValidReferences($references);
+        $result = $subject->filterValidReferences($references);
         $expected = [7];
         $this->assertSame($expected, $result);
     }
@@ -65,20 +49,23 @@ class RecordServiceTest extends TestCase
     /**
      * @test
      */
-    public function filterValidReferencesRemovesTtContentItemsInConnectedMode()
+    public function filterValidReferencesRemovesTtContentItemsInFreeMode()
     {
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $subject = new RecordService($persistenceService->reveal());
+
         $references = [
             ['uid' => 7],
             ['uid' => 14],
         ];
 
-        $this->persistenceService->getSysFileReferenceRecord(7)->willReturn(['tablenames' => 'tt_content', 'uid_foreign' => 42]);
-        $this->persistenceService->getRecord('tt_content', 42)->willReturn(['l18n_parent' => 21]);
+        $persistenceService->getSysFileReferenceRecord(7)->willReturn(['tablenames' => 'tt_content', 'uid_foreign' => 42]);
+        $persistenceService->getRecord('tt_content', 42)->willReturn(['l18n_parent' => 21]);
 
-        $this->persistenceService->getSysFileReferenceRecord(14)->willReturn(['tablenames' => 'tt_content', 'uid_foreign' => 43]);
-        $this->persistenceService->getRecord('tt_content', 43)->willReturn(['l18n_parent' => 0]);
+        $persistenceService->getSysFileReferenceRecord(14)->willReturn(['tablenames' => 'tt_content', 'uid_foreign' => 43]);
+        $persistenceService->getRecord('tt_content', 43)->willReturn(['l18n_parent' => 0]);
 
-        $result = $this->subject->filterValidReferences($references);
+        $result = $subject->filterValidReferences($references);
         $expected = [7];
         $this->assertSame($expected, $result);
     }
@@ -86,19 +73,27 @@ class RecordServiceTest extends TestCase
     /**
      * @test
      */
-    public function isFalConsumingTableReturnsTrueForExistingFalFieldInTable()
+    public function isFalConsumingTableReturnsTrueForTableContainingFalFields()
     {
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $subject = new RecordService($persistenceService->reveal());
+
         $GLOBALS['TCA']['foo']['columns']['bar']['config']['foreign_table'] = 'sys_file_reference';
-        $this->assertTrue($this->subject->isFalConsumingTable('foo'));
+
+        $this->assertTrue($subject->isFalConsumingTable('foo'));
     }
 
     /**
      * @test
      */
-    public function isFalConsumingTableReturnsFalseForNoExistingFalFieldInTable()
+    public function isFalConsumingTableReturnsFalseForTableNotContainingFalFields()
     {
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $subject = new RecordService($persistenceService->reveal());
+
         $GLOBALS['TCA']['foo']['columns']['bar']['config']['foreign_table'] = 'tt_content';
-        $this->assertFalse($this->subject->isFalConsumingTable('foo'));
+
+        $this->assertFalse($subject->isFalConsumingTable('foo'));
     }
 
     /**
@@ -106,6 +101,9 @@ class RecordServiceTest extends TestCase
      */
     public function isFalConsumingTableReturnsFalseForIrrelevantTable()
     {
-        $this->assertFalse($this->subject->isFalConsumingTable('sys_file'));
+        $persistenceService = $this->prophesize(PersistenceService::class);
+        $subject = new RecordService($persistenceService->reveal());
+
+        $this->assertFalse($subject->isFalConsumingTable('sys_file'));
     }
 }

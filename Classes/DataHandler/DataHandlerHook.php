@@ -20,7 +20,6 @@ use T3G\AgencyPack\FileVariants\Service\RecordService;
 use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Description
@@ -53,7 +52,7 @@ class DataHandlerHook
      * @param PersistenceService $persistenceService
      * @param RecordService $recordService
      */
-    protected function initializeServices($fileRecordService = null, $referenceRecordService = null, $persistenceService = null, $recordService = null)
+    public function __construct($fileRecordService = null, $referenceRecordService = null, $persistenceService = null, $recordService = null)
     {
         $this->persistenceService = $persistenceService;
         if ($this->persistenceService === null) {
@@ -81,26 +80,15 @@ class DataHandlerHook
      * @param int|string $id
      * @param array $fieldArray
      * @param DataHandler $pObj
-     * @param FileRecordService $fileRecordService
-     * @param ReferenceRecordService $referenceRecordService
-     * @param PersistenceService $persistenceService
-     * @param RecordService $recordService
      */
     public function processDatamap_afterDatabaseOperations(
         string $status,
         string $table,
         $id,
         array $fieldArray,
-        DataHandler $pObj,
-        $fileRecordService = null,
-        $referenceRecordService = null,
-        $persistenceService = null,
-        $recordService = null
+        DataHandler $pObj
     )
     {
-
-        $this->initializeServices($fileRecordService, $referenceRecordService, $persistenceService, $recordService);
-
         // sys_file_metadata record is updated with file_variant set
         // related file must be replaced (preserve the uid)!
         if ($table === 'sys_file_metadata' && $status === 'update' && array_key_exists('language_variant', $fieldArray)) {
@@ -116,30 +104,15 @@ class DataHandlerHook
      * @param string|int $id recordUid
      * @param mixed $value Command Value
      * @param DataHandler $pObj
-     * @param $pasteUpdate
-     * @param array $pasteDatamap
-     * @param FileRecordService $fileRecordService
-     * @param ReferenceRecordService $referenceRecordService
-     * @param PersistenceService $persistenceService
-     * @param RecordService $recordService
      */
     public function processCmdmap_postProcess(
         string $command,
         string $table,
         $id,
         $value,
-        DataHandler $pObj,
-        $pasteUpdate,
-        array $pasteDatamap,
-        $fileRecordService = null,
-        $referenceRecordService = null,
-        $persistenceService = null,
-        $recordService = null
+        DataHandler $pObj
     )
     {
-
-        $this->initializeServices($fileRecordService, $referenceRecordService, $persistenceService, $recordService);
-
         // translation of metadata record
         // results in copied sys_file and relation of record to new file
         // all references need to be updated to the new file
@@ -181,7 +154,5 @@ class DataHandlerHook
         }
         return $id;
     }
-
-
 
 }
