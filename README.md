@@ -116,39 +116,35 @@ In Frontend, always the language variant file will be rendered, if one is detect
 - disable sys_language_uid = -1 in TCA
 - ~~in copy mode sys_file_reference must relate a default language file record. Variants are to be ignored.~~
 
-- DataProvider
--- create DataProvider depending on TcaInline, (depends, and before) in inlineParentRecord, maybe even tcaDatabaseRecord group 
+### DataProvider
+- create DataProvider depending on TcaInline, (depends, and before) in inlineParentRecord, maybe even tcaDatabaseRecord group 
 (core/Configuration/DefaultConfiguration 540)
--- detect table, detect FAL fields (foreign_table = sys_file_reference)
--- are we in translation? (sys_language_uid > 0 && l[10|18]n_parent == 0) <== copy mode!! -> TCAInline->compileChild
--- InlineControlContainer->render -> inlineRecordContainer
--- types[showItem] -> remove everything, only header will be displayed
--- detect whether copy or translate mode is on
--- based on that, define rendering, either default or passive
+- detect table, detect FAL fields (foreign_table = sys_file_reference)
+- are we in translation? (sys_language_uid > 0 && l[10|18]n_parent == 0) <== copy mode!! -> TCAInline->compileChild
+- InlineControlContainer->render -> inlineRecordContainer
+- types[showItem] -> remove everything, only header will be displayed
+- detect whether copy or translate mode is on
+- based on that, define rendering, either default or passive
 
-- DataHandler
--- ~~let a hook detect connected translation mode, in this case rewrite the file reference in sys_file_reference to relate
+### DataHandler
+- ~~let a hook detect connected translation mode, in this case rewrite the file reference in sys_file_reference to relate
 to the language variant.~~
 -- ~~other hook: upon availability of a new variant, update all consuming fields in connected mode.~~
--- If a variants gets deleted, let the referencing CEs use default.
--- If a consuming element gets changed, update its translation children.
+- If a variants gets deleted, let the referencing CEs use default.
+- If a consuming element gets changed, update its translation children.
 
-- Frontend Renderer
--- ~~check it accepts being served with a non default language relation and must not overlay on its own.~~
+### Frontend Renderer
+- ~~check it accepts being served with a non default language relation and must not overlay on its own.~~
 ==> seems to be fine, tested with shortcut CE and default language references. No overlay done, even if translations are
 available.
 
-- File Module
--- given a file record has language variants, how to handle a delete? The copies might be referenced in some fields.
--- cascading delete will not be sufficient here probably.
--- ~~Figure out how to upload without creating sys_file_references. Existing file records are no options, we need to create own one.
+### File Module
+- given a file record has language variants, how to handle a delete? The copies might be referenced in some fields.
+- cascading delete will not be sufficient here probably.
+- ~~Figure out how to upload without creating sys_file_references. Existing file records are no options, we need to create own one.
 Otherwise I would translate a file using another one by manipulating sys_language_uid. It would fail if the file was in use
 elsewhere as a default language item.~~
--- Exclude languageVariant Storage / Folder from search
+- Exclude languageVariant Storage / Folder from search
 
-- Setup
+### Setup/Configuration
 -- provide second filestorage
-
-
-
-
