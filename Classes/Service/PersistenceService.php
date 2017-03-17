@@ -251,11 +251,11 @@ class PersistenceService
     /**
      * @param File $parentFile
      * @param Folder $folder
-     * @return int
+     * @return File
      */
-    public function copyFileObject($parentFile, $folder): int
+    public function copyFileObject($parentFile, $folder): File
     {
-        return $parentFile->copyTo($folder)->getUid();
+        return $parentFile->copyTo($folder);
     }
 
     /**
@@ -330,5 +330,19 @@ class PersistenceService
             $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter($tableName))
         );
         return $queryBuilder->execute()->fetchAll();
+    }
+
+    /**
+     * @param string $table
+     * @param int $uid
+     */
+    public function deleteRecord(string $table, int $uid)
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder->delete($table)->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+        )->execute();
+
     }
 }

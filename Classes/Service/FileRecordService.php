@@ -60,7 +60,7 @@ class FileRecordService
         }
         $parentFile = $this->persistenceService->getFileObject($parentUid);
         $folder = $this->persistenceService->findStorageDestination();
-        $translatedFileUid = $this->persistenceService->copyFileObject($parentFile, $folder);
+        $translatedFileUid = $this->persistenceService->copyFileObject($parentFile, $folder)->getUid();
 
         $dataMap = [
             'sys_file' => [
