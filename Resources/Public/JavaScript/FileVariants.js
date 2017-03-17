@@ -14,7 +14,7 @@ define(["require", "jquery"], function (require, $) {
 	"use strict";
 	/**
 	 * Module: TYPO3/CMS/FileVariants/FileVariants
-	 * contains all logic for the color picker used in FormEngine
+	 * contains all logic filevariants manipulation used in BE
 	 * @exports TYPO3/CMS/FileVariants/FileVariants
 	 */
 	var FileVariants = (function () {
@@ -25,7 +25,7 @@ define(["require", "jquery"], function (require, $) {
 			this.selector = '.t3js-delete-filevariant-trigger';
 		}
 		/**
-		 * Initialize the color picker for the given selector
+		 * Initialize the trigger for the given selector
 		 */
 		FileVariants.prototype.initialize = function () {
 			$(document).on('click', this.selector, function(e) {
