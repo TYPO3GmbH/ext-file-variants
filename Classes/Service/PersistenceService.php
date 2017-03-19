@@ -283,7 +283,7 @@ class PersistenceService
             $queryBuilder->expr()->eq(
                 'uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)
             )
-        );
+        )->execute();
 
     }
 
