@@ -43,7 +43,8 @@ class FileVariantsController {
     {
         $this->fileRecordService = $fileRecordService;
         if ($this->fileRecordService === null) {
-            $this->fileRecordService = GeneralUtility::makeInstance(FileRecordService::class);
+
+            $this->fileRecordService = GeneralUtility::makeInstance(FileRecordService::class, GeneralUtility::makeInstance(PersistenceService::class));
         }
     }
 

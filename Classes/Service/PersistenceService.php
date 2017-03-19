@@ -19,6 +19,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\FolderInterface;
@@ -268,7 +269,7 @@ class PersistenceService
     {
         $file = ResourceFactory::getInstance()->getFileObject($fileUid);
         $file->getStorage()->replaceFile($file, $localFilePath);
-        $file->rename($filename);
+        $file->rename($filename, DuplicationBehavior::RENAME);
     }
 
     /**
