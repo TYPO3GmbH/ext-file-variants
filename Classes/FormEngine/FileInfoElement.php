@@ -40,7 +40,7 @@ class FileInfoElement extends \TYPO3\CMS\Backend\Form\Element\FileInfoElement{
             } else {
 
                 // find out whether there is an variant present
-                $fileVariantExists = $this->areReletadFilesEqual();
+                $fileVariantExists = $this->areRelatedFilesEqual();
                 if ($fileVariantExists === false) {
 
                     $resultArray['requireJsModules'][] = [
@@ -64,7 +64,7 @@ class FileInfoElement extends \TYPO3\CMS\Backend\Form\Element\FileInfoElement{
     /**
      * @return bool
      */
-    protected function areReletadFilesEqual(): bool
+    protected function areRelatedFilesEqual(): bool
     {
         $l10n_parent = (int)$this->data['databaseRow']['l10n_parent'][0];
         $fileUid = (int)$this->data['databaseRow']['file'][0];

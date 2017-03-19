@@ -16,6 +16,7 @@ namespace T3G\AgencyPack\FileVariants\Controller;
  */
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use T3G\AgencyPack\FileVariants\Service\FileRecordService;
 use T3G\AgencyPack\FileVariants\Service\PersistenceService;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Form\FormDataGroup\TcaDatabaseRecord;
@@ -30,6 +31,24 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class FileVariantsController {
 
     /**
+     * @var FileRecordService
+     */
+    protected $fileRecordService;
+
+    /**
+     * FileVariantsController constructor.
+     * @param FileRecordService $fileRecordService
+     */
+    public function __construct(FileRecordService $fileRecordService = null)
+    {
+        $this->fileRecordService = $fileRecordService;
+        if ($this->fileRecordService === null) {
+            $this->fileRecordService = GeneralUtility::makeInstance(FileRecordService::class);
+        }
+    }
+
+
+    /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
@@ -37,8 +56,7 @@ class FileVariantsController {
     public function ajaxDeleteFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $uid = (int)$request->getQueryParams()['uid'];
-        /** @var PersistenceService $persistenceService */
-        $persistenceService = GeneralUtility::makeInstance(PersistenceService::class);
+
 
         $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
@@ -52,21 +70,12 @@ class FileVariantsController {
         $formData = $formDataCompiler->compile($formDataCompilerInput);
         $formData['renderType'] = 'fileInfo';
 
-        // replace the variant with the a copy of the original file
-        $file = (int)$formData['databaseRow']['file'][0];
-        $fileRecord = $persistenceService->getRecord('sys_file', $file);
-        $defaultFileObject = ResourceFactory::getInstance()->getFileObject((int)$fileRecord['l10n_parent']);
-        $copy = $persistenceService->copyFileObject($defaultFileObject, $defaultFileObject->getParentFolder());
-        // this record will be stale after the replace, remove it right away
-        $SysFileRecordToBeDeleted = $copy->getUid();
-        $path = PATH_site . $copy->getPublicUrl();
-
-        $persistenceService->replaceFile($file, $defaultFileObject->getName(), $path);
-
-        $persistenceService->deleteRecord('sys_file', $SysFileRecordToBeDeleted);
+        $this->fileRecordService->replaceVariantWithDefaultFile((int)$formData['databaseRow']['file'][0]);
 
         $formResult = $nodeFactory->create($formData)->render();
         $response->getBody()->write($formResult['html']);
         return $response;
     }
+
+
 }

@@ -13,6 +13,7 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 
 /**
  * Manipulation of records from tables sys_file and sys_file_metadata
@@ -162,6 +163,32 @@ class FileRecordService
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * @param int $fileUid
+     */
+    public function replaceVariantWithDefaultFile(int $fileUid)
+    {
+        $fileRecord = $this->persistenceService->getRecord('sys_file', $fileUid);
+        $defaultFileObject = ResourceFactory::getInstance()->getFileObject((int)$fileRecord['l10n_parent']);
+        $copy = $this->persistenceService->copyFileObject($defaultFileObject, $defaultFileObject->getParentFolder());
+        // this record will be stale after the replace, remove it right away
+        $sysFileRecordToBeDeleted = $copy->getUid();
+        $path = PATH_site . $copy->getPublicUrl();
+
+        $this->persistenceService->replaceFile($fileUid, $defaultFileObject->getName(), $path);
+        $this->persistenceService->deleteRecord('sys_file', $sysFileRecordToBeDeleted);
+
+        // metadata records for copied file are not needed, either
+        $metadataRecords = $this->persistenceService->getSysFileMetaDataRecordsByFileUid($sysFileRecordToBeDeleted);
+        $metadataRecordsToBeDeleted = [];
+        if (count($metadataRecords) > 0) {
+            foreach ($metadataRecords as $record) {
+                $metadataRecordsToBeDeleted[] = $record['uid'];
+            }
+            $this->persistenceService->deleteRecords('sys_file_metadata', $metadataRecordsToBeDeleted);
         }
     }
 }

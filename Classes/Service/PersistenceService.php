@@ -14,12 +14,14 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -250,7 +252,7 @@ class PersistenceService
 
     /**
      * @param File $parentFile
-     * @param Folder $folder
+     * @param FolderInterface $folder
      * @return File
      */
     public function copyFileObject($parentFile, $folder): File
@@ -344,5 +346,33 @@ class PersistenceService
             $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
         )->execute();
 
+    }
+
+    /**
+     * @param string $table
+     * @param array $uids
+     */
+    public function deleteRecords(string $table, array $uids) {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder->delete($table)->where(
+            $queryBuilder->expr()->in('uid', $queryBuilder->createNamedParameter($uids, Connection::PARAM_INT_ARRAY))
+        )->execute();
+    }
+
+    /**
+     * @param int $fileUid
+     * @return array
+     */
+    public function getSysFileMetaDataRecordsByFileUid(int $fileUid): array
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder->select('uid')->from('sys_file_metadata')->where(
+            $queryBuilder->expr()->eq(
+                'file',
+                $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
+        );
+        return $queryBuilder->execute()->fetchAll();
     }
 }
