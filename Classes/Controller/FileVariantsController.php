@@ -18,6 +18,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use T3G\AgencyPack\FileVariants\Service\FileRecordService;
 use T3G\AgencyPack\FileVariants\Service\PersistenceService;
+use T3G\AgencyPack\FileVariants\Service\RecordService;
+use T3G\AgencyPack\FileVariants\Service\ReferenceRecordService;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Form\FormDataGroup\TcaDatabaseRecord;
 use TYPO3\CMS\Backend\Form\FormResultCompiler;
@@ -26,7 +28,7 @@ use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
-  * Description
+  * Ajax Controller for file variants actions
   */
 class FileVariantsController {
 
@@ -44,7 +46,19 @@ class FileVariantsController {
         $this->fileRecordService = $fileRecordService;
         if ($this->fileRecordService === null) {
 
-            $this->fileRecordService = GeneralUtility::makeInstance(FileRecordService::class, GeneralUtility::makeInstance(PersistenceService::class));
+            // @todo -2 looks ugly, clean up this crazy dependencies
+            $persistenceService = GeneralUtility::makeInstance(PersistenceService::class);
+            $recordService = GeneralUtility::makeInstance(RecordService::class, $persistenceService);
+            $referenceRecordService = GeneralUtility::makeInstance(
+                ReferenceRecordService::class,
+                $persistenceService,
+                $recordService
+            );
+            $this->fileRecordService = GeneralUtility::makeInstance(
+                FileRecordService::class,
+                $persistenceService,
+                $referenceRecordService
+            );
         }
     }
 
