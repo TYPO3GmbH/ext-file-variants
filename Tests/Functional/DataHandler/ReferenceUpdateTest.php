@@ -318,34 +318,4 @@ class ReferenceUpdateTest extends FunctionalTestCase {
         $this->importAssertCSVScenario($scenarioName);
     }
 
-    public function deletionOfFileVariantResetsAllConsumersInConnectedModeToDefaultFile()
-    {
-
-    }
-
-    public function deletionOfFileVariantDoesNotTouchAllConsumersInFreeMode()
-    {
-
-    }
-
-    public function deletionOfDefaultFileCausesResetToDefaultFileForAllTranslations()
-    {
-        // remove default file -> remove variants -> update consumers to relate to default file
-        // leads to broken relations, this is the case already before the change.
-    }
-
-    public function additionOfReferenceToTranslatedConnectedModeCEUsesVariant()
-    {
-
-    }
-
-    public function additionOfReferenceToTranslatedFreeModeCEDoesNotUseVariant()
-    {
-
-    }
-
-    public function additionOfReferenceToFALConsumingTableItemUsesVariantsInTranslations()
-    {
-
-    }
 }

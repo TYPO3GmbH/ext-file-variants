@@ -14,12 +14,15 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -250,12 +253,12 @@ class PersistenceService
 
     /**
      * @param File $parentFile
-     * @param Folder $folder
-     * @return int
+     * @param FolderInterface $folder
+     * @return File
      */
-    public function copyFileObject($parentFile, $folder): int
+    public function copyFileObject($parentFile, $folder): File
     {
-        return $parentFile->copyTo($folder)->getUid();
+        return $parentFile->copyTo($folder);
     }
 
     /**
@@ -266,7 +269,7 @@ class PersistenceService
     {
         $file = ResourceFactory::getInstance()->getFileObject($fileUid);
         $file->getStorage()->replaceFile($file, $localFilePath);
-        $file->rename($filename);
+        $file->rename($filename, DuplicationBehavior::RENAME);
     }
 
     /**
@@ -283,7 +286,7 @@ class PersistenceService
             $queryBuilder->expr()->eq(
                 'uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT)
             )
-        );
+        )->execute();
 
     }
 
@@ -328,6 +331,48 @@ class PersistenceService
             $queryBuilder->expr()->eq('uid_foreign', $queryBuilder->createNamedParameter($uid_foreign, \PDO::PARAM_INT)),
             $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($sys_language_uid, \PDO::PARAM_INT)),
             $queryBuilder->expr()->eq('tablenames', $queryBuilder->createNamedParameter($tableName))
+        );
+        return $queryBuilder->execute()->fetchAll();
+    }
+
+    /**
+     * @param string $table
+     * @param int $uid
+     */
+    public function deleteRecord(string $table, int $uid)
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder->delete($table)->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+        )->execute();
+
+    }
+
+    /**
+     * @param string $table
+     * @param array $uids
+     */
+    public function deleteRecords(string $table, array $uids) {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder->delete($table)->where(
+            $queryBuilder->expr()->in('uid', $queryBuilder->createNamedParameter($uids, Connection::PARAM_INT_ARRAY))
+        )->execute();
+    }
+
+    /**
+     * @param int $fileUid
+     * @return array
+     */
+    public function getSysFileMetaDataRecordsByFileUid(int $fileUid): array
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder->select('uid')->from('sys_file_metadata')->where(
+            $queryBuilder->expr()->eq(
+                'file',
+                $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
         );
         return $queryBuilder->execute()->fetchAll();
     }
