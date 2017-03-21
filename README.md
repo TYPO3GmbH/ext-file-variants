@@ -30,9 +30,7 @@ translated. The metadata record will relate to that new file record, which in tu
 5. Do so for all the record you wish to translate. If no translation is provided, the content language fallback chain will
 be in place as before.
 
-An extra storage will be provided by the extension, that serves as destination for the language variants. A fallback to 
-default storage is in place.
-
+If you provide a separate File Storage, it will be used. Otherwise a dedicated folder in default Storage is used. 
 ### Data Example
 
 Default language english, uid 0
@@ -130,7 +128,7 @@ In Frontend, always the language variant file will be rendered, if one is detect
 - ~~let a hook detect connected translation mode, in this case rewrite the file reference in sys_file_reference to relate
 to the language variant.~~
 -- ~~other hook: upon availability of a new variant, update all consuming fields in connected mode.~~
-- If a variants gets deleted, let the referencing CEs use default.
+- ~~If a variants gets deleted, let the referencing CEs use default.~~
 - If a consuming element gets changed, update its translation children.
 
 ### Frontend Renderer
@@ -139,8 +137,9 @@ to the language variant.~~
 available.
 
 ### File Module
-- given a file record has language variants, how to handle a delete? The copies might be referenced in some fields.
-- cascading delete will not be sufficient here probably.
+- ~~given a file record has language variants, how to handle a delete? The copies might be referenced in some fields.~~
+- there is just no real deletion. A variant can be reset to its default, but no deletion is possible
+- ~~cascading delete will not be sufficient here probably.~~
 - ~~Figure out how to upload without creating sys_file_references. Existing file records are no options, we need to create own one.
 Otherwise I would translate a file using another one by manipulating sys_language_uid. It would fail if the file was in use
 elsewhere as a default language item.~~
