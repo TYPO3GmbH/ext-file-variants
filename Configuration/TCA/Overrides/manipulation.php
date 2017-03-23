@@ -3,12 +3,12 @@ defined('TYPO3_MODE') or die();
 
 call_user_func(function () {
 
-    $persistenceService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\T3G\AgencyPack\FileVariants\Service\PersistenceService::class);
-    /** @var \T3G\AgencyPack\FileVariants\Service\RecordService $recordService */
-    $recordService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\T3G\AgencyPack\FileVariants\Service\RecordService::class, $persistenceService);
+//    $persistenceService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\T3G\AgencyPack\FileVariants\Service\PersistenceService::class);
+//    /** @var \T3G\AgencyPack\FileVariants\Service\RecordService $recordService */
+//    $recordService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\T3G\AgencyPack\FileVariants\Service\RecordService::class, $persistenceService);
 
     foreach ($GLOBALS['TCA'] as $table => $config) {
-        if ($recordService->isFalConsumingTable($table)) {
+     //   if ($recordService->isFalConsumingTable($table)) {
             // streamline language sync for all FAL fields
             foreach ($config['columns'] as $fieldName => $fieldConfig) {
                 if ($fieldConfig['config']['foreign_table'] === 'sys_file_reference') {
@@ -20,7 +20,7 @@ call_user_func(function () {
                     }
                 }
             }
-        }
+   //     }
         // deactivate sys_language_uid = -1
         $languageField = $GLOBALS['TCA'][$table]['ctrl']['languageField'];
         $fieldConfig = $config['columns'][$languageField]['config'];
