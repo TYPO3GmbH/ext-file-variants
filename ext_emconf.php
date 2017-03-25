@@ -13,13 +13,13 @@ $EM_CONF[$_EXTKEY] = array(
         'conflicts' => array(),
     ),
     'autoload' => array(
-//        'psr-4' => array(
-//            'T3G\\AgencyPack\\FileVariants\\' => 'Classes',
-//        ),
+        'psr-4' => array(
+            'T3G\\AgencyPack\\FileVariants\\' => 'Classes',
+        ),
     ),
     'state' => 'stable',
     'uploadfolder' => 0,
-    'createDirs' => 'typo3temp/uploads',
+    'createDirs' => 'typo3temp/file_variants_uploads',
     'clearCacheOnLoad' => 1,
     'author' => 'Anja Leichsenring',
     'author_email' => 'anja.leichsenring@typo3.com',

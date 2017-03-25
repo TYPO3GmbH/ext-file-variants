@@ -1,0 +1,5 @@
+# cat=basic/enable/5; type=int; label=Uid of storage to use for file variants:The default storage (UID 1) can be used.
+variantsStorageUid = 2
+
+# cat=basic/enable/10; type=string; label=Folder to use to store file variants (will be created if absent).
+variantsFolder = /languageVariants

@@ -15,9 +15,6 @@ call_user_func(function () {
                     if (isset($fieldConfig['config']['behaviour']['localizationMode'])) {
                         unset($GLOBALS['TCA'][$table]['columns'][$fieldName]['config']['behaviour']['localizationMode']);
                     }
-                    if (!isset($fieldConfig['config']['behaviour']['allowLanguageSynchronization'])) {
-                        $GLOBALS['TCA'][$table]['columns'][$fieldName]['config']['behaviour']['allowLanguageSynchronization'] = true;
-                    }
                 }
             }
    //     }
