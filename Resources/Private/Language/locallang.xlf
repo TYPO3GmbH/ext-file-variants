@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages" date="2017-03-26T16:33:01Z" product-name="file_variants">
+        <header/>
+        <body>
+            <trans-unit id="file_variants.delete.title">
+                <source>Delete language variant</source>
+            </trans-unit>
+            <trans-unit id="file_variants.delete.message">
+                <source>Do you really want to delete the language variant "%1$s" for file "%2$s"?</source>
+            </trans-unit>
+            <trans-unit id="file_variants.actions.cancel">
+                <source>Cancel</source>
+            </trans-unit>
+            <trans-unit id="file_variants.actions.delete">
+                <source>Delete</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

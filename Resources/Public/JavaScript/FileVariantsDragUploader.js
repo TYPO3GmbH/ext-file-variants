@@ -313,7 +313,6 @@ define(['jquery',
     FileVariantsDragUploader.processFileVariantUpload = function (file, url) {
         var url = url + '&file=' + encodeURIComponent(file.uid);
         $('#t3js-fileinfo').load(url);
-
     };
 
     FileVariantsDragUploader.initialize = function () {
@@ -335,6 +334,49 @@ define(['jquery',
 
         $(function () {
             $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
+            $('.t3js-filevariant-trigger-delete').on('click', function(e) {
+                var $me = $(this);
+
+                e.preventDefault();
+
+                Modal.confirm(
+                    TYPO3.lang['file_variants.delete.title'],
+                    TYPO3.lang['file_variants.delete.message'].replace('%1$s', $me.data('language')).replace('%2$s', $me.data('file')),
+                    Severity.warning,
+                    [
+                        {
+                            active: true,
+                            btnClass: 'btn-default',
+                            name: 'cancel',
+                            text: TYPO3.lang['file_variants.actions.cancel'],
+                            trigger: function() {
+                                Modal.dismiss();
+                            }
+                        },
+                        {
+                            btnClass: 'btn-warning',
+                            name: 'rename',
+                            text: TYPO3.lang['file_variants.actions.delete'],
+                            trigger: function() {
+                                $.ajax({
+                                    url: $me.data('url'),
+                                    success: function() {
+                                        // TODO: Redirect to file list main module?
+                                    },
+                                    error: function(response) {
+                                        // TODO: response.responseText should only contain the exception message, not the its whole markup (CSS, stacktrace etc.)
+                                        Notification.error(response.statusText, response.responseText);
+                                    },
+                                    complete: function() {
+                                        // Always hide modal, we don't care whether the action was successful or not
+                                        Modal.dismiss();
+                                    }
+                                });
+                            }
+                        }
+                    ]
+                );
+            });
         });
     };
 
@@ -344,7 +386,6 @@ define(['jquery',
      * and return the main object
      */
     var initialize = function () {
-
         FileVariantsDragUploader.initialize();
 
         // load required modules to hook in the post initialize function

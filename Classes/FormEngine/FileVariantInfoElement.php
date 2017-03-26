@@ -20,6 +20,7 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
@@ -54,7 +55,7 @@ class FileVariantInfoElement extends FileInfoElement
             if ($fileUid < 1) {
                 $resultArray['html'] = 'something went wrong, no valid file uid received (' . $fileUid . ')';
             } else {
-
+                GeneralUtility::makeInstance(PageRenderer::class)->addInlineLanguageLabelFile('EXT:file_variants/Resources/Private/Language/locallang.xlf');
                 $resultArray['requireJsModules'][] = 'TYPO3/CMS/FileVariants/FileVariantsDragUploader';
                 $resultArray['requireJsModules'][] = [
                     'TYPO3/CMS/FileVariants/FileVariants' => 'function(FileVariants){FileVariants.initialize()}'
@@ -81,11 +82,17 @@ class FileVariantInfoElement extends FileInfoElement
                 // find out whether there is an variant present
                 $fileVariantExists = $this->areRelatedFilesEqual();
                 if ($fileVariantExists === false) {
+                    // Determine language
+                    $languageUid = (int)(is_array($this->data['databaseRow']['sys_language_uid'])
+                        ? $this->data['databaseRow']['sys_language_uid'][0]
+                        : $this->data['databaseRow']['sys_language_uid']
+                    );
+                    $languageLabel = $this->data['systemLanguageRows'][$languageUid]['title'];
 
                     // reset variant to default
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_deleteFileVariant',
                         ['uid' => $this->data['vanillaUid']]);
-                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger-delete" data-url="' . $path . '">remove language variant</button></p>';
+                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger-delete" data-url="' . $path . '" data-file="' . htmlspecialchars($this->data['recordTitle']) . '" data-language="' . htmlspecialchars($languageLabel) . '">remove language variant</button></p>';
 
                     // upload new file to replace current variant
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant', ['uid' => $this->data['vanillaUid']]);
