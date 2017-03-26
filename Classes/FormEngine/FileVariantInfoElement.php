@@ -82,6 +82,18 @@ class FileVariantInfoElement extends FileInfoElement
                 // find out whether there is an variant present
                 $fileVariantExists = $this->areRelatedFilesEqual();
                 if ($fileVariantExists === false) {
+                    // Get sys_file uid by metadata uid record
+                    $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                        ->getQueryBuilderForTable('sys_file_metadata')
+                    ;
+                    $queryBuilder->select('file')->from('sys_file_metadata')->where(
+                        $queryBuilder->expr()->eq(
+                            'uid',
+                            $queryBuilder->createNamedParameter($this->data['vanillaUid'], \PDO::PARAM_INT)
+                        )
+                    );
+                    $fileUid = (int)$queryBuilder->execute()->fetch()['file'];
+
                     // Determine language
                     $languageUid = (int)(is_array($this->data['databaseRow']['sys_language_uid'])
                         ? $this->data['databaseRow']['sys_language_uid'][0]
@@ -89,11 +101,20 @@ class FileVariantInfoElement extends FileInfoElement
                     );
                     $languageLabel = $this->data['systemLanguageRows'][$languageUid]['title'];
 
+                    $uploadUri = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_uploadFileVariant',
+                        [
+                            'uid' => $this->data['vanillaUid']
+                        ]
+                    );
+
                     // reset variant to default
-                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger-delete" data-uid="' . (int)$this->data['vanillaUid'] . '" data-url="' . $path . '" data-file="' . htmlspecialchars($this->data['recordTitle']) . '" data-language="' . htmlspecialchars($languageLabel) . '">remove language variant</button></p>';
+                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger-delete" data-uid="' . (int)$this->data['vanillaUid'] . '" data-file-uid="' . $fileUid . '" data-url="' . $uploadUri . '" data-file="' . htmlspecialchars($this->data['recordTitle']) . '" data-language="' . htmlspecialchars($languageLabel) . '">remove language variant</button></p>';
 
                     // upload new file to replace current variant
-                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant', ['uid' => $this->data['vanillaUid']]);
+                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant', [
+                        'uid' => $this->data['vanillaUid'],
+                        'sys_file' => $fileUid
+                    ]);
                     $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">replace language variant</button></p>';
                 } else {
                     // provide upload possibility

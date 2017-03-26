@@ -364,6 +364,11 @@ define(['jquery',
                                     data: {
                                         uid: parseInt($me.data('uid'))
                                     },
+                                    success: function() {
+                                        FileVariantsDragUploader.processFileVariantUpload({
+                                            uid: parseInt($me.data('fileUid'))
+                                        }, $me.data('url'));
+                                    },
                                     error: function(response) {
                                         Notification.error(response.statusText, response.responseText);
                                     },
