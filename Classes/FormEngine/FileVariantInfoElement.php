@@ -82,25 +82,6 @@ class FileVariantInfoElement extends FileInfoElement
                 // find out whether there is an variant present
                 $fileVariantExists = $this->areRelatedFilesEqual();
                 if ($fileVariantExists === false) {
-                    // Get sys_file uid by metadata uid record
-                    $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-                        ->getQueryBuilderForTable('sys_file_metadata')
-                    ;
-                    $queryBuilder->select('file')->from('sys_file_metadata')->where(
-                        $queryBuilder->expr()->eq(
-                            'uid',
-                            $queryBuilder->createNamedParameter($this->data['vanillaUid'], \PDO::PARAM_INT)
-                        )
-                    );
-                    $fileUid = (int)$queryBuilder->execute()->fetch()['file'];
-
-                    // Determine language
-                    $languageUid = (int)(is_array($this->data['databaseRow']['sys_language_uid'])
-                        ? $this->data['databaseRow']['sys_language_uid'][0]
-                        : $this->data['databaseRow']['sys_language_uid']
-                    );
-                    $languageLabel = $this->data['systemLanguageRows'][$languageUid]['title'];
-
                     // reset variant to default
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_deleteFileVariant',
                         ['uid' => $this->data['vanillaUid']]);
