@@ -21,8 +21,9 @@ define(['jquery',
     'TYPO3/CMS/Backend/Modal',
     'TYPO3/CMS/Backend/Notification',
     'TYPO3/CMS/Backend/Severity',
+    'TYPO3/CMS/Backend/FormEngine',
     'TYPO3/CMS/Lang/Lang'
-], function ($, moment, NProgress, Modal, Notification, Severity) {
+], function ($, moment, NProgress, Modal, Notification, Severity, FormEngine) {
 
     var percentagePerFile = 1;
 
@@ -364,7 +365,7 @@ define(['jquery',
                                         uid: parseInt($me.data('uid'))
                                     },
                                     success: function() {
-                                        // TODO: Redirect to file list main module?
+                                        FormEngine.closeDocument();
                                     },
                                     error: function(response) {
                                         // TODO: response.responseText should only contain the exception message, not the its whole markup (CSS, stacktrace etc.)
