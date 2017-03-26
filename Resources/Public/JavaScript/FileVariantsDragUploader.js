@@ -333,8 +333,8 @@ define(['jquery',
             });
         };
 
-        // $(function () {
-        //     $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
+         $(function () {
+             $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
         //     $('.t3js-filevariant-trigger-delete').on('click', function(e) {
         //         var $me = $(this);
         //
@@ -382,7 +382,7 @@ define(['jquery',
         //             ]
         //         );
         //     });
-        // });
+         });
     };
 
 

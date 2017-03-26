@@ -34,10 +34,6 @@ define([
          */
         FileVariants.prototype.initialize = function () {
 
-
-
-
-
             $(document).on('click', this.selector, function(e) {
                 e.preventDefault();
                 var url = $(this).data('url');

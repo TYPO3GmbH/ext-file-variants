@@ -56,7 +56,9 @@ class FileVariantInfoElement extends FileInfoElement
                 $resultArray['html'] = 'something went wrong, no valid file uid received (' . $fileUid . ')';
             } else {
                 GeneralUtility::makeInstance(PageRenderer::class)->addInlineLanguageLabelFile('EXT:file_variants/Resources/Private/Language/locallang.xlf');
-                $resultArray['requireJsModules'][] = 'TYPO3/CMS/FileVariants/FileVariantsDragUploader';
+                $resultArray['requireJsModules'][] = [
+                    'TYPO3/CMS/FileVariants/FileVariantsDragUploader' => 'function(fileVariantsDragUploader){fileVariantsDragUploader.initialize()}'
+                ];
                 $resultArray['requireJsModules'][] = [
                     'TYPO3/CMS/FileVariants/FileVariants' => 'function(FileVariants){FileVariants.initialize()}'
                 ];
@@ -88,17 +90,19 @@ class FileVariantInfoElement extends FileInfoElement
                     $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">remove language variant</button></p>';
 
                     // upload new file to replace current variant
-                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant', [
-                        'uid' => $this->data['vanillaUid'],
-                        'sys_file' => $fileUid
-                    ]);
-                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">replace language variant</button></p>';
+                    $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
+                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant',
+                        ['uid' => $this->data['vanillaUid']]);
+                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' .$this->folder->getCombinedIdentifier(). '" 
+	 data-dropzone-trigger=".t3js-drag-uploader-trigger" data-dropzone-target=".t3js-module-body h1:first"
+	 data-file-deny-pattern="' .$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']. '" data-max-file-size="' .$maxFileSize. '" data-handling-url="' .$path. '"
+	></div>';
                 } else {
                     // provide upload possibility
                     $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_uploadFileVariant',
                         ['uid' => $this->data['vanillaUid']]);
-                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' .$this->folder->getCombinedIdentifier(). '" data-progress-container="#typo3-filelist"
+                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' .$this->folder->getCombinedIdentifier(). '" 
 	 data-dropzone-trigger=".t3js-drag-uploader-trigger" data-dropzone-target=".t3js-module-body h1:first"
 	 data-file-deny-pattern="' .$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']. '" data-max-file-size="' .$maxFileSize. '" data-handling-url="' .$path. '"
 	></div>';
