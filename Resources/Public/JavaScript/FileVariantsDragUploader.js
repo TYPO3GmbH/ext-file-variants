@@ -23,7 +23,7 @@ define(['jquery',
     'TYPO3/CMS/Backend/Severity',
     'TYPO3/CMS/Backend/FormEngine',
     'TYPO3/CMS/Lang/Lang'
-], function ($, moment, NProgress, Modal, Notification, Severity, FormEngine) {
+], function ($, moment, NProgress, Modal, Notification, Severity) {
 
     var percentagePerFile = 1;
 
@@ -364,11 +364,7 @@ define(['jquery',
                                     data: {
                                         uid: parseInt($me.data('uid'))
                                     },
-                                    success: function() {
-                                        FormEngine.closeDocument();
-                                    },
                                     error: function(response) {
-                                        // TODO: response.responseText should only contain the exception message, not the its whole markup (CSS, stacktrace etc.)
                                         Notification.error(response.statusText, response.responseText);
                                     },
                                     complete: function() {
