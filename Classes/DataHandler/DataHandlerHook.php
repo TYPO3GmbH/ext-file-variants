@@ -64,14 +64,14 @@ class DataHandlerHook
     )
     {
         if ($table !== 'sys_file_storage') {
-            $this->prepareFileHandlingEnvironment();
+            $this->prepareFileStorageEnvironment();
         }
     }
 
     /**
      * make sure upload storage and folder are in place
      */
-    protected function prepareFileHandlingEnvironment()
+    protected function prepareFileStorageEnvironment()
     {
         $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
         $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
