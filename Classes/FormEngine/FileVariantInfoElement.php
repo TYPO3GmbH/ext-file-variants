@@ -55,9 +55,7 @@ class FileVariantInfoElement extends FileInfoElement
                 $resultArray['html'] = 'something went wrong, no valid file uid received (' . $fileUid . ')';
             } else {
 
-                $resultArray['requireJsModules'][] = [
-                    'TYPO3/CMS/FileVariants/FileVariantsDragUploader' => 'function(fileVariantsDragUploader){fileVariantsDragUploader.initialize()}'
-                ];
+                $resultArray['requireJsModules'][] = 'TYPO3/CMS/FileVariants/FileVariantsDragUploader';
                 $resultArray['requireJsModules'][] = [
                     'TYPO3/CMS/FileVariants/FileVariants' => 'function(FileVariants){FileVariants.initialize()}'
                 ];
@@ -87,7 +85,7 @@ class FileVariantInfoElement extends FileInfoElement
                     // reset variant to default
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_deleteFileVariant',
                         ['uid' => $this->data['vanillaUid']]);
-                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">remove language variant</button></p>';
+                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger-delete" data-url="' . $path . '">remove language variant</button></p>';
 
                     // upload new file to replace current variant
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant', ['uid' => $this->data['vanillaUid']]);
