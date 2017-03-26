@@ -359,7 +359,10 @@ define(['jquery',
                             text: TYPO3.lang['file_variants.actions.delete'],
                             trigger: function() {
                                 $.ajax({
-                                    url: $me.data('url'),
+                                    url: TYPO3.settings.ajaxUrls['tx_filevariants_deleteFileVariant'],
+                                    data: {
+                                        uid: parseInt($me.data('uid'))
+                                    },
                                     success: function() {
                                         // TODO: Redirect to file list main module?
                                     },
