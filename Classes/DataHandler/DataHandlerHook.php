@@ -85,7 +85,7 @@ class DataHandlerHook
                 $this->folder = $this->storage->getFolder($targetFolder);
             }
         } catch (\InvalidArgumentException $exception) {
-            throw new \RuntimeException('storage with uid ' . $storageUid . ' is now available. Create it and check the given uid in extension configuration.', 1490480372);
+            throw new \RuntimeException('storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.', 1490480372);
         }
     }
 }
