@@ -10,7 +10,12 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-define(["require", "jquery", 'TYPO3/CMS/Backend/DragUploader'], function (require, $, DragUploader) {
+define([
+    "require",
+    "jquery",
+    'TYPO3/CMS/Backend/Modal',
+    'TYPO3/CMS/Backend/Severity'
+], function (require, $, Modal, Severity) {
     "use strict";
     /**
      * Module: TYPO3/CMS/FileVariants/FileVariants
@@ -32,43 +37,34 @@ define(["require", "jquery", 'TYPO3/CMS/Backend/DragUploader'], function (requir
 
 
 
-            //
-            // $(document).on('click', this.selector, function(e) {
-            //     e.preventDefault();
-            //     var url = $(this).data('url');
-            //     var uploadForm = '<form action="#" method="post" enctype="multipart/form-data" name="file_variant_upload">' +
-            //             '<label>File</label>' +
-            //             '<input id="uploaded_file_name" name="variant" type="file" />' +
-            //         '</form>';
-            //
-            //     var buttons = [
-            //         {
-            //             text: 'Cancel',
-            //             btnClass: 'btn-default',
-            //             trigger: function () {
-            //                 Modal.currentModal.trigger('modal-dismiss');
-            //             }
-            //         },
-            //         {
-            //             text: 'Upload',
-            //             active: true,
-            //             btnClass: 'btn-info',
-            //             trigger: function () {
-            //                 Modal.currentModal.trigger('modal-dismiss');
-            //                 var form = $(this).find('form');
-            //                 console.log(form.attr('name'));
-            //                 form.submit();
-            //
-            //             }
-            //         }
-            //     ];
-            //     Modal.show('Upload file variant file', uploadForm, top.TYPO3.Severity.info, buttons);
-            //
-            //     var
 
-            //     var content = 'foo';
-            //     $('#t3js-fileinfo').html(content);
-            // });
+            $(document).on('click', this.selector, function(e) {
+                e.preventDefault();
+                var url = $(this).data('url');
+                var modal = Modal.confirm('really?', 'do you want to remove the file variant?', Severity.info, [
+                    {
+                        text: TYPO3.lang['buttons.confirm.delete_record.no'] || 'Cancel',
+                        active: true,
+                        btnClass: 'btn-default',
+                        name: 'no'
+                    },
+                    {
+                        text: TYPO3.lang['buttons.confirm.delete_record.yes'] || 'Yes, reset to default',
+                        btnClass: 'btn-warning',
+                        name: 'yes'
+                    }
+                ]);
+                modal.on('button.clicked', function(e) {
+                    if (e.target.name === 'no') {
+                        Modal.dismiss();
+                    } else if (e.target.name === 'yes') {
+                        $('#t3js-fileinfo').load(url);
+                        Modal.dismiss();
+                    }
+                });
+
+
+            });
         };
         return FileVariants;
     }());

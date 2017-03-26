@@ -101,14 +101,10 @@ class FileVariantInfoElement extends FileInfoElement
                     );
                     $languageLabel = $this->data['systemLanguageRows'][$languageUid]['title'];
 
-                    $uploadUri = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_uploadFileVariant',
-                        [
-                            'uid' => $this->data['vanillaUid']
-                        ]
-                    );
-
                     // reset variant to default
-                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger-delete" data-uid="' . (int)$this->data['vanillaUid'] . '" data-file-uid="' . $fileUid . '" data-url="' . $uploadUri . '" data-file="' . htmlspecialchars($this->data['recordTitle']) . '" data-language="' . htmlspecialchars($languageLabel) . '">remove language variant</button></p>';
+                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_deleteFileVariant',
+                        ['uid' => $this->data['vanillaUid']]);
+                    $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">remove language variant</button></p>';
 
                     // upload new file to replace current variant
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant', [

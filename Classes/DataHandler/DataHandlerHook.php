@@ -19,6 +19,7 @@ use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class DataHandlerHook
 {
@@ -114,10 +115,10 @@ class DataHandlerHook
             $handledMetaDataRecord = $queryBuilder->execute()->fetch();
 
             $fileUid = (int)$handledMetaDataRecord['file'];
-
             $parentFile = ResourceFactory::getInstance()->getFileObject($fileUid);
 
-            $translatedFileUid = $parentFile->copyTo($this->folder)->getUid();
+            $copy = $parentFile->copyTo($this->folder);
+            $translatedFileUid = $copy->getUid();
 
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
