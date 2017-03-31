@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\Tests\Functional;
+namespace T3G\AgencyPack\FileVariants\Tests\Functional;
 /*
  * This file is part of the TYPO3 CMS project.
  *

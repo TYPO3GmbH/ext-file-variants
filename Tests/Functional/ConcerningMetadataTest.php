@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\Tests\Functional;
+namespace T3G\AgencyPack\FileVariants\Tests\Functional;
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -19,7 +19,7 @@ use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 
-class ConcerningMetadataTest extends FunctionalTestCase
+class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Functional\FunctionalTestCase
 {
     /**
      * @var string
