@@ -14,16 +14,8 @@ namespace T3G\AgencyPack\Tests\Functional;
  *
  * The TYPO3 project - inspiring people to share!
  */
-use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
-use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-
 class ConcerningFileReferencesTest extends FunctionalTestCase
 {
-
 
     /**
      * @var string

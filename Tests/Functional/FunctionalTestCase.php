@@ -24,9 +24,17 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
   * Description
   */
-class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase {
-    protected $assertionDataSetDirectory;
-    protected $scenarioDataSetDirectory;
+abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase {
+
+    /**
+     * @var string
+     */
+    protected $assertionDataSetDirectory = '';
+
+    /**
+     * @var string
+     */
+    protected $scenarioDataSetDirectory = '';
 
     /**
      * @var int

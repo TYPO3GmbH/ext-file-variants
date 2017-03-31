@@ -15,14 +15,9 @@ namespace T3G\AgencyPack\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 use T3G\AgencyPack\FileVariants\Controller\FileVariantsController;
-use TYPO3\CMS\Core\Core\Bootstrap;
-use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
-use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
-use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ConcerningMetadataTest extends FunctionalTestCase
 {
