@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
         backupStaticAttributes="false"
-        bootstrap="../../../../../vendor/typo3/testing_framework/Resources/Core/Build/UnitTestsBootstrap.php"
+        bootstrap="../../../../vendor/typo3/testing_framework/Resources/Core/Build/UnitTestsBootstrap.php"
         colors="true"
         convertErrorsToExceptions="true"
         convertWarningsToExceptions="true"
