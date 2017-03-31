@@ -147,7 +147,7 @@ class DataHandlerHook
                 }
             }
             foreach ($filteredReferences as $reference) {
-                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBilderForTable('sys_file_reference');
+                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
                 $queryBuilder->update('sys_file_reference')->set('file', $fileUid)->where(
                     $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, \PDO::PARAM_INT))
                 )->execute();

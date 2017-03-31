@@ -153,4 +153,8 @@ class FileVariantsController
         return $response;
     }
 
+    public function ajaxResetFileVariant($request, $param)
+    {
+    }
+
 }

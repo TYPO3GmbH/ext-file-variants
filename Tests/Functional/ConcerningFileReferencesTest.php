@@ -25,7 +25,7 @@ use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
-class MetadataTranslationTest extends FunctionalTestCase
+class ConcerningFileReferencesTest extends FunctionalTestCase
 {
     /**
      * @var int
@@ -45,12 +45,12 @@ class MetadataTranslationTest extends FunctionalTestCase
     /**
      * @var string
      */
-    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/Initial/';
+    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/ConcerningFileReferences/Initial/';
 
     /**
      * @var string
      */
-    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/AfterOperation/';
+    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/ConcerningFileReferences/AfterOperation/';
 
     protected function setUp()
     {
@@ -69,7 +69,8 @@ class MetadataTranslationTest extends FunctionalTestCase
 
         $this->backendUser = $this->setUpBackendUserFromFixture(1);
         $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
-        GeneralUtility::setSingletonInstance(FileMetadataPermissionsAspect::class, $fileMetadataPermissionAspect->reveal());
+        GeneralUtility::setSingletonInstance(FileMetadataPermissionsAspect::class,
+            $fileMetadataPermissionAspect->reveal());
 
         $this->actionService = new ActionService();
 
@@ -93,7 +94,8 @@ class MetadataTranslationTest extends FunctionalTestCase
     /**
      * remove files and related records (sys_file, sys_file_metadata) from environment
      */
-    protected function cleanUpFilesAndRelatedRecords() {
+    protected function cleanUpFilesAndRelatedRecords()
+    {
         // find files in storage
         $storage = ResourceFactory::getInstance()->getStorageObject(2);
         $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
@@ -173,47 +175,15 @@ class MetadataTranslationTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function uploadingVariantReplacesFileWithoutChangingUid()
+    public function deleteTranslatedMetadataResetsConsumingReferencesToDefaultFile()
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
-        $scenarioName = 'provideFileVariant';
+        $scenarioName = 'deleteMetadata';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
-        $controller = new FileVariantsController();
-        $request = new ServerRequest();
-
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'languageVariants/languageVariants/cat_1.jpg');
-
-        mkdir(PATH_site . 'typo3temp/file_variants_uploads/', 0777, true);
-        $localFilePath = PATH_site . 'typo3temp/file_variants_uploads/cat_2.jpg';
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', $localFilePath);
-
-        $storage = ResourceFactory::getInstance()->getStorageObject(2);
-        $folder = $storage->getFolder('languageVariants');
-        $newFile = $storage->addFile($localFilePath, $folder);
-        $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
-        $controller->ajaxUploadFileVariant($request, new Response());
-
-        //$this->actionService->localizeRecord('sys_file_metadata', 11, 1);
+        $this->actionService->deleteRecord('sys_file_metadata', 12);
 
         $this->importAssertCSVScenario($scenarioName);
     }
-
-    /**
-     * @test
-     */
-     public function translationOfMetadataCreatesLocalizedFileRecord()
-    {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
-        $scenarioName = 'translateMetadata';
-        $this->importCsvScenario($scenarioName);
-        $this->setUpFrontendRootPage(1);
-
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
-        $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
-
-        $this->importAssertCSVScenario($scenarioName);
-    }
-
 }
