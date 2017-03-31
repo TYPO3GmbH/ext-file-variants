@@ -22,7 +22,8 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"T3G\\AgencyPack\\FileVariants\\": "Classes/"
+			"T3G\\AgencyPack\\FileVariants\\": "Classes/",
+			"T3G\\AgencyPack\\FileVariants\\Tests\\": "Tests/"
 		}
 	},
 	"autoload-dev": {
