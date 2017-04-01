@@ -110,8 +110,7 @@ class FileVariantsController
      */
     public function ajaxReplaceFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $response->getBody()->write('hello replace');
-        return $response;
+        return $this->ajaxReplaceFileVariant($request, $response);
     }
 
     /**

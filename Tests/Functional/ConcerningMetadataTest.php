@@ -137,7 +137,7 @@ class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Function
         $controller = new FileVariantsController();
         $request = new ServerRequest();
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'languageVariants/languageVariants/cat_1.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', PATH_site . 'languageVariants/languageVariants/cat_2.jpg');
 
         @mkdir(PATH_site . 'typo3temp/file_variants_uploads/', 0777, true);
         $localFilePath = PATH_site . 'typo3temp/file_variants_uploads/cat_3.jpg';
@@ -147,7 +147,7 @@ class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Function
         $folder = $storage->getFolder('languageVariants');
         $newFile = $storage->addFile($localFilePath, $folder);
         $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
-        $controller->ajaxReplaceFileVariant($request, new Response());
+        $controller->ajaxUploadFileVariant($request, new Response());
 
         $this->importAssertCSVScenario($scenarioName);
     }
