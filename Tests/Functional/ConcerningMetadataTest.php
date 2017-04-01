@@ -15,6 +15,8 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 use T3G\AgencyPack\FileVariants\Controller\FileVariantsController;
+use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -30,6 +32,21 @@ class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Function
      * @var string
      */
     protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/ConcerningMetadata/AfterOperation/';
+
+    /**
+     * @test
+     */
+    public function exceptionIsThrownForBadStorageConfiguration()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 42]);
+        $subject = new DataHandlerHook();
+        /** @var DataHandler $dataHandler */
+        $dataHandler = $this->prophesize(DataHandler::class);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionCode(1490480372);
+        $subject->processCmdmap_postProcess('localize', 'sys_file_metadata', '1', 'foo', $dataHandler->reveal());
+    }
 
     /**
      * @test

@@ -42,4 +42,20 @@ class ConcerningFileReferencesTest extends FunctionalTestCase
 
         $this->importAssertCSVScenario($scenarioName);
     }
+
+    /**
+     * @test
+     */
+    public function translateMetadataUpdatesConsumingReferences()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $scenarioName = 'translateMetadata';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
+
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
+        $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
+
+        $this->importAssertCSVScenario($scenarioName);
+    }
 }

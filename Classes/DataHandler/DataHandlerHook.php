@@ -19,7 +19,6 @@ use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class DataHandlerHook
 {
@@ -147,16 +146,11 @@ class DataHandlerHook
             }
             foreach ($filteredReferences as $reference) {
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
-                $queryBuilder->update('sys_file_reference')->set('file', $fileUid)->where(
+                $queryBuilder->update('sys_file_reference')->set('uid_local', $translatedFileUid)->where(
                     $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, \PDO::PARAM_INT))
                 )->execute();
             }
         }
-
-
-
-
-
 
     }
 
@@ -191,13 +185,13 @@ class DataHandlerHook
      */
     protected function substNewWithId($id, DataHandler $pObj): int
     {
-        if (is_string($id) && strpos($id, 'NEW') >= 0) {
+        if (is_string($id) && strpos($id, 'NEW') !== false) {
             $id = $pObj->substNEWwithIDs[$id];
         }
         if ($id === null) {
             $id = -1;
         }
-        return $id;
+        return (int)$id;
     }
 
     /**

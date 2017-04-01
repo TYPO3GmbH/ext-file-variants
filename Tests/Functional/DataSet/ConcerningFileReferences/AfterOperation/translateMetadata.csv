@@ -1,0 +1,17 @@
+tt_content,,,,,,,,,,,,
+,uid,pid,hidden,deleted,sys_language_uid,CType,header,image,l18n_parent,,,
+,1,2,0,0,0,image,Image,1,0,,,
+,2,2,0,0,1,image,Image DE,1,1,,,
+sys_file_reference,,,,,,,,,,,,
+,uid,pid,uid_local,uid_foreign,hidden,deleted,sys_language_uid,l10n_parent,tablenames,fieldname,table_local,
+,1,2,11,1,0,0,0,0,tt_content,image,sys_file,
+,2,2,12,2,0,0,1,1,tt_content,image,sys_file,
+sys_file,,,,,,,,,,,,
+,uid,pid,missing,storage,type,metadata,identifier,extension,mime_type,name,sys_language_uid,l10n_parent
+,11,0,0,1,2,0,/cat_1.jpg,jpg,image/jpeg,cat_1.jpg,0,0
+,12,0,0,2,2,0,/languageVariants/cat_1.jpg,jpg,image/jpeg,cat_1.jpg,1,11
+sys_file_metadata,,,,,,,,,,,,
+,uid,pid,cruser_id,sys_language_uid,l10n_parent,file,title,,,,,
+,11,0,1,0,0,11,NULL,,,,,
+,12,0,1,1,11,12,[Translate to deutsch:] NULL,,,,,
+,13,0,1,0,0,12,,,,,,
