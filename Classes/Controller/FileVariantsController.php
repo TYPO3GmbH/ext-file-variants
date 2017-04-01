@@ -135,6 +135,17 @@ class FileVariantsController
         $currentFile->getStorage()->replaceFile($currentFile, PATH_site . $uploadedFile->getPublicUrl());
         $currentFile->rename($uploadedFile->getName(), DuplicationBehavior::RENAME);
 
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
+        $queryBuilder->delete('sys_file')->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT))
+        )->execute();
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder->delete('sys_file_metadata')->where(
+            $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT))
+        )->execute();
 
         $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
