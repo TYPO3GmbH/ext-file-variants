@@ -73,9 +73,8 @@ class DataHandlerHook
      * @param string $command
      * @param string $table
      * @param $id
-     * @param $value
      */
-    public function processCmdmap(string $command, string $table, $id, $value) {
+    public function processCmdmap(string $command, string $table, $id) {
         if ($table === 'sys_file_metadata' && $command === 'delete') {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
