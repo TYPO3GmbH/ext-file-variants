@@ -34,7 +34,7 @@ class FileVariantsController
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function ajaxDeleteFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function ajaxResetFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $uid = (int)$request->getQueryParams()['uid'];
 
@@ -110,7 +110,7 @@ class FileVariantsController
      */
     public function ajaxReplaceFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        return $this->ajaxReplaceFileVariant($request, $response);
+        return $this->ajaxUploadFileVariant($request, $response);
     }
 
     /**
@@ -161,10 +161,6 @@ class FileVariantsController
         $formResult = $nodeFactory->create($formData)->render();
         $response->getBody()->write($formResult['html']);
         return $response;
-    }
-
-    public function ajaxResetFileVariant($request, $param)
-    {
     }
 
 }

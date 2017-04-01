@@ -147,7 +147,7 @@ class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Function
         $folder = $storage->getFolder('languageVariants');
         $newFile = $storage->addFile($localFilePath, $folder);
         $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
-        $controller->ajaxUploadFileVariant($request, new Response());
+        $controller->ajaxReplaceFileVariant($request, new Response());
 
         $this->importAssertCSVScenario($scenarioName);
     }
@@ -158,7 +158,7 @@ class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Function
     public function resetVariantReplacesFileWithoutChangingUid()
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
-        $scenarioName = 'replaceFileVariant';
+        $scenarioName = 'resetFileVariant';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
@@ -166,6 +166,7 @@ class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Function
         $request = new ServerRequest();
 
         copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'languageVariants/languageVariants/cat_1.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', PATH_site . 'languageVariants/languageVariants/cat_2.jpg');
 
         $request = $request->withQueryParams(['uid' => 12]);
         $controller->ajaxResetFileVariant($request, new Response());
