@@ -85,9 +85,6 @@ class DataHandlerHook
         DataHandler $pObj
     )
     {
-        if ($table !== 'sys_file_storage') {
-            $this->prepareFileStorageEnvironment();
-        }
 
         // translation of metadata record
         // results in copied sys_file and relation of record to new file
@@ -98,6 +95,8 @@ class DataHandlerHook
             if ($id < 1) {
                 throw new \RuntimeException('can\'t retrieve valid id', 1489332067);
             }
+
+            $this->prepareFileStorageEnvironment();
 
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
@@ -153,6 +152,10 @@ class DataHandlerHook
                 )->execute();
             }
         }
+
+
+
+
 
 
     }

@@ -18,6 +18,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\DataHandler;
 
 use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use PHPUnit\Framework\TestCase;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 
 class DataHandlerHookTest extends TestCase
 {
@@ -30,6 +31,22 @@ class DataHandlerHookTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionCode(1490476773);
         new DataHandlerHook();
+    }
+
+    /**
+     * @test
+     */
+    public function hookThrowsExceptionIfNoValidIdIsFound()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['foo']);
+        $subject = new DataHandlerHook();
+        /** @var DataHandler $dataHandler */
+        $dataHandler = $this->prophesize(DataHandler::class);
+        $dataHandler->substNEWwithIDs = [];
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionCode(1489332067);
+        $subject->processCmdmap_postProcess('localize', 'sys_file_metadata', 'NEW_42', 'foo', $dataHandler->reveal());
     }
 
 }
