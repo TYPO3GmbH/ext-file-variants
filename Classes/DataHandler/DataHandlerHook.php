@@ -164,6 +164,9 @@ class DataHandlerHook
     {
         $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
         $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
+        if ($storageUid === 0) {
+            $storageUid = ResourceFactory::getInstance()->getDefaultStorage()->getUid();
+        }
         $targetFolder = $extensionConfiguration['variantsFolder'];
         try {
             $this->storage = ResourceFactory::getInstance()->getStorageObject($storageUid);

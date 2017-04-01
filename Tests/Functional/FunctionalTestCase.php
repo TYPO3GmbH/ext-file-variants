@@ -16,6 +16,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  */
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
 use TYPO3\CMS\Core\Tests\Functional\DataHandling\Framework\ActionService;
@@ -95,22 +96,27 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      */
     protected function cleanUpFilesAndRelatedRecords()
     {
-        // find files in storage
-        $storage = ResourceFactory::getInstance()->getStorageObject(2);
-        $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
-        try {
-            $folder = $storage->getFolder('languageVariants');
-            $files = $storage->getFilesInFolder($folder);
-            foreach ($files as $file) {
-                $storage->deleteFile($file);
-                $recordsToDelete['sys_file'][] = $file->getUid();
-                $metadata = $file->_getMetaData();
-                $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
+        // find all storages used
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_storage');
+        $result = $queryBuilder->select('*')->from('sys_file_storage')->execute();
+        while ($storageUid = $result->fetch()['uid']) {
+            // find files in storage
+            $storage = ResourceFactory::getInstance()->getStorageObject($storageUid);
+            $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
+            try {
+                $folder = $storage->getFolder('languageVariants');
+                $files = $storage->getFilesInFolder($folder);
+                foreach ($files as $file) {
+                    $storage->deleteFile($file);
+                    $recordsToDelete['sys_file'][] = $file->getUid();
+                    $metadata = $file->_getMetaData();
+                    $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
+                }
+            } catch (\Exception $exception) {
+                // sometimes, there is no folder to empty. Let's ignore that.
             }
-        } catch (\Exception $exception) {
-            // sometimes, there is no folder to empty. Let's ignore that.
+            $this->actionService->deleteRecords($recordsToDelete);
         }
-        $this->actionService->deleteRecords($recordsToDelete);
     }
 
     /**
