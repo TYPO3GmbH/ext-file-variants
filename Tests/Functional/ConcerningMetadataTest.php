@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 namespace T3G\AgencyPack\FileVariants\Tests\Functional;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -16,10 +17,13 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  */
 use T3G\AgencyPack\FileVariants\Controller\FileVariantsController;
 use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
+use TYPO3\CMS\Backend\Controller\File\FileController;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Functional\FunctionalTestCase
 {
@@ -177,16 +181,35 @@ class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Function
     /**
      * @test
      */
-    public function deleteTranslatedMetadataRemovesAllRelatedFilesAndMetadata()
+    public function fileDeletionRemovesAllRelatedFilesAndMetadata()
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['doNotCheckReferer'] = true;
+
         $scenarioName = 'deleteMetadata';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'languageVariants/languageVariants/cat_1.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', PATH_site . 'languageVariants/languageVariants/cat_3.jpg');
+        $file = ResourceFactory::getInstance()->getFileObject(12);
 
-        $this->actionService->deleteRecord('sys_file_metadata', 12);
+        $_SERVER['HTTP_HOST'] = 'localhost';
+        $_SERVER['REQUEST_URI'] = '/index.php';
+        $_GET = ['file' => [
+            'delete' => [
+                [
+                    'data' =>
+                        $file->getUid()
+                ]
+            ]
+        ]
+        ];
+        $request = ServerRequestFactory::fromGlobals();
+        $response = GeneralUtility::makeInstance(Response::class);
+        /** @var FileController $fileController */
+        $fileController = GeneralUtility::makeInstance(FileController::class);
+        $fileController->mainAction($request, $response);
+
         $this->importAssertCSVScenario($scenarioName);
     }
 }

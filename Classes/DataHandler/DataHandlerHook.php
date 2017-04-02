@@ -72,52 +72,6 @@ class DataHandlerHook
     /**
      * @param string $command
      * @param string $table
-     * @param $id
-     */
-    public function processCmdmap(string $command, string $table, $id) {
-        if ($table === 'sys_file_metadata' && $command === 'delete') {
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-            $fileUid = (int)$queryBuilder->select('file')->from('sys_file_metadata')->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($id, \PDO::PARAM_INT))
-            )->execute()->fetchColumn();
-
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-            $parentFileUid = (int)$queryBuilder->select('l10n_parent')->from('sys_file')->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute()->fetchColumn();
-
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
-            $references = $queryBuilder->select('uid')->from('sys_file_reference')->where(
-                $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
-            while ($reference = $references->fetch()['uid']) {
-                /** @var QueryBuilder $queryBuilder */
-                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
-                $queryBuilder->update('sys_file_reference')->set('uid_local', $parentFileUid)->where(
-                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, \PDO::PARAM_INT))
-                )->execute();
-            }
-
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-            $queryBuilder->delete('sys_file_metadata')->where(
-                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
-
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-            $queryBuilder->delete('sys_file')->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
-        }
-    }
-
-    /**
-     * @param string $command
-     * @param string $table
      * @param string|int $id recordUid
      * @param mixed $value Command Value
      * @param DataHandler $pObj

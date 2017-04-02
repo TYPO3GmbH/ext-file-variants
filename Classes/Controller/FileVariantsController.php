@@ -54,7 +54,7 @@ class FileVariantsController
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
         $queryBuilder->select('l10n_parent')->from('sys_file')->where(
-            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
         );
 
         $fileRecord = $queryBuilder->execute()->fetch();
