@@ -23,6 +23,7 @@ use TYPO3\CMS\Backend\Form\FormResultCompiler;
 use TYPO3\CMS\Backend\Form\NodeFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Database\ReferenceIndex;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -98,6 +99,10 @@ class FileVariantsController
             )->execute();
         }
 
+        /** @var $refIndexObj ReferenceIndex */
+        $refIndexObj = GeneralUtility::makeInstance(ReferenceIndex::class);
+        $refIndexObj->updateIndex(false);
+
         $formResult = $nodeFactory->create($formData)->render();
         $response->getBody()->write($formResult['html']);
         return $response;
@@ -145,6 +150,10 @@ class FileVariantsController
         $queryBuilder->delete('sys_file_metadata')->where(
             $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT))
         )->execute();
+
+        /** @var $refIndexObj ReferenceIndex */
+        $refIndexObj = GeneralUtility::makeInstance(ReferenceIndex::class);
+        $refIndexObj->updateIndex(false);
 
         $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);

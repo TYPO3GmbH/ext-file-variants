@@ -28,7 +28,7 @@ class FileDeleteSlot
     /**
      * @param FileInterface $file
      */
-    public function handleFileVariantDeletion(FileInterface $file)
+    public function handleFileVariantDeletionPreDelete(FileInterface $file)
     {
 
         if ($file instanceof File) {
@@ -51,6 +51,18 @@ class FileDeleteSlot
                     $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, \PDO::PARAM_INT))
                 )->execute();
             }
+
+        }
+    }
+
+    /**
+     * @param FileInterface $file
+     */
+    public function handleFileVariantDeletionPostDelete(FileInterface $file)
+    {
+
+        if ($file instanceof File) {
+            $fileUid = $file->getUid();
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
             $queryBuilder->delete('sys_file_metadata')->where(
