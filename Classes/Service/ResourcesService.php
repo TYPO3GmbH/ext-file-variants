@@ -22,6 +22,10 @@ use TYPO3\CMS\Core\Resource\ResourceStorage;
   */
 class ResourcesService {
 
+    /**
+     * @param int $uid
+     * @return ResourceStorage
+     */
     public function retrieveStorageObject(int $uid): ResourceStorage
     {
         if ($uid === 0) {
