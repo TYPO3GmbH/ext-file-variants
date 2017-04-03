@@ -14,6 +14,7 @@ namespace T3G\AgencyPack\FileVariants\DataHandler;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -161,12 +162,11 @@ class DataHandlerHook
     {
         $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
         $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
-        if ($storageUid === 0) {
-            $storageUid = ResourceFactory::getInstance()->getDefaultStorage()->getUid();
-        }
+        /** @var ResourcesService $resourcesService */
+        $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
         $targetFolder = $extensionConfiguration['variantsFolder'];
         try {
-            $this->storage = ResourceFactory::getInstance()->getStorageObject($storageUid);
+            $this->storage = $resourcesService->retrieveStorageObject($storageUid);
 
             if (!$this->storage->hasFolder($targetFolder)) {
                 $this->folder = $this->storage->createFolder($targetFolder);

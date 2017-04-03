@@ -15,6 +15,7 @@ namespace T3G\AgencyPack\FileVariants\FormEngine;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Backend\Form\Element\FileInfoElement;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Database\Connection;
@@ -67,7 +68,9 @@ class FileVariantInfoElement extends FileInfoElement
                 $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
                 $targetFolder = $extensionConfiguration['variantsFolder'];
                 try {
-                    $this->storage = ResourceFactory::getInstance()->getStorageObject($storageUid);
+                    /** @var ResourcesService $resourcesService */
+                    $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
+                    $this->storage = $resourcesService->retrieveStorageObject($storageUid);
 
                     if (!$this->storage->hasFolder($targetFolder)) {
                         $this->folder = $this->storage->createFolder($targetFolder);
@@ -75,7 +78,7 @@ class FileVariantInfoElement extends FileInfoElement
                         $this->folder = $this->storage->getFolder($targetFolder);
                     }
                 } catch (\InvalidArgumentException $exception) {
-                    throw new \RuntimeException('storage with uid ' . $storageUid . ' is now available. Create it and check the given uid in extension configuration.', 1490480372);
+                    throw new \RuntimeException('storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.', 1490480372);
                 }
 
                 /** @var UriBuilder $uriBuilder */
