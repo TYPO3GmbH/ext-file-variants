@@ -36,7 +36,7 @@ define(['jquery',
      *
      * @param {HTMLElement} element
      * @constructor
-     * @exports TYPO3/CMS/Backend/FileVariantsDragUploader
+     * @exports TYPO3/CMS/FileVariants/FileVariantsDragUploader
      */
     var FileVariantsDragUploaderPlugin = function (element) {
         var me = this;
@@ -312,8 +312,8 @@ define(['jquery',
     };
 
     FileVariantsDragUploader.processFileVariantUpload = function (file, url) {
-        var url = url + '&file=' + encodeURIComponent(file.uid);
-        $('#t3js-fileinfo').load(url);
+        var ajaxurl = url + '&file=' + encodeURIComponent(file.uid);
+        $('#t3js-fileinfo').load(ajaxurl);
     };
 
     FileVariantsDragUploader.initialize = function () {
@@ -335,53 +335,6 @@ define(['jquery',
 
          $(function () {
              $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
-        //     $('.t3js-filevariant-trigger-delete').on('click', function(e) {
-        //         var $me = $(this);
-        //
-        //         e.preventDefault();
-        //
-        //         Modal.confirm(
-        //             TYPO3.lang['file_variants.delete.title'],
-        //             TYPO3.lang['file_variants.delete.message'].replace('%1$s', $me.data('language')).replace('%2$s', $me.data('file')),
-        //             Severity.warning,
-        //             [
-        //                 {
-        //                     active: true,
-        //                     btnClass: 'btn-default',
-        //                     name: 'cancel',
-        //                     text: TYPO3.lang['file_variants.actions.cancel'],
-        //                     trigger: function() {
-        //                         Modal.dismiss();
-        //                     }
-        //                 },
-        //                 {
-        //                     btnClass: 'btn-warning',
-        //                     name: 'rename',
-        //                     text: TYPO3.lang['file_variants.actions.delete'],
-        //                     trigger: function() {
-        //                         $.ajax({
-        //                             url: TYPO3.settings.ajaxUrls['tx_filevariants_deleteFileVariant'],
-        //                             data: {
-        //                                 uid: parseInt($me.data('uid'))
-        //                             },
-        //                             success: function() {
-        //                                 FileVariantsDragUploader.processFileVariantUpload({
-        //                                     uid: parseInt($me.data('fileUid'))
-        //                                 }, $me.data('url'));
-        //                             },
-        //                             error: function(response) {
-        //                                 Notification.error(response.statusText, response.responseText);
-        //                             },
-        //                             complete: function() {
-        //                                 // Always hide modal, we don't care whether the action was successful or not
-        //                                 Modal.dismiss();
-        //                             }
-        //                         });
-        //                     }
-        //                 }
-        //             ]
-        //         );
-        //     });
          });
     };
 
