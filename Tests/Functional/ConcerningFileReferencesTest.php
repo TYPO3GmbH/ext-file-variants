@@ -112,7 +112,7 @@ class ConcerningFileReferencesTest extends FunctionalTestCase
     public function translatingConsumingRecordInFreeModeProvidesLanguageVariantForLanguage()
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
-        $scenarioName = 'translateConsumingRecord';
+        $scenarioName = 'translateConsumingFreeModeRecord';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
