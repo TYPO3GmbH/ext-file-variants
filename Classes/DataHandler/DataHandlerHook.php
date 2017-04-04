@@ -22,6 +22,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class DataHandlerHook
 {
@@ -111,13 +112,25 @@ class DataHandlerHook
                     $currentFileId = $queryBuilder->execute()->fetchColumn();
                     /** @var QueryBuilder $queryBuilder */
                     $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-                    $queryBuilder->select('uid')->from('sys_file')->where(
-                        $queryBuilder->expr()->eq('l10n_parent',
-                            $queryBuilder->createNamedParameter($currentFileId, \PDO::PARAM_INT)),
-                        $queryBuilder->expr()->eq('sys_language_uid',
-                            $queryBuilder->createNamedParameter($value, \PDO::PARAM_INT))
+                    $queryBuilder->select('sys_language_uid', 'l10n_parent')->from('sys_file')->where(
+                        $queryBuilder->expr()->eq('uid',
+                            $queryBuilder->createNamedParameter($currentFileId, \PDO::PARAM_INT))
                     );
+                    $fileRecord = $queryBuilder->execute()->fetch();
+                    if ($fileRecord['sys_language_uid'] === 0){
+                        $queryBuilder->select('uid')->from('sys_file')->where(
+                            $queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter($currentFileId, \PDO::PARAM_INT)),
+                            $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($value, \PDO::PARAM_INT))
+                        );
+                    } else {
+                        $queryBuilder->select('uid')->from('sys_file')->where(
+                            $queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter($fileRecord['l10n_parent'], \PDO::PARAM_INT)),
+                            $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($value, \PDO::PARAM_INT))
+                        );
+                    }
+
                     $fileVariantUid = $queryBuilder->execute()->fetchColumn();
+
                     if ((int)$fileVariantUid > 0) {
                         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
                         $queryBuilder->update('sys_file_reference')->set('uid_local', $fileVariantUid)->where(

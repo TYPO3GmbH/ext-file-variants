@@ -126,4 +126,54 @@ class ConcerningFileReferencesTest extends FunctionalTestCase
 
         $this->importAssertCSVScenario($scenarioName);
     }
+
+    /**
+     * @test
+     */
+    public function translatingConsumingRecordFromNonDefaultLanguageProvidesLanguageVariant()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $scenarioName = 'translateFromNonDefaultLanguage';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
+
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', PATH_site . 'languageVariants/languageVariants/cat_2.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', PATH_site . 'languageVariants/languageVariants/cat_3.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_4.jpg', PATH_site . 'languageVariants/languageVariants/cat_4.jpg');
+        $this->actionService->localizeRecord('tt_content', 1, 1);
+        $this->actionService->localizeRecord('tt_content', 2, 2);
+        $this->actionService->localizeRecord('tt_content', 3, 3);
+
+        $this->importAssertCSVScenario($scenarioName);
+    }
+
+    /**
+     * @test
+     */
+    public function copyConsumingRecordFromNonDefaultLanguageProvidesLanguageVariant()
+    {
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $scenarioName = 'copyFromNonDefaultLanguage';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
+
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', PATH_site . 'languageVariants/languageVariants/cat_2.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', PATH_site . 'languageVariants/languageVariants/cat_3.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_4.jpg', PATH_site . 'languageVariants/languageVariants/cat_4.jpg');
+        $this->actionService->copyRecordToLanguage('tt_content', 1, 1);
+        $this->actionService->copyRecordToLanguage('tt_content', 2, 2);
+        $this->actionService->copyRecordToLanguage('tt_content', 3, 3);
+
+        $this->importAssertCSVScenario($scenarioName);
+    }
+
+    /**
+     * @test
+     */
+    public function translatingConsumingRecordThatIsNotTtContentWorksLikeConnectedMode()
+    {
+
+    }
 }
