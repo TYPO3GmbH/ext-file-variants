@@ -174,6 +174,17 @@ class ConcerningFileReferencesTest extends FunctionalTestCase
      */
     public function translatingConsumingRecordThatIsNotTtContentWorksLikeConnectedMode()
     {
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $scenarioName = 'translateConsumingRecordNotTtContent';
+        $this->importCsvScenario($scenarioName);
+        $this->setUpFrontendRootPage(1);
 
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', PATH_site . 'languageVariants/languageVariants/cat_2.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', PATH_site . 'languageVariants/languageVariants/cat_3.jpg');
+        $this->actionService->localizeRecord('sys_file_collection', 1, 1);
+        $this->actionService->copyRecordToLanguage('sys_file_collection', 2, 2);
+
+        $this->importAssertCSVScenario($scenarioName);
     }
 }

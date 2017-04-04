@@ -117,7 +117,7 @@ class DataHandlerHook
                             $queryBuilder->createNamedParameter($currentFileId, \PDO::PARAM_INT))
                     );
                     $fileRecord = $queryBuilder->execute()->fetch();
-                    if ($fileRecord['sys_language_uid'] === 0){
+                    if ((int)$fileRecord['sys_language_uid'] === 0){
                         $queryBuilder->select('uid')->from('sys_file')->where(
                             $queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter($currentFileId, \PDO::PARAM_INT)),
                             $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter($value, \PDO::PARAM_INT))
