@@ -99,6 +99,10 @@ class ConcerningFileReferencesTest extends FunctionalTestCase
         copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', PATH_site . 'languageVariants/languageVariants/cat_2.jpg');
         copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', PATH_site . 'languageVariants/languageVariants/cat_3.jpg');
         copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_4.jpg', PATH_site . 'languageVariants/languageVariants/cat_4.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/nature_1.jpg', PATH_site . 'fileadmin/nature_1.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/nature_2.jpg', PATH_site . 'languageVariants/languageVariants/nature_2.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/nature_3.jpg', PATH_site . 'languageVariants/languageVariants/nature_3.jpg');
+        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/nature_4.jpg', PATH_site . 'languageVariants/languageVariants/nature_4.jpg');
         $this->actionService->localizeRecord('tt_content', 1, 1);
         $this->actionService->localizeRecord('tt_content', 1, 2);
         $this->actionService->localizeRecord('tt_content', 1, 3);
