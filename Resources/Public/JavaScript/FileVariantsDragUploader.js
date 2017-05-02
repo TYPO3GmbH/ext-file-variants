@@ -144,18 +144,6 @@ define(['jquery',
             me.$dropzone.removeClass('drop-status-ok');
         };
 
-        /**
-         * bind file picker to default upload button
-         *
-         * @param {Object} button
-         */
-        me.bindUploadButton = function (button) {
-            button.click(function (event) {
-                event.preventDefault();
-                me.$fileInput.click();
-            });
-        };
-
         if (me.browserCapabilities.DnD) {
             me.$body.on('dragover', me.dragFileIntoDocument);
             me.$body.on('dragend', me.dragAborted);
@@ -179,12 +167,11 @@ define(['jquery',
                 me.$fileInput.click()
             });
             $('<span />').addClass('dropzone-close').click(me.hideDropzone).appendTo(me.$dropzone);
+            me.$trigger = $(me.$element.data('dropzone-trigger'));
 
             me.$fileInput.on('change', function () {
                 me.processFiles(this.files);
             });
-
-            me.bindUploadButton(me.$trigger.length ? me.$trigger : me.$element);
         }
 
     };
