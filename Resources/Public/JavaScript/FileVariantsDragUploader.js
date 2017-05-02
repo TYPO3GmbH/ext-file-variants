@@ -313,7 +313,9 @@ define(['jquery',
 
     FileVariantsDragUploader.processFileVariantUpload = function (file, url) {
         var ajaxurl = url + '&file=' + encodeURIComponent(file.uid);
-        $('#t3js-fileinfo').load(ajaxurl);
+        $('#t3js-fileinfo').load(ajaxurl, function() {
+            $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
+        });
     };
 
     FileVariantsDragUploader.initialize = function () {
