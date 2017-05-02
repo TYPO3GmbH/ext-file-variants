@@ -96,7 +96,7 @@ class FileVariantInfoElement extends FileInfoElement
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant',
                         ['uid' => $this->data['vanillaUid']]);
                     $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' .$this->folder->getCombinedIdentifier(). '" 
-	 data-dropzone-trigger=".t3js-drag-uploader-trigger" data-dropzone-target=".t3js-module-body h1:first"
+	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
 	 data-file-deny-pattern="' .$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']. '" data-max-file-size="' .$maxFileSize. '" data-handling-url="' .$path. '"
 	></div>';
                 } else {
@@ -105,7 +105,7 @@ class FileVariantInfoElement extends FileInfoElement
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_uploadFileVariant',
                         ['uid' => $this->data['vanillaUid']]);
                     $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' .$this->folder->getCombinedIdentifier(). '" 
-	 data-dropzone-trigger=".t3js-drag-uploader-trigger" data-dropzone-target=".t3js-module-body h1:first"
+	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
 	 data-file-deny-pattern="' .$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']. '" data-max-file-size="' .$maxFileSize. '" data-handling-url="' .$path. '"
 	></div>';
                     //$resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger t3js-drag-uploader" data-url="' . $path . '">create language variant</button></p>';
