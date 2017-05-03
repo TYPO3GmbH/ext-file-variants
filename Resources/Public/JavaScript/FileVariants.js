@@ -11,13 +11,13 @@
  * The TYPO3 project - inspiring people to share!
  */
 define([
-    "require",
-    "jquery",
+    'jquery',
     'TYPO3/CMS/Backend/Modal',
     'TYPO3/CMS/Backend/Severity',
-	'TYPO3/CMS/FileVariants/FileVariantsDragUploader'
-], function (require, $, Modal, Severity, FileVariantsDragUploader) {
-    "use strict";
+    'TYPO3/CMS/FileVariants/FileVariantsDragUploader'
+], function ($, Modal, Severity, FileVariantsDragUploader) {
+    'use strict';
+
     /**
      * Module: TYPO3/CMS/FileVariants/FileVariants
      * contains all logic filevariants manipulation used in BE
@@ -58,7 +58,7 @@ define([
                         $('#t3js-fileinfo').load(url);
                         Modal.dismiss();
                         // @todo reinitialize the drag uploader
-						$('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
+                        $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
                     }
                 });
 

@@ -16,14 +16,10 @@
  *
  */
 define(['jquery',
-    'moment',
-    'nprogress',
-    'TYPO3/CMS/Backend/Modal',
     'TYPO3/CMS/Backend/Notification',
-    'TYPO3/CMS/Backend/Severity',
     'TYPO3/CMS/Backend/FormEngine',
     'TYPO3/CMS/Lang/Lang'
-], function ($, moment, NProgress, Modal, Notification, Severity) {
+], function ($, Notification) {
 
     var percentagePerFile = 1;
 
@@ -166,7 +162,6 @@ define(['jquery',
                 '</div>').click(function () {
                 me.$fileInput.click()
             });
-            $('<span />').addClass('dropzone-close').click(me.hideDropzone).appendTo(me.$dropzone);
             me.$trigger = $(me.$element.data('dropzone-trigger'));
 
             me.$fileInput.on('change', function () {
@@ -206,11 +201,6 @@ define(['jquery',
 
         me.uploadSuccess = function (data) {
             if (data.upload) {
-
-                setTimeout(function () {
-                    me.fileVariantsDragUploader.$trigger.trigger('uploadSuccess', [me, data]);
-                }, 3000);
-
                 FileVariantsDragUploader.processFileVariantUpload(data.upload[0], handlingUrl);
             }
         };
@@ -302,6 +292,15 @@ define(['jquery',
         var ajaxurl = url + '&file=' + encodeURIComponent(file.uid);
         $('#t3js-fileinfo').load(ajaxurl, function() {
             $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
+        });
+        $.ajax({
+            url: TYPO3.settings.ajaxUrls['flashmessages_render'],
+            cache: false,
+            success: function(data) {
+                $.each(data, function(index, flashMessage) {
+                    Notification.showMessage(flashMessage.title, flashMessage.message, flashMessage.severity);
+                });
+            }
         });
     };
 
