@@ -50,6 +50,13 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      */
     protected $actionService;
 
+    /**
+     * The fixture which is used when initializing a backend user
+     *
+     * @var string
+     */
+    protected $backendUserFixture = 'PACKAGE:t3g/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
+
     protected function setUp()
     {
         $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
