@@ -99,9 +99,9 @@ class FileVariantsController
             )->execute();
         }
 
-        /** @var $refIndexObj ReferenceIndex */
-        $refIndexObj = GeneralUtility::makeInstance(ReferenceIndex::class);
-        $refIndexObj->updateIndex(false);
+//        /** @var $refIndexObj ReferenceIndex */
+//        $refIndexObj = GeneralUtility::makeInstance(ReferenceIndex::class);
+//        $refIndexObj->updateIndex(false);
 
         $formResult = $nodeFactory->create($formData)->render();
         $response->getBody()->write($formResult['html']);
@@ -152,8 +152,8 @@ class FileVariantsController
         )->execute();
 
         /** @var $refIndexObj ReferenceIndex */
-        $refIndexObj = GeneralUtility::makeInstance(ReferenceIndex::class);
-        $refIndexObj->updateIndex(false);
+//        $refIndexObj = GeneralUtility::makeInstance(ReferenceIndex::class);
+//        $refIndexObj->updateIndex(false);
 
         $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);

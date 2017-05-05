@@ -14,8 +14,9 @@ define([
     'jquery',
     'TYPO3/CMS/Backend/Modal',
     'TYPO3/CMS/Backend/Severity',
+    'TYPO3/CMS/Backend/Notification',
     'TYPO3/CMS/FileVariants/FileVariantsDragUploader'
-], function ($, Modal, Severity, FileVariantsDragUploader) {
+], function ($, Modal, Severity, Notification, FileVariantsDragUploader) {
     'use strict';
 
     /**
@@ -55,11 +56,13 @@ define([
                     if (e.target.name === 'no') {
                         Modal.dismiss();
                     } else if (e.target.name === 'yes') {
-                        $('#t3js-fileinfo').load(url);
+                        $('#t3js-fileinfo').load(url, function() {
+                            $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
+                        });
                         Modal.dismiss();
-                        // @todo reinitialize the drag uploader
-                        $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
+
                     }
+
                 });
 
 
