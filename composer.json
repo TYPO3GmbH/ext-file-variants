@@ -26,6 +26,9 @@
 			"T3G\\AgencyPack\\FileVariants\\Tests\\": "Tests/"
 		}
 	},
+	"require-dev": {
+		"t3g/testing-framework": "dev-bugfix/TGT-614-branch-for-ext-file_variants"
+	},
 	"autoload-dev": {
 		"psr-4": {
 			"T3G\\AgencyPack\\FileVariants\\Tests\\": "Tests/"
