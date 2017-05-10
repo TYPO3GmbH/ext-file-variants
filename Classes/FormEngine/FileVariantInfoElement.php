@@ -23,8 +23,13 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\FolderInterface;
+use TYPO3\CMS\Core\Resource\ProcessedFile;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3\CMS\Lang\LanguageService;
 
 /**
  * Description
@@ -90,6 +95,8 @@ class FileVariantInfoElement extends FileInfoElement
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_deleteFileVariant',
                         ['uid' => $this->data['vanillaUid']]);
                     $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">remove language variant</button></p>';
+                    $defaultFileUid = $this->getDefaultFileUid();
+                    $resultArray['html'] .= $this->createDefaultImagePreview($defaultFileUid);
 
                     // upload new file to replace current variant
                     $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
@@ -108,7 +115,6 @@ class FileVariantInfoElement extends FileInfoElement
 	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
 	 data-file-deny-pattern="' .$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']. '" data-max-file-size="' .$maxFileSize. '" data-handling-url="' .$path. '"
 	></div>';
-                    //$resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger t3js-drag-uploader" data-url="' . $path . '">create language variant</button></p>';
                 }
             }
         }
@@ -123,15 +129,9 @@ class FileVariantInfoElement extends FileInfoElement
      */
     protected function areRelatedFilesEqual(): bool
     {
-        $l10n_parent = (int)$this->data['databaseRow']['l10n_parent'][0];
         $fileUid = (int)$this->data['databaseRow']['file'][0];
+        $defaultFileUid = $this->getDefaultFileUid();
 
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->select('file')->from('sys_file_metadata')->where(
-            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($l10n_parent, \PDO::PARAM_INT))
-        );
-        $defaultFileUid = (int)$queryBuilder->execute()->fetchColumn();
         // this file has not been copied upon metadata translation. Probably we talk stale data.
         // make sure there will be no error at least.
         if ($defaultFileUid === $fileUid) {
@@ -146,5 +146,40 @@ class FileVariantInfoElement extends FileInfoElement
         );
         $sha1s = $queryBuilder->execute()->fetchAll();
         return $sha1s[0]['sha1'] === $sha1s[1]['sha1'];
+    }
+
+    /**
+     * @return int
+     */
+    protected function getDefaultFileUid(): int
+    {
+        $l10n_parent = (int)$this->data['databaseRow']['l10n_parent'][0];
+
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder->select('file')->from('sys_file_metadata')->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($l10n_parent, \PDO::PARAM_INT))
+        );
+        return (int)$queryBuilder->execute()->fetchColumn();
+    }
+
+    protected function createDefaultImagePreview($defaultFileUid)
+    {
+        $file = ResourceFactory::getInstance()->getFileObject($defaultFileUid);
+        $processedFile = $file->process(ProcessedFile::CONTEXT_IMAGEPREVIEW, ['width' => 150, 'height' => 150]);
+        $previewImage = $processedFile->getPublicUrl(true);
+        $content = '';
+        if ($file->isMissing()) {
+            $content .= '<span class="label label-danger label-space-right">'
+                . htmlspecialchars(LocalizationUtility::translate('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:warning.file_missing', 'lang'))
+                . '</span>';
+        }
+        if ($previewImage) {
+            $content .= '<img src="' . htmlspecialchars($previewImage) . '" ' .
+                'width="' . $processedFile->getProperty('width') . '" ' .
+                'height="' . $processedFile->getProperty('height') . '" ' .
+                'alt="" class="t3-tceforms-sysfile-imagepreview" />';
+        }
+        return $content;
     }
 }
