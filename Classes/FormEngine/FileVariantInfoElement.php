@@ -23,13 +23,8 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Resource\FolderInterface;
-use TYPO3\CMS\Core\Resource\ProcessedFile;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
-use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
-use TYPO3\CMS\Lang\LanguageService;
 
 /**
  * Description
@@ -71,9 +66,8 @@ class FileVariantInfoElement extends FileInfoElement
                 $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
                 $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
                 $targetFolder = $extensionConfiguration['variantsFolder'];
+                $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
                 try {
-                    /** @var ResourcesService $resourcesService */
-                    $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
                     $this->storage = $resourcesService->retrieveStorageObject($storageUid);
 
                     if (!$this->storage->hasFolder($targetFolder)) {
@@ -96,7 +90,7 @@ class FileVariantInfoElement extends FileInfoElement
                         ['uid' => $this->data['vanillaUid']]);
                     $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">remove language variant</button></p>';
                     $defaultFileUid = $this->getDefaultFileUid();
-                    $resultArray['html'] .= $this->createDefaultImagePreview($defaultFileUid);
+                    $resultArray['html'] .= $resourcesService->generatePreviewImageHtml($defaultFileUid);
 
                     // upload new file to replace current variant
                     $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
@@ -163,23 +157,5 @@ class FileVariantInfoElement extends FileInfoElement
         return (int)$queryBuilder->execute()->fetchColumn();
     }
 
-    protected function createDefaultImagePreview($defaultFileUid)
-    {
-        $file = ResourceFactory::getInstance()->getFileObject($defaultFileUid);
-        $processedFile = $file->process(ProcessedFile::CONTEXT_IMAGEPREVIEW, ['width' => 150, 'height' => 150]);
-        $previewImage = $processedFile->getPublicUrl(true);
-        $content = '';
-        if ($file->isMissing()) {
-            $content .= '<span class="label label-danger label-space-right">'
-                . htmlspecialchars(LocalizationUtility::translate('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:warning.file_missing', 'lang'))
-                . '</span>';
-        }
-        if ($previewImage) {
-            $content .= '<img src="' . htmlspecialchars($previewImage) . '" ' .
-                'width="' . $processedFile->getProperty('width') . '" ' .
-                'height="' . $processedFile->getProperty('height') . '" ' .
-                'alt="" class="t3-tceforms-sysfile-imagepreview" />';
-        }
-        return $content;
-    }
+
 }

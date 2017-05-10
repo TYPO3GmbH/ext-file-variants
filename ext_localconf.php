@@ -31,4 +31,10 @@ call_user_func(function () {
         \T3G\AgencyPack\FileVariants\Signal\Slot\FileDeleteSlot::class,        // Slot class name
         'handleFileVariantDeletionPostDelete'                               // Slot name
     );
+
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1494415118] = [
+        'nodeName' => 'FileVariantsOverviewWizard',
+        'priority' => 40,
+        'class' => \T3G\AgencyPack\FileVariants\FormEngine\FieldWizard\FileVariantsOverviewWizard::class,
+    ];
 });

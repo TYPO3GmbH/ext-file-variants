@@ -14,8 +14,10 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
   * Resources related helper methods
@@ -34,6 +36,32 @@ class ResourcesService {
             $storage = ResourceFactory::getInstance()->getStorageObject($uid);
         }
         return $storage;
+    }
+
+    /**
+     * @param int $fileUid
+     * @param int $width
+     * @param int $height
+     * @return string generatedHtml
+     */
+    public function generatePreviewImageHtml(int $fileUid, int $width = 150, int $height = 150)
+    {
+        $file = ResourceFactory::getInstance()->getFileObject($fileUid);
+        $processedFile = $file->process(ProcessedFile::CONTEXT_IMAGEPREVIEW, ['width' => $width, 'height' => $height]);
+        $previewImage = $processedFile->getPublicUrl(true);
+        $content = '';
+        if ($file->isMissing()) {
+            $content .= '<span class="label label-danger label-space-right">'
+                . htmlspecialchars(LocalizationUtility::translate('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:warning.file_missing', 'lang'))
+                . '</span>';
+        }
+        if ($previewImage) {
+            $content .= '<img src="' . htmlspecialchars($previewImage) . '" ' .
+                'width="' . $processedFile->getProperty('width') . '" ' .
+                'height="' . $processedFile->getProperty('height') . '" ' .
+                'alt="" class="t3-tceforms-sysfile-imagepreview" />';
+        }
+        return $content;
     }
 
 }
