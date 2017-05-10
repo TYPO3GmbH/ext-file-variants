@@ -90,7 +90,11 @@ class FileVariantInfoElement extends FileInfoElement
                         ['uid' => $this->data['vanillaUid']]);
                     $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">remove language variant</button></p>';
                     $defaultFileUid = $this->getDefaultFileUid();
-                    $resultArray['html'] .= $resourcesService->generatePreviewImageHtml($defaultFileUid);
+
+                    $resultArray['html'] .= '<div class="t3-sysfile-default">';
+                    $resultArray['html'] .= '<span>Default file:</span>';
+                    $resultArray['html'] .= $resourcesService->generatePreviewImageHtml($defaultFileUid, 't3-tceforms-sysfile-default-imagepreview');
+                    $resultArray['html'] .= '</div>';
 
                     // upload new file to replace current variant
                     $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
