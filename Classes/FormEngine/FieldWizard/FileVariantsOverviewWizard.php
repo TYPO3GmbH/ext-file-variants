@@ -61,6 +61,8 @@ class FileVariantsOverviewWizard extends AbstractNode
             $result['html'] .= '</div>';
         }
 
+        $result['stylesheetFiles'][] = 'EXT:file_variants/Resources/Public/Css/FileVariantInfoElement.css';
+
         return $result;
     }
 }

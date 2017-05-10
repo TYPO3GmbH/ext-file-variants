@@ -62,6 +62,7 @@ class FileVariantInfoElement extends FileInfoElement
                 $resultArray['requireJsModules'][] = [
                     'TYPO3/CMS/FileVariants/FileVariants' => 'function(FileVariants){FileVariants.initialize()}'
                 ];
+                $resultArray['stylesheetFiles'][] = 'EXT:file_variants/Resources/Public/Css/FileVariantInfoElement.css';
 
                 $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
                 $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
@@ -86,15 +87,18 @@ class FileVariantInfoElement extends FileInfoElement
                 $fileVariantExists = $this->areRelatedFilesEqual();
                 if ($fileVariantExists === false) {
                     // reset variant to default
-                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_deleteFileVariant',
-                        ['uid' => $this->data['vanillaUid']]);
+                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_deleteFileVariant', ['uid' => $this->data['vanillaUid']]);
                     $resultArray['html'] .= '<p><button class="btn btn-default t3js-filevariant-trigger" data-url="' . $path . '">remove language variant</button></p>';
                     $defaultFileUid = $this->getDefaultFileUid();
+
+                    $resultArray['html'] = '<div class="t3-sysfile-metadata">' . $resultArray['html'] . '</div>';
 
                     $resultArray['html'] .= '<div class="t3-sysfile-default">';
                     $resultArray['html'] .= '<span>Default file:</span>';
                     $resultArray['html'] .= $resourcesService->generatePreviewImageHtml($defaultFileUid, 't3-tceforms-sysfile-default-imagepreview');
                     $resultArray['html'] .= '</div>';
+
+                    $resultArray['html'] = '<div class="t3-sysfile-wrapper">' . $resultArray['html'] . '</div>';
 
                     // upload new file to replace current variant
                     $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
