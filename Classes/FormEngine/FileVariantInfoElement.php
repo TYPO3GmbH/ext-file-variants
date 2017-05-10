@@ -109,6 +109,8 @@ class FileVariantInfoElement extends FileInfoElement
 	 data-file-deny-pattern="' .$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']. '" data-max-file-size="' .$maxFileSize. '" data-handling-url="' .$path. '"
 	></div>';
                 } else {
+                    $resultArray['html'] = '<div class="t3-sysfile-wrapper">' . $resultArray['html'] . '</div>';
+
                     // provide upload possibility
                     $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
                     $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_uploadFileVariant',
