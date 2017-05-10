@@ -71,7 +71,7 @@ local is sys_file, foreign is tt_content
 ## Behaviour
 
 After Installation, the sys_file_metadata edit mask in Filelist Module is slightly changed. Nothing happens for the default language records. But creating / editing a tranlation record offers,
-next to the fileinfo, a possiblity to upload a new file into the record. This file will recide in the dedicated translation storage or folder. After uploading, the fileinfo element changes its
+next to the fileinfo, a possiblity to upload a new file into the record. This file will recide in the dedicated translation storage or folder. After uploading, the fileinfo element changes its 
 content and displays the uploaded file.
 A button next to it allows for reset to the file used in default language. Also, the uploader is displayed again, so the file can be replaced at will. The formerly used one is lost.
 
