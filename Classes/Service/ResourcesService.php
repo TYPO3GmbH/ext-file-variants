@@ -42,9 +42,10 @@ class ResourcesService {
      * @param int $fileUid
      * @param int $width
      * @param int $height
+     * @param $css_class
      * @return string generatedHtml
      */
-    public function generatePreviewImageHtml(int $fileUid, int $width = 150, int $height = 150)
+    public function generatePreviewImageHtml(int $fileUid, $css_class = 't3-tceforms-sysfile-imagepreview', int $width = 150, int $height = 150)
     {
         $file = ResourceFactory::getInstance()->getFileObject($fileUid);
         $processedFile = $file->process(ProcessedFile::CONTEXT_IMAGEPREVIEW, ['width' => $width, 'height' => $height]);
@@ -59,7 +60,7 @@ class ResourcesService {
             $content .= '<img src="' . htmlspecialchars($previewImage) . '" ' .
                 'width="' . $processedFile->getProperty('width') . '" ' .
                 'height="' . $processedFile->getProperty('height') . '" ' .
-                'alt="" class="t3-tceforms-sysfile-imagepreview" />';
+                'alt="" class="' . $css_class . '" />';
         }
         return $content;
     }

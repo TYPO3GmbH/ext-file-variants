@@ -35,6 +35,13 @@ class FileVariantsOverviewWizard extends AbstractNode
     {
         $result = $this->initializeResultArray();
 
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_language');
+        $languages = [];
+        $languageRecords = $queryBuilder->select('uid', 'title', 'language_isocode')->from('sys_language')->execute();
+        while ($language = $languageRecords->fetch()) {
+            $languages[(int)$language['uid']] = $language['title'] . ' (' . $language['language_isocode'] . ')';
+        }
+
         // no parent - we are in default language
         $parentField = (int)$this->data['databaseRow']['l10n_parent'][0];
         if ($parentField === 0) {
@@ -46,10 +53,9 @@ class FileVariantsOverviewWizard extends AbstractNode
                     $queryBuilder->createNamedParameter((int)$this->data['databaseRow']['uid'], \PDO::PARAM_INT))
             )->execute();
             while ($translation = $translations->fetch()) {
-
-                $result['html'] .= '<p>';
-                $result['html'] .= '<span>Lang: ' . $translation['sys_language_uid'] . '</span>';
-                $result['html'] .= $resourcesService->generatePreviewImageHtml((int)$translation['file']);
+                $result['html'] .= '<p class="t3-sysfile-translation">';
+                $result['html'] .= '<span>' . $languages[(int)$translation['sys_language_uid']] . '</span>';
+                $result['html'] .= $resourcesService->generatePreviewImageHtml((int)$translation['file'], 't3-tceforms-sysfile-translation-imagepreview');
                 $result['html'] .= '</p>';
             }
             $result['html'] .= '</div>';
