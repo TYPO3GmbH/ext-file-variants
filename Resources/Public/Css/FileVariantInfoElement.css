@@ -24,6 +24,7 @@
     display: inline-block;
     box-shadow: 0 3px 10px #ccc;
     margin-bottom: 20px;
+    margin-right: 10px;
 }
 
 .variants-preview p.t3-sysfile-translation span {
