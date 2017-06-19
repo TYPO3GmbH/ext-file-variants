@@ -178,7 +178,7 @@ define(['jquery',
         me.override = override;
 
         me.updateMessage = function (message) {
-            me.$progressMessage.text(message);
+            Notification.error('Error', message, 0);
         };
 
         me.uploadStart = function () {
