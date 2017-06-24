@@ -111,7 +111,7 @@ class DataHandlerHook
                             $queryBuilder->createNamedParameter((int)$reference, \PDO::PARAM_INT))
                     );
                     $currentFileId = (int)$queryBuilder->execute()->fetchColumn();
-                    $fileVariantUid = $this->findLanguageVariantForLanguageAndParentFile($value, $currentFileId);
+                    $fileVariantUid = $this->findLanguageVariantForLanguageAndParentFile((int)$value, $currentFileId);
 
                     if ((int)$fileVariantUid > 0) {
                         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
