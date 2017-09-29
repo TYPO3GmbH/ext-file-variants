@@ -32,9 +32,18 @@ class ResourcesService {
     {
         if ($uid === 0) {
             $storage = ResourceFactory::getInstance()->getDefaultStorage();
+            if ($storage === null) {
+                throw new \UnexpectedValueException('No default storage found. Declare a storage as default or adapt the extension configuration.', 1490480362);
+            }
         } else {
-            $storage = ResourceFactory::getInstance()->getStorageObject($uid);
+            try {
+                $storage = ResourceFactory::getInstance()->getStorageObject($uid);
+            }
+            catch (\Exception $e) {
+                throw new \InvalidArgumentException('Storage with uid ' . $uid . ' is not available. Create it and/or adapt the extension configuration.', 1490480372);
+            }
         }
+
         return $storage;
     }
 

@@ -68,16 +68,12 @@ class FileVariantInfoElement extends FileInfoElement
                 $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
                 $targetFolder = $extensionConfiguration['variantsFolder'];
                 $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
-                try {
-                    $this->storage = $resourcesService->retrieveStorageObject($storageUid);
+                $this->storage = $resourcesService->retrieveStorageObject($storageUid);
 
-                    if (!$this->storage->hasFolder($targetFolder)) {
-                        $this->folder = $this->storage->createFolder($targetFolder);
-                    } else {
-                        $this->folder = $this->storage->getFolder($targetFolder);
-                    }
-                } catch (\InvalidArgumentException $exception) {
-                    throw new \RuntimeException('storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.', 1490480372);
+                if (!$this->storage->hasFolder($targetFolder)) {
+                    $this->folder = $this->storage->createFolder($targetFolder);
+                } else {
+                    $this->folder = $this->storage->getFolder($targetFolder);
                 }
 
                 /** @var UriBuilder $uriBuilder */
