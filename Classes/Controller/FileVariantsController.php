@@ -84,18 +84,14 @@ class FileVariantsController
                 'file',
                 $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT))
         );
-        $metadataRecords = $queryBuilder->execute()->fetchAll();
-        $metadataRecordsToBeDeleted = [];
-        if (count($metadataRecords) > 0) {
-            foreach ($metadataRecords as $record) {
-                $metadataRecordsToBeDeleted[] = $record['uid'];
-            }
+        $metadataRecordsToBeDeleted = $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
+        if (count($metadataRecordsToBeDeleted) > 0) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getQueryBuilderForTable('sys_file_metadata');
             $queryBuilder->delete('sys_file_metadata')->where(
                 $queryBuilder->expr()
-                    ->eq('uid', $queryBuilder->createNamedParameter($metadataRecordsToBeDeleted, \PDO::PARAM_INT))
+                    ->in('uid', $metadataRecordsToBeDeleted, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             )->execute();
         }
 
