@@ -63,7 +63,7 @@ class FileVariantsController
         $copy = $defaultFileObject->copyTo($defaultFileObject->getParentFolder());
         // this record will be stale after the replace, remove it right away
         $sysFileRecordToBeDeleted = $copy->getUid();
-        $path = PATH_site . $copy->getPublicUrl();
+        $path = $this->getAbsolutePathToFile($copy);
 
         $file = ResourceFactory::getInstance()->getFileObject($fileUid);
         $file->getStorage()->replaceFile($file, $path);
@@ -132,7 +132,7 @@ class FileVariantsController
 
         $currentFile = ResourceFactory::getInstance()->getFileObject($currentFileUid);
         $uploadedFile = ResourceFactory::getInstance()->getFileObject($uploadedFileUid);
-        $currentFile->getStorage()->replaceFile($currentFile, PATH_site . $uploadedFile->getPublicUrl());
+        $currentFile->getStorage()->replaceFile($currentFile, $this->getAbsolutePathToFile($uploadedFile));
         $currentFile->rename($uploadedFile->getName(), DuplicationBehavior::RENAME);
 
         /** @var QueryBuilder $queryBuilder */
@@ -166,6 +166,32 @@ class FileVariantsController
         $formResult = $nodeFactory->create($formData)->render();
         $response->getBody()->write($formResult['html']);
         return $response;
+    }
+
+    /**
+     * Returns an absolute file path to the given File resource
+     *
+     * @param \TYPO3\CMS\Core\Resource\File $file
+     * @return string
+     */
+    protected function getAbsolutePathToFile(\TYPO3\CMS\Core\Resource\File $file): string
+    {
+        $storage = $file->getStorage();
+        if (!$storage->isPublic()) {
+            // manually create a possibly valid file path from the storage configuration
+            $storageConfiguration = $storage->getConfiguration();
+            if ($storageConfiguration['pathType'] == 'absolute') {
+                $path = realpath($storageConfiguration['basePath']) . $file->getIdentifier();
+            }
+            else {
+                $path = realpath(PATH_site . $storageConfiguration['basePath']) . $file->getIdentifier();
+            }
+        }
+        else {
+            $path = PATH_site . $file->getPublicUrl();
+        }
+
+        return $path;
     }
 
 }
