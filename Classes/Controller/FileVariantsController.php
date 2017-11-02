@@ -182,12 +182,10 @@ class FileVariantsController
             $storageConfiguration = $storage->getConfiguration();
             if ($storageConfiguration['pathType'] == 'absolute') {
                 $path = realpath($storageConfiguration['basePath']) . $file->getIdentifier();
-            }
-            else {
+            } else {
                 $path = realpath(PATH_site . $storageConfiguration['basePath']) . $file->getIdentifier();
             }
-        }
-        else {
+        } else {
             $path = PATH_site . $file->getPublicUrl();
         }
 
