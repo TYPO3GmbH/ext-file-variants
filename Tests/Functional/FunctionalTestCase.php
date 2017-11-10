@@ -85,8 +85,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         // set up the second file storage
         mkdir(PATH_site . 'languageVariants/languageVariants', 0777, true);
         mkdir(PATH_site . 'languageVariants/_processed_', 0777, true);
-
-     //   $this->initializeFeatureConfig();
     }
 
     protected function tearDown()
