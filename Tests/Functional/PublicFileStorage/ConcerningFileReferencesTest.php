@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\FileVariants\Tests\Functional;
+namespace T3G\AgencyPack\FileVariants\Tests\Functional\PublicFileStorage;
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -14,6 +14,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use T3G\AgencyPack\FileVariants\Tests\Functional\FunctionalTestCase;
 use TYPO3\CMS\Backend\Controller\File\FileController;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
@@ -26,12 +27,12 @@ class ConcerningFileReferencesTest extends FunctionalTestCase
     /**
      * @var string
      */
-    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/ConcerningFileReferences/Initial/';
+    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/PublicFileStorage/DataSet/ConcerningFileReferences/Initial/';
 
     /**
      * @var string
      */
-    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/ConcerningFileReferences/AfterOperation/';
+    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/PublicFileStorage/DataSet/ConcerningFileReferences/AfterOperation/';
 
 
     /**

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace T3G\AgencyPack\FileVariants\Tests\Functional;
+namespace T3G\AgencyPack\FileVariants\Tests\Functional\PublicFileStorage;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -17,6 +17,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  */
 use T3G\AgencyPack\FileVariants\Controller\FileVariantsController;
 use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
+use T3G\AgencyPack\FileVariants\Tests\Functional\FunctionalTestCase;
 use TYPO3\CMS\Backend\Controller\File\FileController;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Http\Response;
@@ -25,17 +26,17 @@ use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ConcerningMetadataTest extends \T3G\AgencyPack\FileVariants\Tests\Functional\FunctionalTestCase
+class ConcerningMetadataTest extends FunctionalTestCase
 {
     /**
      * @var string
      */
-    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/ConcerningMetadata/Initial/';
+    protected $scenarioDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/PublicFileStorage/DataSet/ConcerningMetadata/Initial/';
 
     /**
      * @var string
      */
-    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/DataSet/ConcerningMetadata/AfterOperation/';
+    protected $assertionDataSetDirectory = 'typo3conf/ext/file_variants/Tests/Functional/PublicFileStorage/DataSet/ConcerningMetadata/AfterOperation/';
 
     /**
      * @test
