@@ -25,6 +25,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\ReferenceIndex;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -171,10 +172,10 @@ class FileVariantsController
     /**
      * Returns an absolute file path to the given File resource
      *
-     * @param \TYPO3\CMS\Core\Resource\File $file
+     * @param File $file
      * @return string
      */
-    protected function getAbsolutePathToFile(\TYPO3\CMS\Core\Resource\File $file): string
+    protected function getAbsolutePathToFile(File $file): string
     {
         $storage = $file->getStorage();
         if (!$storage->isPublic()) {

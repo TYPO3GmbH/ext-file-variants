@@ -86,6 +86,4 @@ This results in a consistent behaviour, that summarizes as:
 ## Missing Features
 
 1. Upgrade Wizard. If metadata record translations are already there, no variants are provided nor used.
-2. Summary of available variants for the default language metadata record.
-3. Display of default language file for the translated metadata record (to know to what file the reset will lead).
-4. Workspaces Support.
+2. Workspaces Support.
