@@ -20,6 +20,10 @@ use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use PHPUnit\Framework\TestCase;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 
+/**
+ * Class DataHandlerHookTest
+ * @package T3G\AgencyPack\FileVariants\Tests\Unit\DataHandler
+ */
 class DataHandlerHookTest extends TestCase
 {
 
