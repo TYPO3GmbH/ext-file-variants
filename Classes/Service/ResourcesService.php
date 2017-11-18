@@ -14,6 +14,7 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
@@ -25,10 +26,36 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 class ResourcesService {
 
     /**
+     * make sure upload storage and folder are in place
+     */
+    public function prepareFileStorageEnvironment(): FolderInterface
+    {
+        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
+        $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
+        /** @var ResourcesService $resourcesService */
+
+        $targetFolder = $extensionConfiguration['variantsFolder'];
+        try {
+            /** @var \TYPO3\CMS\Core\Resource\ResourceStorageInterface storage */
+            $storage = $this->retrieveStorageObject($storageUid);
+
+            if (!$storage->hasFolder($targetFolder)) {
+                $folder = $storage->createFolder($targetFolder);
+            } else {
+                $folder = $storage->getFolder($targetFolder);
+            }
+        } catch (\InvalidArgumentException $exception) {
+            throw new \RuntimeException('storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.',
+                1490480372);
+        }
+        return $folder;
+    }
+
+    /**
      * @param int $uid
      * @return ResourceStorage
      */
-    public function retrieveStorageObject(int $uid): ResourceStorage
+    protected function retrieveStorageObject(int $uid): ResourceStorage
     {
         if ($uid === 0) {
             $storage = ResourceFactory::getInstance()->getDefaultStorage();

@@ -31,16 +31,6 @@ class DataHandlerHook
     protected $uploadFolderPath = PATH_site . 'typo3temp/file_variants_uploads';
 
     /**
-     * @var \TYPO3\CMS\Core\Resource\ResourceStorageInterface
-     */
-    protected $storage;
-
-    /**
-     * @var \TYPO3\CMS\Core\Resource\FolderInterface
-     */
-    protected $folder;
-
-    /**
      * DataHandlerHook constructor.
      */
     public function __construct()
@@ -55,6 +45,9 @@ class DataHandlerHook
     }
 
     /**
+     *
+     * replaces the uid of the default language sys_file record uid with the translated one
+     *
      * @param string $status
      * @param string $table
      * @param $id
@@ -134,7 +127,8 @@ class DataHandlerHook
                 throw new \RuntimeException('can\'t retrieve valid id', 1489332067);
             }
 
-            $this->prepareFileStorageEnvironment();
+            $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
+            $folder = $resourcesService->prepareFileStorageEnvironment();
 
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
@@ -154,7 +148,7 @@ class DataHandlerHook
             $fileUid = (int)$handledMetaDataRecord['file'];
             $parentFile = ResourceFactory::getInstance()->getFileObject($fileUid);
 
-            $copy = $parentFile->copyTo($this->folder);
+            $copy = $parentFile->copyTo($folder);
             $translatedFileUid = $copy->getUid();
 
             /** @var QueryBuilder $queryBuilder */
@@ -197,29 +191,7 @@ class DataHandlerHook
 
     }
 
-    /**
-     * make sure upload storage and folder are in place
-     */
-    protected function prepareFileStorageEnvironment()
-    {
-        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
-        $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
-        /** @var ResourcesService $resourcesService */
-        $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
-        $targetFolder = $extensionConfiguration['variantsFolder'];
-        try {
-            $this->storage = $resourcesService->retrieveStorageObject($storageUid);
 
-            if (!$this->storage->hasFolder($targetFolder)) {
-                $this->folder = $this->storage->createFolder($targetFolder);
-            } else {
-                $this->folder = $this->storage->getFolder($targetFolder);
-            }
-        } catch (\InvalidArgumentException $exception) {
-            throw new \RuntimeException('storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.',
-                1490480372);
-        }
-    }
 
     /**
      * @param string|int $id
