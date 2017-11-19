@@ -1,0 +1,20 @@
+sys_file_reference,,,,,,,,,,,,
+,uid,pid,uid_local,uid_foreign,hidden,deleted,sys_language_uid,l10n_parent,tablenames,fieldname,table_local,
+,1,2,2,1,0,0,0,0,tt_content,assets,sys_file,
+,2,2,3,2,0,0,1,1,tt_content,assets,sys_file,
+,3,2,4,3,0,0,2,1,tt_content,assets,sys_file,
+,4,3,2,4,0,0,0,0,tt_content,assets,sys_file,
+,5,3,3,5,0,0,1,0,tt_content,assets,sys_file,
+,6,3,4,6,0,0,2,0,tt_content,assets,sys_file,
+sys_file,,,,,,,,,,,,
+,uid,pid,missing,storage,type,metadata,identifier,extension,mime_type,name,sys_language_uid,l10n_parent
+,2,0,0,1,2,0,/cat_1.jpg,jpg,image/jpeg,cat_1.jpg,0,0
+,3,0,0,5,2,0,/languageVariants/cat_1.jpg,jpg,image/jpeg,cat_1.jpg,1,2
+,4,0,0,5,2,0,/languageVariants/cat_1_01.jpg,jpg,image/jpeg,cat_1_01.jpg,2,2
+sys_file_metadata,,,,,,,,,,,,
+,uid,pid,cruser_id,sys_language_uid,l10n_parent,file,title,,,,,
+,2,0,1,0,0,2,english,,,,,
+,3,0,1,1,2,3,[Translate to Dutch:] english,,,,,
+,4,0,1,2,2,4,[Translate to German:] english,,,,,
+,5,0,1,0,0,3,NULL,,,,,
+,6,0,1,0,0,4,NULL,,,,,

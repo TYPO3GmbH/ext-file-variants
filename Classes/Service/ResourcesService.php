@@ -14,10 +14,13 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
 /**
@@ -101,4 +104,86 @@ class ResourcesService {
         return $content;
     }
 
+    /**
+     * @param int $sys_language_uid
+     * @param array $metaDataRecord
+     * @param FolderInterface $folder
+     */
+    public function copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy(
+        $sys_language_uid,
+        array $metaDataRecord,
+        FolderInterface $folder
+    ) {
+        $fileUid = (int)$metaDataRecord['file'];
+        $parentFile = ResourceFactory::getInstance()->getFileObject($fileUid);
+
+        $copy = $parentFile->copyTo($folder);
+        $translatedFileUid = $copy->getUid();
+
+        // set translation parameters for the copied file (it serves as translation variant of the original file)
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
+        $queryBuilder->update('sys_file')
+            ->set('sys_language_uid', (int)$sys_language_uid)
+            ->set('l10n_parent', $fileUid)
+            ->where(
+                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($translatedFileUid, \PDO::PARAM_INT)
+                )
+            )->execute();
+
+        // update the translated metadata file to use the translation variant of the original file
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
+        $queryBuilder->update('sys_file_metadata')->set('file', $translatedFileUid)->where(
+            $queryBuilder->expr()->eq('uid',
+                $queryBuilder->createNamedParameter((int)$metaDataRecord['uid'], \PDO::PARAM_INT))
+        )->execute();
+
+        // find the references that must use the translation variant now
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+        $references = $queryBuilder->select('uid')
+            ->from('sys_file_reference')
+            ->where(
+                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter((int)$sys_language_uid, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
+            )->execute();
+        $filteredReferences = [];
+        while ($reference = $references->fetch()) {
+            $uid = $reference['uid'];
+            if ($this->isValidReference($uid)) {
+                $filteredReferences[] = $uid;
+            }
+        }
+        // run the update on the found references
+        foreach ($filteredReferences as $reference) {
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+            $queryBuilder->update('sys_file_reference')
+                ->set('uid_local', $translatedFileUid)
+                ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, \PDO::PARAM_INT)))
+                ->execute();
+        }
+    }
+
+    /**
+     * Filters away irrelevant tables and checks for free mode in tt_content records
+     * everything else is a valid reference in context of file variants update
+     *
+     * @param int $uid
+     * @return bool
+     */
+    protected function isValidReference(int $uid): bool
+    {
+        $isValid = true;
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
+        $queryBuilder->select('tablenames', 'uid_foreign')->from('sys_file_reference')->where(
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
+        );
+        $sysFileReferenceRecord = $queryBuilder->execute()->fetch();
+        $irrelevantTableNames = ['pages', 'pages_language_overlay', 'sys_file_metadata', 'sys_file'];
+        if (in_array($sysFileReferenceRecord['tablenames'], $irrelevantTableNames)) {
+            $isValid = false;
+        }
+        return $isValid;
+    }
 }

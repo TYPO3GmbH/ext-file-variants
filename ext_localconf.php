@@ -37,4 +37,7 @@ call_user_func(function () {
         'priority' => 40,
         'class' => \T3G\AgencyPack\FileVariants\FormEngine\FieldWizard\FileVariantsOverviewWizard::class,
     ];
+
+    // Upgrade Wizard
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'][\T3G\AgencyPack\FileVariants\Updates\MetaDataRecordsUpdateWizard::class] = \T3G\AgencyPack\FileVariants\Updates\MetaDataRecordsUpdateWizard::class;
 });
