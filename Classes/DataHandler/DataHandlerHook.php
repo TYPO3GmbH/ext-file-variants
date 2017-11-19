@@ -197,6 +197,4 @@ class DataHandlerHook
 
         return (int)$queryBuilder->execute()->fetchColumn();
     }
-
-
 }
