@@ -1,4 +1,26 @@
-.idea/
+# PHPStorm
+.idea
+
+# OSX
+.DS_Store
+
+# Composer
+/vendor/
+/bin/
+/logs/
+
+# CGL Fixer
+.php_cs.cache
+
+# TYPO3
+/typo3/
+/typo3temp/
+/typo3conf/
+/uploads/
+/index.php
+/file_variants
+
+# Other stuff
 /out/
 .idea_modules/
 atlassian-ide-plugin.xml
@@ -6,5 +28,4 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 composer.phar
-/vendor/
 

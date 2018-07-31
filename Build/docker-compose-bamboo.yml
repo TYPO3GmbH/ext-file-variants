@@ -1,7 +1,7 @@
 version: '2.3'
 services:
   mariadb10:
-    image: mariadb:10.1
+    image: mariadb:10
     environment:
       MYSQL_ROOT_PASSWORD: funcp
     tmpfs:
@@ -9,7 +9,7 @@ services:
     networks:
       - test
 
-  start_dependencies_functional_mariadb10:
+  start_dependencies:
     image: alpine:3.8
     links:
       - mariadb10

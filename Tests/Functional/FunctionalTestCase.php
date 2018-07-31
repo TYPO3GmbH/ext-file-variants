@@ -55,11 +55,16 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      *
      * @var string
      */
-    protected $backendUserFixture = 'PACKAGE:t3g/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
+    protected $backendUserFixture = 'PACKAGE:typo3/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
 
     protected function setUp()
     {
-        $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
+        if (!file_exists('file_variants')) {
+            symlink('.', 'file_variants');
+        }
+        $this->coreExtensionsToLoad[] = 'fluid';
+        $this->coreExtensionsToLoad[] = 'extensionmanager';
+        $this->testExtensionsToLoad[] = 'file_variants';
 
         parent::setUp();
 
