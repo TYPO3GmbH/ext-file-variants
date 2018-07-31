@@ -1,5 +1,13 @@
 <?php
 declare(strict_types=1);
+
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\Service;
 
 /*
@@ -26,7 +34,8 @@ use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 /**
   * Resources related helper methods
   */
-class ResourcesService {
+class ResourcesService
+{
 
     /**
      * make sure upload storage and folder are in place
@@ -36,7 +45,6 @@ class ResourcesService {
         $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
         $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
         /** @var ResourcesService $resourcesService */
-
         $targetFolder = $extensionConfiguration['variantsFolder'];
         try {
             /** @var \TYPO3\CMS\Core\Resource\ResourceStorageInterface storage */
@@ -48,8 +56,10 @@ class ResourcesService {
                 $folder = $storage->getFolder($targetFolder);
             }
         } catch (\InvalidArgumentException $exception) {
-            throw new \RuntimeException('storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.',
-                1490480372);
+            throw new \RuntimeException(
+                'storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.',
+                1490480372
+            );
         }
         return $folder;
     }
@@ -68,8 +78,7 @@ class ResourcesService {
         } else {
             try {
                 $storage = ResourceFactory::getInstance()->getStorageObject($uid);
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 throw new \InvalidArgumentException('Storage with uid ' . $uid . ' is not available. Create it and/or adapt the extension configuration.', 1490480372);
             }
         }
@@ -127,7 +136,9 @@ class ResourcesService {
             ->set('sys_language_uid', (int)$sys_language_uid)
             ->set('l10n_parent', $fileUid)
             ->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($translatedFileUid, \PDO::PARAM_INT)
+                $queryBuilder->expr()->eq(
+                    'uid',
+                    $queryBuilder->createNamedParameter($translatedFileUid, \PDO::PARAM_INT)
                 )
             )->execute();
 
@@ -135,8 +146,10 @@ class ResourcesService {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
         $queryBuilder->update('sys_file_metadata')->set('file', $translatedFileUid)->where(
-            $queryBuilder->expr()->eq('uid',
-                $queryBuilder->createNamedParameter((int)$metaDataRecord['uid'], \PDO::PARAM_INT))
+            $queryBuilder->expr()->eq(
+                'uid',
+                $queryBuilder->createNamedParameter((int)$metaDataRecord['uid'], \PDO::PARAM_INT)
+            )
         )->execute();
 
         // find the references that must use the translation variant now

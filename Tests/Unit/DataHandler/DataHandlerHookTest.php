@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\Tests\Unit\DataHandler;
 
 /*
@@ -16,13 +23,12 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\DataHandler;
  * The TYPO3 project - inspiring people to share!
  */
 
-use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use PHPUnit\Framework\TestCase;
+use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 
 /**
  * Class DataHandlerHookTest
- * @package T3G\AgencyPack\FileVariants\Tests\Unit\DataHandler
  */
 class DataHandlerHookTest extends TestCase
 {
@@ -52,5 +58,4 @@ class DataHandlerHookTest extends TestCase
         $this->expectExceptionCode(1489332067);
         $subject->processCmdmap_postProcess('localize', 'sys_file_metadata', 'NEW_42', 'foo', $dataHandler->reveal());
     }
-
 }

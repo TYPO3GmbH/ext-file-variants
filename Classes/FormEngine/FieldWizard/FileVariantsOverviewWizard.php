@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\FormEngine\FieldWizard;
 
 /*
@@ -49,8 +56,10 @@ class FileVariantsOverviewWizard extends AbstractNode
             $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
             $translations = $queryBuilder->select('file', 'sys_language_uid')->from('sys_file_metadata')->where(
-                $queryBuilder->expr()->eq('l10n_parent',
-                    $queryBuilder->createNamedParameter((int)$this->data['databaseRow']['uid'], \PDO::PARAM_INT))
+                $queryBuilder->expr()->eq(
+                    'l10n_parent',
+                    $queryBuilder->createNamedParameter((int)$this->data['databaseRow']['uid'], \PDO::PARAM_INT)
+                )
             )->execute();
             while ($translation = $translations->fetch()) {
                 $result['html'] .= '<p class="t3-sysfile-translation">';

@@ -1,6 +1,14 @@
 <?php
 
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\Updates;
+
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -27,7 +35,6 @@ use TYPO3\CMS\Install\Updates\AbstractUpdate;
  * default one, as would be the cores standard behaviour.
  *
  * Class MetaDataRecordsUpdateWizard
- * @package T3G\AgencyPack\FileVariants\Updates
  */
 class MetaDataRecordsUpdateWizard extends AbstractUpdate
 {
@@ -93,8 +100,11 @@ class MetaDataRecordsUpdateWizard extends AbstractUpdate
             $queryBuilder->expr()->gt('sys_language_uid', 0)
         )->execute();
         while ($metaDataRecord = $translatedFileMetadataRecords->fetch()) {
-            $resourcesService->copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy($metaDataRecord['sys_language_uid'],
-                $metaDataRecord, $folder);
+            $resourcesService->copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy(
+                $metaDataRecord['sys_language_uid'],
+                $metaDataRecord,
+                $folder
+            );
         }
 
         return true;

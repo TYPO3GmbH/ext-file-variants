@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\Tests\Functional\PublicFileStorage;
 
 use T3G\AgencyPack\FileVariants\Tests\Functional\FunctionalTestCase;
@@ -7,7 +14,6 @@ use T3G\AgencyPack\FileVariants\Updates\MetaDataRecordsUpdateWizard;
 
 /**
  * Class UpgradeWizardTest
- * @package T3G\AgencyPack\FileVariants\Tests\Functional
  */
 class UpgradeWizardTest extends FunctionalTestCase
 {

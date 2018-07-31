@@ -1,5 +1,13 @@
 <?php
 declare(strict_types=1);
+
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\Tests\Functional;
 
 /*
@@ -25,7 +33,8 @@ use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\ActionService;
 /**
   * extending typo3/testing-framework basic FunctionalTestCase
   */
-abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase {
+abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
+{
 
     /**
      * @var string
@@ -78,8 +87,10 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
 
         $this->backendUser = $this->setUpBackendUserFromFixture(1);
         $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
-        GeneralUtility::setSingletonInstance(FileMetadataPermissionsAspect::class,
-            $fileMetadataPermissionAspect->reveal());
+        GeneralUtility::setSingletonInstance(
+            FileMetadataPermissionsAspect::class,
+            $fileMetadataPermissionAspect->reveal()
+        );
 
         $this->actionService = new ActionService();
 
@@ -185,5 +196,4 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $scenarioFileName = GeneralUtility::getFileAbsFileName($scenarioFileName);
         $this->assertCSVDataSet($scenarioFileName);
     }
-
 }
