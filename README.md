@@ -1,8 +1,6 @@
 # translatable files
 
-This extension serves as a working prototype for translatable assets.
-The functionality will not interfere with any core concepts, but is target
-to be included into the TYPO3 core.
+This extension serves as a working prototype for translatable assets for TYPO3 v8.7.
 
 ## Features
 
