@@ -65,9 +65,15 @@ class DataHandlerHook
         if ($table === 'sys_file_reference' && isset($fieldArray['sys_language_uid']) && (int)$fieldArray['sys_language_uid'] > 0) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-            $parentFile = (int)$queryBuilder->select('uid_local')->from('sys_file_reference')->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter((int)$fieldArray['uid_local'], \PDO::PARAM_INT))
-            )->execute()->fetchColumn();
+            $parentFile = (int)$queryBuilder
+                ->select('uid_local')
+                ->from('sys_file_reference')
+                ->where($queryBuilder->expr()->eq(
+                    'uid',
+                    $queryBuilder->createNamedParameter((int)$fieldArray['l10n_parent'], \PDO::PARAM_INT)
+                ))
+                ->execute()
+                ->fetchColumn();
             $fileVariantUid = $this->findLanguageVariantForLanguageAndParentFile((int)$fieldArray['sys_language_uid'], $parentFile);
             if ($fileVariantUid > 0) {
                 $fieldArray['uid_local'] = $fileVariantUid;
