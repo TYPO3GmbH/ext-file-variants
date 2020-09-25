@@ -23,6 +23,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -79,8 +80,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
 
         // make sure there are no leftover files from earlier tests
         // done in setup because teardown is called only once per file
-        if (file_exists(PATH_site . 'languageVariants')) {
-            system('rm -rf ' . escapeshellarg(PATH_site . 'languageVariants'));
+        if (file_exists(Environment::getPublicPath() . '/languageVariants')) {
+            system('rm -rf ' . escapeshellarg(Environment::getPublicPath() . '/languageVariants'));
         }
 
         Bootstrap::getInstance()->initializeLanguageObject();
@@ -99,8 +100,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
 
         // set up the second file storage
-        mkdir(PATH_site . 'languageVariants/languageVariants', 0777, true);
-        mkdir(PATH_site . 'languageVariants/_processed_', 0777, true);
+        mkdir(Environment::getPublicPath() . '/languageVariants/languageVariants', 0777, true);
+        mkdir(Environment::getPublicPath() . '/languageVariants/_processed_', 0777, true);
     }
 
     protected function tearDown()

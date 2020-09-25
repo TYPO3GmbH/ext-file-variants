@@ -28,6 +28,7 @@ use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Form\FormDataGroup\TcaDatabaseRecord;
 use TYPO3\CMS\Backend\Form\FormResultCompiler;
 use TYPO3\CMS\Backend\Form\NodeFactory;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\ReferenceIndex;
@@ -192,10 +193,10 @@ class FileVariantsController
             if ($storageConfiguration['pathType'] == 'absolute') {
                 $path = realpath($storageConfiguration['basePath']) . $file->getIdentifier();
             } else {
-                $path = realpath(PATH_site . $storageConfiguration['basePath']) . $file->getIdentifier();
+                $path = realpath(Environment::getPublicPath() . '/' . $storageConfiguration['basePath']) . $file->getIdentifier();
             }
         } else {
-            $path = PATH_site . $file->getPublicUrl();
+            $path = Environment::getPublicPath() . '/' . $file->getPublicUrl();
         }
 
         return $path;

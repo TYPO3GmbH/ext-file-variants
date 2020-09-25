@@ -23,19 +23,15 @@ namespace T3G\AgencyPack\FileVariants\DataHandler;
  * The TYPO3 project - inspiring people to share!
  */
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DataHandlerHook
 {
-    /**
-     * @var string
-     */
-    protected $uploadFolderPath = PATH_site . 'typo3temp/file_variants_uploads';
-
     /**
      * DataHandlerHook constructor.
      */
@@ -47,8 +43,9 @@ class DataHandlerHook
                 1490476773
             );
         }
-        if (!is_dir($this->uploadFolderPath)) {
-            mkdir($this->uploadFolderPath, 2777, true);
+        $uploadFolderPath = Environment::getPublicPath() . '/typo3temp/file_variants_uploads';
+        if (!is_dir($uploadFolderPath)) {
+            mkdir($uploadFolderPath, 2777, true);
         }
     }
 
