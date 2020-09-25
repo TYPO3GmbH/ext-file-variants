@@ -84,7 +84,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             system('rm -rf ' . escapeshellarg(Environment::getPublicPath() . '/languageVariants'));
         }
 
-        Bootstrap::getInstance()->initializeLanguageObject();
+        Bootstrap::initializeLanguageObject();
 
         $this->backendUser = $this->setUpBackendUserFromFixture(1);
         $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
