@@ -82,7 +82,7 @@ class FileDeleteSlot
             )->execute();
             foreach ($fileVariants->fetchAll(\PDO::FETCH_COLUMN) as $variantUid) {
                 /** @var File $variantFile */
-                $variantFile = ResourceFactory::getInstance()->getFileObject($variantUid);
+                $variantFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($variantUid);
                 $variantFile->getStorage()->deleteFile($variantFile);
             }
         }

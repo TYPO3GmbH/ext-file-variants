@@ -121,7 +121,7 @@ class ConcerningMetadata extends FunctionalTestCase
         $localFilePath = Environment::getPublicPath() . '/typo3temp/file_variants_uploads/cat_2.jpg';
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', $localFilePath);
 
-        $storage = ResourceFactory::getInstance()->getStorageObject(2);
+        $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject(2);
         $folder = $storage->getFolder('languageVariants');
         $newFile = $storage->addFile($localFilePath, $folder);
         $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
@@ -149,7 +149,7 @@ class ConcerningMetadata extends FunctionalTestCase
         $localFilePath = Environment::getPublicPath() . '/typo3temp/file_variants_uploads/cat_3.jpg';
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', $localFilePath);
 
-        $storage = ResourceFactory::getInstance()->getStorageObject(2);
+        $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject(2);
         $folder = $storage->getFolder('languageVariants');
         $newFile = $storage->addFile($localFilePath, $folder);
         $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
@@ -192,7 +192,7 @@ class ConcerningMetadata extends FunctionalTestCase
         $this->setUpFrontendRootPage(1);
 
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_3.jpg');
-        $file = ResourceFactory::getInstance()->getFileObject(12);
+        $file = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject(12);
 
         $_SERVER['HTTP_HOST'] = 'localhost';
         $_SERVER['REQUEST_URI'] = '/index.php';

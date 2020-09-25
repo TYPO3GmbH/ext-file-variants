@@ -72,13 +72,13 @@ class ResourcesService
     protected function retrieveStorageObject(int $uid): ResourceStorage
     {
         if ($uid === 0) {
-            $storage = ResourceFactory::getInstance()->getDefaultStorage();
+            $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getDefaultStorage();
             if ($storage === null) {
                 throw new \UnexpectedValueException('No default storage found. Declare a storage as default or adapt the extension configuration.', 1490480362);
             }
         } else {
             try {
-                $storage = ResourceFactory::getInstance()->getStorageObject($uid);
+                $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject($uid);
             } catch (\Exception $e) {
                 throw new \InvalidArgumentException('Storage with uid ' . $uid . ' is not available. Create it and/or adapt the extension configuration.', 1490480372);
             }
@@ -96,7 +96,7 @@ class ResourcesService
      */
     public function generatePreviewImageHtml(int $fileUid, $css_class = 't3-tceforms-sysfile-imagepreview', int $width = 150, int $height = 150)
     {
-        $file = ResourceFactory::getInstance()->getFileObject($fileUid);
+        $file = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($fileUid);
         $processedFile = $file->process(ProcessedFile::CONTEXT_IMAGEPREVIEW, ['width' => $width, 'height' => $height]);
         $previewImage = $processedFile->getPublicUrl(true);
         $content = '';
@@ -125,7 +125,7 @@ class ResourcesService
         FolderInterface $folder
     ) {
         $fileUid = (int)$metaDataRecord['file'];
-        $parentFile = ResourceFactory::getInstance()->getFileObject($fileUid);
+        $parentFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($fileUid);
 
         $copy = $parentFile->copyTo($folder);
         $translatedFileUid = $copy->getUid();

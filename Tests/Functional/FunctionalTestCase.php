@@ -122,7 +122,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $result = $queryBuilder->select('*')->from('sys_file_storage')->execute();
         while ($storageUid = $result->fetch()['uid']) {
             // find files in storage
-            $storage = ResourceFactory::getInstance()->getStorageObject($storageUid);
+            $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject($storageUid);
             $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
             try {
                 $folder = $storage->getFolder('languageVariants');
