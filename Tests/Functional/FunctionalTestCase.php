@@ -130,7 +130,12 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                 foreach ($files as $file) {
                     $storage->deleteFile($file);
                     $recordsToDelete['sys_file'][] = $file->getUid();
-                    $metadata = $file->_getMetaData();
+                    if (method_exists($file, 'getMetaData')) {
+                        $metadata = $file->getMetaData();
+                    } else {
+                        // @extensionScannerIgnoreLine
+                        $metadata = $file->_getMetaData();
+                    }
                     $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
                 }
             } catch (\Exception $exception) {
