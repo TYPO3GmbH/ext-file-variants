@@ -238,8 +238,8 @@ define(['jquery',
         } else {
 
             var formData = new FormData();
-            formData.append('file[upload][1][target]', me.fileVariantsDragUploader.target);
-            formData.append('file[upload][1][data]', '1');
+            formData.append('data[upload][1][target]', me.fileVariantsDragUploader.target);
+            formData.append('data[upload][1][data]', '1');
             formData.append('overwriteExistingFiles', me.override);
             formData.append('redirect', '');
             formData.append('upload_1', me.file);
