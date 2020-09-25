@@ -186,7 +186,6 @@ class ConcerningMetadata extends FunctionalTestCase
     public function fileDeletionRemovesAllRelatedFilesAndMetadata()
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['doNotCheckReferer'] = true;
 
         $scenarioName = 'deleteMetadata';
         $this->importCsvScenario($scenarioName);

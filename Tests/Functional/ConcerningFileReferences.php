@@ -41,7 +41,6 @@ class ConcerningFileReferences extends FunctionalTestCase
     public function deleteTranslatedMetadataResetsConsumingReferencesToDefaultFile()
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['doNotCheckReferer'] = true;
 
         $scenarioName = 'deleteMetadata';
         $this->importCsvScenario($scenarioName);
