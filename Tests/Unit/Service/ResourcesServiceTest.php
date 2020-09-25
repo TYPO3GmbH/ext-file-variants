@@ -25,7 +25,7 @@ class ResourcesServiceTest extends TestCase
         $config = [
             'variantsStorageUid' => 42,
         ];
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize($config);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = $config;
 
         $subject = new ResourcesService();
         $subject->prepareFileStorageEnvironment();

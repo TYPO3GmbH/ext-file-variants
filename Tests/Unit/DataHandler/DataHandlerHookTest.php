@@ -48,7 +48,7 @@ class DataHandlerHookTest extends TestCase
      */
     public function hookThrowsExceptionIfNoValidIdIsFound()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['foo']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['foo'];
         $subject = new DataHandlerHook();
         /** @var DataHandler $dataHandler */
         $dataHandler = $this->prophesize(DataHandler::class);

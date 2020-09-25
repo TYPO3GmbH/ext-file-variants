@@ -40,7 +40,7 @@ class ConcerningFileReferences extends FunctionalTestCase
      */
     public function deleteTranslatedMetadataResetsConsumingReferencesToDefaultFile()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['doNotCheckReferer'] = true;
 
         $scenarioName = 'deleteMetadata';
@@ -75,7 +75,7 @@ class ConcerningFileReferences extends FunctionalTestCase
      */
     public function translateMetadataUpdatesConsumingReferences()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'translateMetadata';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -91,7 +91,7 @@ class ConcerningFileReferences extends FunctionalTestCase
      */
     public function translatingConsumingRecordInConnectedModeProvidesLanguageVariantForLanguage()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'translateConsumingRecord';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -116,7 +116,7 @@ class ConcerningFileReferences extends FunctionalTestCase
      */
     public function translatingConsumingRecordInFreeModeProvidesLanguageVariantForLanguage()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'translateConsumingFreeModeRecord';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -137,7 +137,7 @@ class ConcerningFileReferences extends FunctionalTestCase
      */
     public function translatingConsumingRecordFromNonDefaultLanguageProvidesLanguageVariant()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'translateFromNonDefaultLanguage';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -158,7 +158,7 @@ class ConcerningFileReferences extends FunctionalTestCase
      */
     public function copyConsumingRecordFromNonDefaultLanguageProvidesLanguageVariant()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'copyFromNonDefaultLanguage';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -179,7 +179,7 @@ class ConcerningFileReferences extends FunctionalTestCase
      */
     public function translatingConsumingRecordThatIsNotTtContentWorksLikeConnectedMode()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'translateConsumingRecordNotTtContent';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);

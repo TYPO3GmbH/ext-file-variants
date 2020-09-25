@@ -44,7 +44,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function exceptionIsThrownForBadStorageConfiguration()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 42]);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 42];
         $subject = new DataHandlerHook();
         /** @var DataHandler $dataHandler */
         $dataHandler = $this->prophesize(DataHandler::class);
@@ -59,7 +59,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function defaultStorageIsUsedIfNoneIsConfigured()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 0, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 0, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'defaultStorage';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -75,7 +75,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function configuredStorageIsUsed()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'configuredStorage';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -91,7 +91,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function translationOfMetadataCreatesLocalizedFileRecord()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'translateMetadata';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -107,7 +107,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function uploadingVariantReplacesFileWithoutChangingUid()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'provideFileVariant';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -135,7 +135,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function replacingVariantReplacesFileWithoutChangingUid()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'replaceFileVariant';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -163,7 +163,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function resetVariantReplacesFileWithoutChangingUid()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'resetFileVariant';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -185,7 +185,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function fileDeletionRemovesAllRelatedFilesAndMetadata()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $GLOBALS['TYPO3_CONF_VARS']['SYS']['doNotCheckReferer'] = true;
 
         $scenarioName = 'deleteMetadata';

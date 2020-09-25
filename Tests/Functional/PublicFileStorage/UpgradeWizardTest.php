@@ -34,7 +34,7 @@ class UpgradeWizardTest extends FunctionalTestCase
      */
     public function runWizard()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 5, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 5, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'UpgradeWizard';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
