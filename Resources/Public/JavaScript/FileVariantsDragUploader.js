@@ -17,8 +17,7 @@
  */
 define(['jquery',
     'TYPO3/CMS/Backend/Notification',
-    'TYPO3/CMS/Backend/FormEngine',
-    'TYPO3/CMS/Lang/Lang'
+    'TYPO3/CMS/Backend/FormEngine'
 ], function ($, Notification) {
 
     var percentagePerFile = 1;
