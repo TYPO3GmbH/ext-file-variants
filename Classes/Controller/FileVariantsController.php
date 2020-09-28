@@ -32,6 +32,7 @@ use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\ReferenceIndex;
+use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -41,10 +42,9 @@ class FileVariantsController
 {
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function ajaxResetFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function ajaxResetFileVariant(ServerRequestInterface $request): ResponseInterface
     {
         $uid = (int)$request->getQueryParams()['uid'];
 
@@ -110,26 +110,25 @@ class FileVariantsController
 //        $refIndexObj->updateIndex(false);
 
         $formResult = $nodeFactory->create($formData)->render();
-        $response->getBody()->write($formResult['html']);
+        $response = new HtmlResponse($formResult['html']);
+
         return $response;
     }
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function ajaxReplaceFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function ajaxReplaceFileVariant(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->ajaxUploadFileVariant($request, $response);
+        return $this->ajaxUploadFileVariant($request);
     }
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function ajaxUploadFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function ajaxUploadFileVariant(ServerRequestInterface $request): ResponseInterface
     {
         $uploadedFileUid = (int)$request->getQueryParams()['file'];
         $metadataUid = (int)$request->getQueryParams()['uid'];
@@ -174,7 +173,8 @@ class FileVariantsController
         $formData['renderType'] = 'fileInfo';
 
         $formResult = $nodeFactory->create($formData)->render();
-        $response->getBody()->write($formResult['html']);
+        $response = new HtmlResponse($formResult['html']);
+
         return $response;
     }
 
