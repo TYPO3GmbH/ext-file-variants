@@ -69,7 +69,7 @@ local is sys_file, foreign is tt_content
 ## Behaviour
 
 After Installation, the sys_file_metadata edit mask in Filelist Module is slightly changed. Nothing happens for the default language records. But creating / editing a tranlation record offers,
-next to the fileinfo, a possiblity to upload a new file into the record. This file will recide in the dedicated translation storage or folder. After uploading, the fileinfo element changes its 
+next to the fileinfo, a possiblity to upload a new file into the record. This file will recide in the dedicated translation storage or folder. After uploading, the fileinfo element changes its
 content and displays the uploaded file.
 A button next to it allows for reset to the file used in default language. Also, the uploader is displayed again, so the file can be replaced at will. The formerly used one is lost.
 
@@ -78,7 +78,7 @@ During this process, all sys_file_reference entries are searched for a link to t
 Upon each translation action to any record, that features a FAL consuming field (like files or images), a check is performed to find out whether a file variant for the target language is available in the system. If it is, the resulting sys_file_reference record will link to that variant instead of the default language image.
 
 This results in a consistent behaviour, that summarizes as:
-- if a variant is available, it will be used. Everywhere and Everytime. Only exception of the rule: the table pages and pages_language_overlay are not file variants aware.
+- if a variant is available, it will be used. Everywhere and Everytime. Only exception of the rule is the table "pages" which is not file variants aware.
 - if no variant is available, default file is used (current standard core behaviour).
 
 ## Missing Features

@@ -194,7 +194,7 @@ class ResourcesService
             $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
         );
         $sysFileReferenceRecord = $queryBuilder->execute()->fetch();
-        $irrelevantTableNames = ['pages', 'pages_language_overlay', 'sys_file_metadata', 'sys_file'];
+        $irrelevantTableNames = ['pages', 'sys_file_metadata', 'sys_file'];
         if (in_array($sysFileReferenceRecord['tablenames'], $irrelevantTableNames)) {
             $isValid = false;
         }
