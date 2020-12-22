@@ -26,7 +26,8 @@ use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Install\Updates\AbstractUpdate;
+use TYPO3\CMS\Install\Updates\DatabaseUpdatedPrerequisite;
+use TYPO3\CMS\Install\Updates\UpgradeWizardInterface;
 
 /**
  * Looks after translated filemetadata records and copies the related files into
@@ -36,22 +37,64 @@ use TYPO3\CMS\Install\Updates\AbstractUpdate;
  *
  * Class MetaDataRecordsUpdateWizard
  */
-class MetaDataRecordsUpdateWizard extends AbstractUpdate
+class MetaDataRecordsUpdateWizard implements UpgradeWizardInterface
 {
-    protected $title = 'Prepare Instance for translateable files.';
+    /**
+     * Return the identifier for this wizard
+     * This should be the same string as used in the ext_localconf class registration
+     *
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return __CLASS__;
+    }
 
     /**
-     * Checks whether updates are required.
+     * Return the speaking name of this wizard
      *
-     * @param string &$description The description for the update
-     * @return bool Whether an update is required (TRUE) or not (FALSE)
+     * @return string
      */
-    public function checkForUpdate(&$description)
+    public function getTitle(): string
     {
-        if ($this->isWizardDone()) {
-            return false;
-        }
+        return 'Prepare Instance for translateable files.';
+    }
 
+    /**
+     * Return the description for this wizard
+     *
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return '';
+    }
+
+    /**
+     * Returns an array of class names of Prerequisite classes
+     *
+     * This way a wizard can define dependencies like "database up-to-date" or
+     * "reference index updated"
+     *
+     * @return string[]
+     */
+    public function getPrerequisites(): array
+    {
+        return [
+            DatabaseUpdatedPrerequisite::class
+        ];
+    }
+
+    /**
+     * Is an update necessary?
+     *
+     * Is used to determine whether a wizard needs to be run.
+     * Check if data for migration exists.
+     *
+     * @return bool
+     */
+    public function updateNecessary(): bool
+    {
         $execute = false;
 
         // check for existing sys_file_metadata records in sys_language_uid > 0
@@ -78,17 +121,18 @@ class MetaDataRecordsUpdateWizard extends AbstractUpdate
             $description = 'Core default behaviour demands for each translation of a sys_file_metadata record to refer to a'
             . 'single sys_file record, that in turn features the same physical image.';
         }
+
         return $execute;
     }
 
     /**
-     * Performs the accordant updates.
+     * Execute the update
      *
-     * @param array &$dbQueries Queries done in this update
-     * @param string &$customMessage Custom message
-     * @return bool Whether everything went smoothly or not
+     * Called when a wizard reports that an update is necessary
+     *
+     * @return bool
      */
-    public function performUpdate(array &$dbQueries, &$customMessage)
+    public function executeUpdate(): bool
     {
         /** @var ResourcesService $resourcesService */
         $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
@@ -99,6 +143,7 @@ class MetaDataRecordsUpdateWizard extends AbstractUpdate
         $translatedFileMetadataRecords = $queryBuilder->select('*')->from('sys_file_metadata')->where(
             $queryBuilder->expr()->gt('sys_language_uid', 0)
         )->execute();
+
         while ($metaDataRecord = $translatedFileMetadataRecords->fetch()) {
             $resourcesService->copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy(
                 $metaDataRecord['sys_language_uid'],

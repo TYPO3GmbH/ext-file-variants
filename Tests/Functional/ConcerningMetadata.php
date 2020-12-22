@@ -25,6 +25,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
 use T3G\AgencyPack\FileVariants\Controller\FileVariantsController;
 use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use TYPO3\CMS\Backend\Controller\File\FileController;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -43,7 +44,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function exceptionIsThrownForBadStorageConfiguration()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 42]);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 42];
         $subject = new DataHandlerHook();
         /** @var DataHandler $dataHandler */
         $dataHandler = $this->prophesize(DataHandler::class);
@@ -58,12 +59,12 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function defaultStorageIsUsedIfNoneIsConfigured()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 0, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 0, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'defaultStorage';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/fileadmin/cat_1.jpg');
         $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
 
         $this->importAssertCSVScenario($scenarioName);
@@ -74,12 +75,12 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function configuredStorageIsUsed()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'configuredStorage';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/fileadmin/cat_1.jpg');
         $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
 
         $this->importAssertCSVScenario($scenarioName);
@@ -90,12 +91,12 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function translationOfMetadataCreatesLocalizedFileRecord()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'translateMetadata';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/fileadmin/cat_1.jpg');
         $this->actionService->localizeRecord('sys_file_metadata', 11, 1);
 
         $this->importAssertCSVScenario($scenarioName);
@@ -106,7 +107,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function uploadingVariantReplacesFileWithoutChangingUid()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'provideFileVariant';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -114,11 +115,11 @@ class ConcerningMetadata extends FunctionalTestCase
         $controller = new FileVariantsController();
         $request = new ServerRequest();
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'languageVariants/languageVariants/cat_1.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_1.jpg');
 
-        @mkdir(PATH_site . 'typo3temp/file_variants_uploads/', 0777, true);
-        $localFilePath = PATH_site . 'typo3temp/file_variants_uploads/cat_2.jpg';
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', $localFilePath);
+        @mkdir(Environment::getPublicPath() . '/typo3temp/file_variants_uploads/', 0777, true);
+        $localFilePath = Environment::getPublicPath() . '/typo3temp/file_variants_uploads/cat_2.jpg';
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', $localFilePath);
 
         $storage = ResourceFactory::getInstance()->getStorageObject(2);
         $folder = $storage->getFolder('languageVariants');
@@ -134,7 +135,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function replacingVariantReplacesFileWithoutChangingUid()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'replaceFileVariant';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -142,11 +143,11 @@ class ConcerningMetadata extends FunctionalTestCase
         $controller = new FileVariantsController();
         $request = new ServerRequest();
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', PATH_site . 'languageVariants/languageVariants/cat_2.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_2.jpg');
 
-        @mkdir(PATH_site . 'typo3temp/file_variants_uploads/', 0777, true);
-        $localFilePath = PATH_site . 'typo3temp/file_variants_uploads/cat_3.jpg';
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', $localFilePath);
+        @mkdir(Environment::getPublicPath() . '/typo3temp/file_variants_uploads/', 0777, true);
+        $localFilePath = Environment::getPublicPath() . '/typo3temp/file_variants_uploads/cat_3.jpg';
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', $localFilePath);
 
         $storage = ResourceFactory::getInstance()->getStorageObject(2);
         $folder = $storage->getFolder('languageVariants');
@@ -162,7 +163,7 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function resetVariantReplacesFileWithoutChangingUid()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'resetFileVariant';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
@@ -170,8 +171,8 @@ class ConcerningMetadata extends FunctionalTestCase
         $controller = new FileVariantsController();
         $request = new ServerRequest();
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'languageVariants/languageVariants/cat_1.jpg');
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', PATH_site . 'languageVariants/languageVariants/cat_2.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_1.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_2.jpg');
 
         $request = $request->withQueryParams(['uid' => 12]);
         $controller->ajaxResetFileVariant($request, new Response());
@@ -184,14 +185,13 @@ class ConcerningMetadata extends FunctionalTestCase
      */
     public function fileDeletionRemovesAllRelatedFilesAndMetadata()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants']);
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['doNotCheckReferer'] = true;
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 2, 'variantsFolder' => 'languageVariants'];
 
         $scenarioName = 'deleteMetadata';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', PATH_site . 'languageVariants/languageVariants/cat_3.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_3.jpg');
         $file = ResourceFactory::getInstance()->getFileObject(12);
 
         $_SERVER['HTTP_HOST'] = 'localhost';

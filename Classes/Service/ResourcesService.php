@@ -22,6 +22,7 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Resource\FolderInterface;
@@ -42,7 +43,7 @@ class ResourcesService
      */
     public function prepareFileStorageEnvironment(): FolderInterface
     {
-        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
+        $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('file_variants');
         $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
         /** @var ResourcesService $resourcesService */
         $targetFolder = $extensionConfiguration['variantsFolder'];
@@ -193,7 +194,7 @@ class ResourcesService
             $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
         );
         $sysFileReferenceRecord = $queryBuilder->execute()->fetch();
-        $irrelevantTableNames = ['pages', 'pages_language_overlay', 'sys_file_metadata', 'sys_file'];
+        $irrelevantTableNames = ['pages', 'sys_file_metadata', 'sys_file'];
         if (in_array($sysFileReferenceRecord['tablenames'], $irrelevantTableNames)) {
             $isValid = false;
         }

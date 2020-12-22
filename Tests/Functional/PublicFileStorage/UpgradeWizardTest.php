@@ -11,6 +11,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional\PublicFileStorage;
 
 use T3G\AgencyPack\FileVariants\Tests\Functional\FunctionalTestCase;
 use T3G\AgencyPack\FileVariants\Updates\MetaDataRecordsUpdateWizard;
+use TYPO3\CMS\Core\Core\Environment;
 
 /**
  * Class UpgradeWizardTest
@@ -33,12 +34,12 @@ class UpgradeWizardTest extends FunctionalTestCase
      */
     public function runWizard()
     {
-        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'] = serialize(['variantsStorageUid' => 5, 'variantsFolder' => 'languageVariants']);
+        $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 5, 'variantsFolder' => 'languageVariants'];
         $scenarioName = 'UpgradeWizard';
         $this->importCsvScenario($scenarioName);
         $this->setUpFrontendRootPage(1);
 
-        copy(PATH_site . 'typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', PATH_site . 'fileadmin/cat_1.jpg');
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/fileadmin/cat_1.jpg');
 
         $subject = new MetaDataRecordsUpdateWizard();
         $dbQueries = [];

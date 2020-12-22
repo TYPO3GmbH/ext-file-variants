@@ -23,32 +23,34 @@ namespace T3G\AgencyPack\FileVariants\DataHandler;
  * The TYPO3 project - inspiring people to share!
  */
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
+use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DataHandlerHook
 {
     /**
-     * @var string
-     */
-    protected $uploadFolderPath = PATH_site . 'typo3temp/file_variants_uploads';
-
-    /**
      * DataHandlerHook constructor.
      */
     public function __construct()
     {
-        if (!isset($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants'])) {
+        try {
+            GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('file_variants');
+        } catch (ExtensionConfigurationExtensionNotConfiguredException $e) {
             throw new \RuntimeException(
                 'No extension configuration found. Go to ExtensionManager and press the wheel symbol for ext:file_variants.',
-                1490476773
+                1490476773,
+                $e
             );
         }
-        if (!is_dir($this->uploadFolderPath)) {
-            mkdir($this->uploadFolderPath, 2777, true);
+        $uploadFolderPath = Environment::getPublicPath() . '/typo3temp/file_variants_uploads';
+        if (!is_dir($uploadFolderPath)) {
+            mkdir($uploadFolderPath, 2777, true);
         }
     }
 
