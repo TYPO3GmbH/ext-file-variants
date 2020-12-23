@@ -47,7 +47,7 @@ class ConcerningFileReferences extends FunctionalTestCase
         $this->setUpFrontendRootPage(1);
 
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_3.jpg');
-        $file = ResourceFactory::getInstance()->getFileObject(12);
+        $file = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject(12);
 
         $_SERVER['HTTP_HOST'] = 'localhost';
         $_SERVER['REQUEST_URI'] = '/index.php';

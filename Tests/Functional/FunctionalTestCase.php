@@ -122,7 +122,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $result = $queryBuilder->select('*')->from('sys_file_storage')->execute();
         while ($storageUid = $result->fetch()['uid']) {
             // find files in storage
-            $storage = ResourceFactory::getInstance()->getStorageObject($storageUid);
+            $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject($storageUid);
             $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
             try {
                 $folder = $storage->getFolder('languageVariants');
@@ -130,7 +130,12 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                 foreach ($files as $file) {
                     $storage->deleteFile($file);
                     $recordsToDelete['sys_file'][] = $file->getUid();
-                    $metadata = $file->_getMetaData();
+                    if (method_exists($file, 'getMetaData')) {
+                        $metadata = $file->getMetaData();
+                    } else {
+                        // @extensionScannerIgnoreLine
+                        $metadata = $file->_getMetaData();
+                    }
                     $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
                 }
             } catch (\Exception $exception) {

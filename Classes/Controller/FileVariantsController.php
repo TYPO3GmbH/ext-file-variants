@@ -68,13 +68,13 @@ class FileVariantsController
         );
 
         $fileRecord = $queryBuilder->execute()->fetch();
-        $defaultFileObject = ResourceFactory::getInstance()->getFileObject((int)$fileRecord['l10n_parent']);
+        $defaultFileObject = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject((int)$fileRecord['l10n_parent']);
         $copy = $defaultFileObject->copyTo($defaultFileObject->getParentFolder());
         // this record will be stale after the replace, remove it right away
         $sysFileRecordToBeDeleted = $copy->getUid();
         $path = $this->getAbsolutePathToFile($copy);
 
-        $file = ResourceFactory::getInstance()->getFileObject($fileUid);
+        $file = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($fileUid);
         $file->getStorage()->replaceFile($file, $path);
         $file->rename($defaultFileObject->getName(), DuplicationBehavior::RENAME);
         /** @var QueryBuilder $queryBuilder */
@@ -139,8 +139,8 @@ class FileVariantsController
         );
         $currentFileUid = $queryBuilder->execute()->fetchColumn();
 
-        $currentFile = ResourceFactory::getInstance()->getFileObject($currentFileUid);
-        $uploadedFile = ResourceFactory::getInstance()->getFileObject($uploadedFileUid);
+        $currentFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($currentFileUid);
+        $uploadedFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($uploadedFileUid);
         $currentFile->getStorage()->replaceFile($currentFile, $this->getAbsolutePathToFile($uploadedFile));
         $currentFile->rename($uploadedFile->getName(), DuplicationBehavior::RENAME);
 
