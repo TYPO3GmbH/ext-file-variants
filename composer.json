@@ -62,7 +62,7 @@
 		"roave/security-advisories": "dev-master",
 		"typo3/testing-framework": "^2.0.4"
 	},
-	"replace": [
-		"t3g/file_variants"
-	]
+	"replace": {
+		"t3g/file_variants": "self.version"
+	}
 }
