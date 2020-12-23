@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 if (!defined('TYPO3_MODE')) {
     die('Access denied!');
 }
@@ -37,4 +44,7 @@ call_user_func(function () {
         'priority' => 40,
         'class' => \T3G\AgencyPack\FileVariants\FormEngine\FieldWizard\FileVariantsOverviewWizard::class,
     ];
+
+    // Upgrade Wizard
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'][\T3G\AgencyPack\FileVariants\Updates\MetaDataRecordsUpdateWizard::class] = \T3G\AgencyPack\FileVariants\Updates\MetaDataRecordsUpdateWizard::class;
 });

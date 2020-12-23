@@ -1,15 +1,9 @@
 {
 	"name": "t3g/file_variants",
-	"description": "Files can present their language variants and use them",
-	"minimum-stability": "dev",
+	"description": "This extension serves as a working prototype for translatable assets for TYPO3 v8.7.",
 	"type": "typo3-cms-extension",
 	"license": "GPL-2.0+",
-	"repositories": {
-		"0": {
-			"type": "composer",
-			"url": "https://composer.typo3.org/"
-		}
-	},
+	"minimum-stability": "dev",
 	"authors": [
 		{
 			"name": "TYPO3 GmbH",
@@ -17,21 +11,55 @@
 			"homepage": "https://typo3.com/"
 		}
 	],
-	"require": {
-		"typo3/cms-core": "^8"
-	},
 	"autoload": {
 		"psr-4": {
 			"T3G\\AgencyPack\\FileVariants\\": "Classes/",
 			"T3G\\AgencyPack\\FileVariants\\Tests\\": "Tests/"
 		}
 	},
-	"require-dev": {
-		"t3g/testing-framework": "dev-bugfix/TGT-614-branch-for-ext-file_variants"
-	},
 	"autoload-dev": {
 		"psr-4": {
 			"T3G\\AgencyPack\\FileVariants\\Tests\\": "Tests/"
 		}
+	},
+	"config": {
+		"discard-changes": true,
+		"bin-dir": "bin",
+		"platform": {
+			"php": "7.0"
+		}
+	},
+	"extra": {
+		"typo3/cms": {
+			"web-dir": "."
+		}
+	},
+	"scripts": {
+		"t3g:test:php:unit": [
+			"phpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml"
+		],
+		"t3g:test:php:functional": [
+			"phpunit -c Build/FunctionalTests.xml --log-junit logs/phpunit.xml"
+		],
+		"t3g:test": [
+			"@t3g:test:php:unit",
+			"@t3g:test:php:functional"
+		],
+		"t3g:cgl": [
+			"php-cs-fixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml"
+		]
+	},
+	"require": {
+		"psr/http-message": "^1.0.0",
+		"typo3/cms-backend": "^9.5",
+		"typo3/cms-core": "^9.5",
+		"typo3/cms-extbase": "^9.5",
+		"typo3/cms-fluid": "^9.5",
+		"typo3/cms-install": "^9.5"
+	},
+	"require-dev": {
+		"friendsofphp/php-cs-fixer": "^2.12",
+		"roave/security-advisories": "dev-master",
+		"typo3/testing-framework": "^2.0.4"
 	}
 }

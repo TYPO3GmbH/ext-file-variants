@@ -1,8 +1,6 @@
 # translatable files
 
-This extension serves as a working prototype for translatable assets.
-The functionality will not interfere with any core concepts, but is target
-to be included into the TYPO3 core.
+This extension serves as a working prototype for translatable assets for TYPO3 v8.7.
 
 ## Features
 
@@ -71,7 +69,7 @@ local is sys_file, foreign is tt_content
 ## Behaviour
 
 After Installation, the sys_file_metadata edit mask in Filelist Module is slightly changed. Nothing happens for the default language records. But creating / editing a tranlation record offers,
-next to the fileinfo, a possiblity to upload a new file into the record. This file will recide in the dedicated translation storage or folder. After uploading, the fileinfo element changes its 
+next to the fileinfo, a possiblity to upload a new file into the record. This file will recide in the dedicated translation storage or folder. After uploading, the fileinfo element changes its
 content and displays the uploaded file.
 A button next to it allows for reset to the file used in default language. Also, the uploader is displayed again, so the file can be replaced at will. The formerly used one is lost.
 
@@ -80,12 +78,10 @@ During this process, all sys_file_reference entries are searched for a link to t
 Upon each translation action to any record, that features a FAL consuming field (like files or images), a check is performed to find out whether a file variant for the target language is available in the system. If it is, the resulting sys_file_reference record will link to that variant instead of the default language image.
 
 This results in a consistent behaviour, that summarizes as:
-- if a variant is available, it will be used. Everywhere and Everytime. Only exception of the rule: the table pages and pages_language_overlay are not file variants aware.
+- if a variant is available, it will be used. Everywhere and Everytime. Only exception of the rule is the table "pages" which is not file variants aware.
 - if no variant is available, default file is used (current standard core behaviour).
 
 ## Missing Features
 
 1. Upgrade Wizard. If metadata record translations are already there, no variants are provided nor used.
-2. Summary of available variants for the default language metadata record.
-3. Display of default language file for the translated metadata record (to know to what file the reset will lead).
-4. Workspaces Support.
+2. Workspaces Support.

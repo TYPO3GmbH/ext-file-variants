@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\FormEngine;
 
 /*
@@ -22,8 +29,6 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Resource\FolderInterface;
-use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -31,15 +36,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class FileVariantInfoElement extends FileInfoElement
 {
-    /**
-     * @var ResourceStorageInterface
-     */
-    protected $storage;
-
-    /**
-     * @var FolderInterface
-     */
-    protected $folder;
 
     /**
      * Handler for single nodes
@@ -50,7 +46,6 @@ class FileVariantInfoElement extends FileInfoElement
     {
         $resultArray = parent::render();
         if ($this->data['databaseRow']['sys_language_uid'][0] > '0') {
-
             $fileUid = (int)$this->data['databaseRow']['file'][0];
             if ($fileUid < 1) {
                 $resultArray['html'] = 'something went wrong, no valid file uid received (' . $fileUid . ')';
@@ -64,21 +59,9 @@ class FileVariantInfoElement extends FileInfoElement
                 ];
                 $resultArray['stylesheetFiles'][] = 'EXT:file_variants/Resources/Public/Css/FileVariantInfoElement.css';
 
-                $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['file_variants']);
-                $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
-                $targetFolder = $extensionConfiguration['variantsFolder'];
+                /** @var ResourcesService $resourcesService */
                 $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
-                try {
-                    $this->storage = $resourcesService->retrieveStorageObject($storageUid);
-
-                    if (!$this->storage->hasFolder($targetFolder)) {
-                        $this->folder = $this->storage->createFolder($targetFolder);
-                    } else {
-                        $this->folder = $this->storage->getFolder($targetFolder);
-                    }
-                } catch (\InvalidArgumentException $exception) {
-                    throw new \RuntimeException('storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.', 1490480372);
-                }
+                $folder = $resourcesService->prepareFileStorageEnvironment();
 
                 /** @var UriBuilder $uriBuilder */
                 $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
@@ -102,22 +85,26 @@ class FileVariantInfoElement extends FileInfoElement
 
                     // upload new file to replace current variant
                     $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
-                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_replaceFileVariant',
-                        ['uid' => $this->data['vanillaUid']]);
-                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' .$this->folder->getCombinedIdentifier(). '" 
+                    $path = $uriBuilder->buildUriFromRoute(
+                        'ajax_tx_filevariants_replaceFileVariant',
+                        ['uid' => $this->data['vanillaUid']]
+                    );
+                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' . $folder->getCombinedIdentifier() . '" 
 	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
-	 data-file-deny-pattern="' .$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']. '" data-max-file-size="' .$maxFileSize. '" data-handling-url="' .$path. '"
+	 data-file-deny-pattern="' . $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'] . '" data-max-file-size="' . $maxFileSize . '" data-handling-url="' . $path . '"
 	></div>';
                 } else {
                     $resultArray['html'] = '<div class="t3-sysfile-wrapper">' . $resultArray['html'] . '</div>';
 
                     // provide upload possibility
                     $maxFileSize = GeneralUtility::getMaxUploadFileSize() * 1024;
-                    $path = $uriBuilder->buildUriFromRoute('ajax_tx_filevariants_uploadFileVariant',
-                        ['uid' => $this->data['vanillaUid']]);
-                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' .$this->folder->getCombinedIdentifier(). '" 
+                    $path = $uriBuilder->buildUriFromRoute(
+                        'ajax_tx_filevariants_uploadFileVariant',
+                        ['uid' => $this->data['vanillaUid']]
+                    );
+                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' . $folder->getCombinedIdentifier() . '" 
 	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
-	 data-file-deny-pattern="' .$GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']. '" data-max-file-size="' .$maxFileSize. '" data-handling-url="' .$path. '"
+	 data-file-deny-pattern="' . $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'] . '" data-max-file-size="' . $maxFileSize . '" data-handling-url="' . $path . '"
 	></div>';
                 }
             }
@@ -145,8 +132,10 @@ class FileVariantInfoElement extends FileInfoElement
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
         $queryBuilder->select('sha1')->from('sys_file')->where(
-            $queryBuilder->expr()->in('uid',
-                $queryBuilder->createNamedParameter([$fileUid, $defaultFileUid], Connection::PARAM_INT_ARRAY))
+            $queryBuilder->expr()->in(
+                'uid',
+                $queryBuilder->createNamedParameter([$fileUid, $defaultFileUid], Connection::PARAM_INT_ARRAY)
+            )
         );
         $sha1s = $queryBuilder->execute()->fetchAll();
         return $sha1s[0]['sha1'] === $sha1s[1]['sha1'];
@@ -166,6 +155,4 @@ class FileVariantInfoElement extends FileInfoElement
         );
         return (int)$queryBuilder->execute()->fetchColumn();
     }
-
-
 }

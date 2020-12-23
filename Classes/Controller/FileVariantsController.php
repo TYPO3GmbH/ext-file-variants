@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\Controller;
 
 /*
@@ -21,10 +28,13 @@ use TYPO3\CMS\Backend\Form\FormDataCompiler;
 use TYPO3\CMS\Backend\Form\FormDataGroup\TcaDatabaseRecord;
 use TYPO3\CMS\Backend\Form\FormResultCompiler;
 use TYPO3\CMS\Backend\Form\NodeFactory;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\ReferenceIndex;
+use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -32,10 +42,9 @@ class FileVariantsController
 {
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function ajaxResetFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function ajaxResetFileVariant(ServerRequestInterface $request): ResponseInterface
     {
         $uid = (int)$request->getQueryParams()['uid'];
 
@@ -63,7 +72,7 @@ class FileVariantsController
         $copy = $defaultFileObject->copyTo($defaultFileObject->getParentFolder());
         // this record will be stale after the replace, remove it right away
         $sysFileRecordToBeDeleted = $copy->getUid();
-        $path = PATH_site . $copy->getPublicUrl();
+        $path = $this->getAbsolutePathToFile($copy);
 
         $file = ResourceFactory::getInstance()->getFileObject($fileUid);
         $file->getStorage()->replaceFile($file, $path);
@@ -82,20 +91,17 @@ class FileVariantsController
         $queryBuilder->select('uid')->from('sys_file_metadata')->where(
             $queryBuilder->expr()->eq(
                 'file',
-                $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT))
+                $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT)
+            )
         );
-        $metadataRecords = $queryBuilder->execute()->fetchAll();
-        $metadataRecordsToBeDeleted = [];
-        if (count($metadataRecords) > 0) {
-            foreach ($metadataRecords as $record) {
-                $metadataRecordsToBeDeleted[] = $record['uid'];
-            }
+        $metadataRecordsToBeDeleted = $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
+        if (count($metadataRecordsToBeDeleted) > 0) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getQueryBuilderForTable('sys_file_metadata');
             $queryBuilder->delete('sys_file_metadata')->where(
                 $queryBuilder->expr()
-                    ->eq('uid', $queryBuilder->createNamedParameter($metadataRecordsToBeDeleted, \PDO::PARAM_INT))
+                    ->in('uid', $metadataRecordsToBeDeleted, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             )->execute();
         }
 
@@ -104,26 +110,25 @@ class FileVariantsController
 //        $refIndexObj->updateIndex(false);
 
         $formResult = $nodeFactory->create($formData)->render();
-        $response->getBody()->write($formResult['html']);
+        $response = new HtmlResponse($formResult['html']);
+
         return $response;
     }
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function ajaxReplaceFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function ajaxReplaceFileVariant(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->ajaxUploadFileVariant($request, $response);
+        return $this->ajaxUploadFileVariant($request);
     }
 
     /**
      * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function ajaxUploadFileVariant(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function ajaxUploadFileVariant(ServerRequestInterface $request): ResponseInterface
     {
         $uploadedFileUid = (int)$request->getQueryParams()['file'];
         $metadataUid = (int)$request->getQueryParams()['uid'];
@@ -136,7 +141,7 @@ class FileVariantsController
 
         $currentFile = ResourceFactory::getInstance()->getFileObject($currentFileUid);
         $uploadedFile = ResourceFactory::getInstance()->getFileObject($uploadedFileUid);
-        $currentFile->getStorage()->replaceFile($currentFile, PATH_site . $uploadedFile->getPublicUrl());
+        $currentFile->getStorage()->replaceFile($currentFile, $this->getAbsolutePathToFile($uploadedFile));
         $currentFile->rename($uploadedFile->getName(), DuplicationBehavior::RENAME);
 
         /** @var QueryBuilder $queryBuilder */
@@ -168,8 +173,32 @@ class FileVariantsController
         $formData['renderType'] = 'fileInfo';
 
         $formResult = $nodeFactory->create($formData)->render();
-        $response->getBody()->write($formResult['html']);
+        $response = new HtmlResponse($formResult['html']);
+
         return $response;
     }
 
+    /**
+     * Returns an absolute file path to the given File resource
+     *
+     * @param File $file
+     * @return string
+     */
+    protected function getAbsolutePathToFile(File $file): string
+    {
+        $storage = $file->getStorage();
+        if (!$storage->isPublic()) {
+            // manually create a possibly valid file path from the storage configuration
+            $storageConfiguration = $storage->getConfiguration();
+            if ($storageConfiguration['pathType'] == 'absolute') {
+                $path = realpath($storageConfiguration['basePath']) . $file->getIdentifier();
+            } else {
+                $path = realpath(Environment::getPublicPath() . '/' . $storageConfiguration['basePath']) . $file->getIdentifier();
+            }
+        } else {
+            $path = Environment::getPublicPath() . '/' . $file->getPublicUrl();
+        }
+
+        return $path;
+    }
 }

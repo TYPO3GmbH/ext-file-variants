@@ -1,5 +1,13 @@
 <?php
 declare(strict_types=1);
+
+/*
+ * This file is part of the package t3g/file_variants.
+ *
+ * For the full copyright and license information, please read the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace T3G\AgencyPack\FileVariants\Tests\Functional;
 
 /*
@@ -15,6 +23,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 use TYPO3\CMS\Core\Core\Bootstrap;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -23,9 +32,10 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\ActionService;
 
 /**
-  * Description
+  * extending typo3/testing-framework basic FunctionalTestCase
   */
-abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase {
+abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
+{
 
     /**
      * @var string
@@ -55,26 +65,33 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      *
      * @var string
      */
-    protected $backendUserFixture = 'PACKAGE:t3g/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
+    protected $backendUserFixture = 'PACKAGE:typo3/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
 
     protected function setUp()
     {
-        $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
+        if (!file_exists('file_variants')) {
+            symlink('.', 'file_variants');
+        }
+        $this->coreExtensionsToLoad[] = 'fluid';
+        $this->coreExtensionsToLoad[] = 'extensionmanager';
+        $this->testExtensionsToLoad[] = 'file_variants';
 
         parent::setUp();
 
         // make sure there are no leftover files from earlier tests
         // done in setup because teardown is called only once per file
-        if (file_exists(PATH_site . 'languageVariants')) {
-            system('rm -rf ' . escapeshellarg(PATH_site . 'languageVariants'));
+        if (file_exists(Environment::getPublicPath() . '/languageVariants')) {
+            system('rm -rf ' . escapeshellarg(Environment::getPublicPath() . '/languageVariants'));
         }
 
-        Bootstrap::getInstance()->initializeLanguageObject();
+        Bootstrap::initializeLanguageObject();
 
         $this->backendUser = $this->setUpBackendUserFromFixture(1);
         $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
-        GeneralUtility::setSingletonInstance(FileMetadataPermissionsAspect::class,
-            $fileMetadataPermissionAspect->reveal());
+        GeneralUtility::setSingletonInstance(
+            FileMetadataPermissionsAspect::class,
+            $fileMetadataPermissionAspect->reveal()
+        );
 
         $this->actionService = new ActionService();
 
@@ -83,10 +100,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         unset($GLOBALS['TCA']['tt_content']['columns']['image']['config']['filter']);
 
         // set up the second file storage
-        mkdir(PATH_site . 'languageVariants/languageVariants', 0777, true);
-        mkdir(PATH_site . 'languageVariants/_processed_', 0777, true);
-
-        $this->initializeFeatureConfig();
+        mkdir(Environment::getPublicPath() . '/languageVariants/languageVariants', 0777, true);
+        mkdir(Environment::getPublicPath() . '/languageVariants/_processed_', 0777, true);
     }
 
     protected function tearDown()
@@ -182,5 +197,4 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $scenarioFileName = GeneralUtility::getFileAbsFileName($scenarioFileName);
         $this->assertCSVDataSet($scenarioFileName);
     }
-
 }
