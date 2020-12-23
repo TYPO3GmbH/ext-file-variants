@@ -1,6 +1,6 @@
 {
-	"name": "t3g/file_variants",
-	"description": "This extension serves as a working prototype for translatable assets for TYPO3 v8.7.",
+	"name": "t3g/file-variants",
+	"description": "Prototype for translatable files in TYPO3",
 	"type": "typo3-cms-extension",
 	"license": "GPL-2.0+",
 	"minimum-stability": "dev",
@@ -61,5 +61,8 @@
 		"friendsofphp/php-cs-fixer": "^2.12",
 		"roave/security-advisories": "dev-master",
 		"typo3/testing-framework": "^2.0.4"
-	}
+	},
+	"replace": [
+		"t3g/file_variants"
+	]
 }
