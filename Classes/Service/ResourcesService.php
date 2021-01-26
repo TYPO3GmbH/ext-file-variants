@@ -102,7 +102,10 @@ class ResourcesService
         $content = '';
         if ($file->isMissing()) {
             $content .= '<span class="label label-danger label-space-right">'
-                . htmlspecialchars(LocalizationUtility::translate('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:warning.file_missing', 'lang'))
+                . htmlspecialchars(LocalizationUtility::translate(
+                    'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:warning.file_missing',
+                    'core'
+                ))
                 . '</span>';
         }
         if ($previewImage) {
