@@ -31,6 +31,7 @@
 	},
 	"extra": {
 		"typo3/cms": {
+			"extension-key": "file_variants",
 			"web-dir": "."
 		}
 	},
