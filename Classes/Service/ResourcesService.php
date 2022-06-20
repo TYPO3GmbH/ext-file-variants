@@ -98,7 +98,7 @@ class ResourcesService
     {
         $file = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($fileUid);
         $processedFile = $file->process(ProcessedFile::CONTEXT_IMAGEPREVIEW, ['width' => $width, 'height' => $height]);
-        $previewImage = $processedFile->getPublicUrl(true);
+        $previewImage = $processedFile->getPublicUrl();
         $content = '';
         if ($file->isMissing()) {
             $content .= '<span class="label label-danger label-space-right">'
