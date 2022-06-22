@@ -22,23 +22,6 @@ call_user_func(function () {
         'priority' => 30,
         'class' => \T3G\AgencyPack\FileVariants\FormEngine\FileVariantInfoElement::class,
     ];
-
-    /** @var \TYPO3\CMS\Extbase\SignalSlot\Dispatcher $signalSlotDispatcher */
-    $signalSlotDispatcher = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\SignalSlot\Dispatcher::class);
-    $signalSlotDispatcher->connect(
-        \TYPO3\CMS\Core\Resource\ResourceStorage::class,  // Signal class name
-        \TYPO3\CMS\Core\Resource\ResourceStorage::SIGNAL_PreFileDelete,                                  // Signal name
-        \T3G\AgencyPack\FileVariants\Signal\Slot\FileDeleteSlot::class,        // Slot class name
-        'handleFileVariantDeletionPreDelete'                               // Slot name
-    );
-
-    $signalSlotDispatcher->connect(
-        \TYPO3\CMS\Core\Resource\ResourceStorage::class,  // Signal class name
-        \TYPO3\CMS\Core\Resource\ResourceStorage::SIGNAL_PostFileDelete,                                  // Signal name
-        \T3G\AgencyPack\FileVariants\Signal\Slot\FileDeleteSlot::class,        // Slot class name
-        'handleFileVariantDeletionPostDelete'                               // Slot name
-    );
-
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1494415118] = [
         'nodeName' => 'FileVariantsOverviewWizard',
         'priority' => 40,

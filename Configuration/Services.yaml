@@ -6,3 +6,15 @@ services:
 
   T3G\AgencyPack\FileVariants\:
     resource: '../Classes/*'
+
+  T3G\AgencyPack\FileVariants\EventListener\BeforeFileDeletedEventListener:
+    tags:
+      - name: event.listener
+        identifier: file-variants-before-file-delete
+        event: TYPO3\CMS\Core\Resource\Event\BeforeFileDeletedEvent
+
+  T3G\AgencyPack\FileVariants\EventListener\AfterFileDeletedEventListener:
+    tags:
+      - name: event.listener
+        identifier: file-variants-after-file-delete
+        event: TYPO3\CMS\Core\Resource\Event\AfterFileDeletedEvent
