@@ -30,6 +30,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 /**
  * Description
@@ -45,7 +46,13 @@ class FileVariantInfoElement extends FileInfoElement
     public function render(): array
     {
         $resultArray = parent::render();
-        if ($this->data['databaseRow']['sys_language_uid'][0] > '0') {
+        $languageUid = $this->data['databaseRow']['sys_language_uid'];
+
+        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '11', '<')) {
+            $languageUid = (int)$languageUid[0];
+        }
+
+        if ($languageUid > 0) {
             $fileUid = (int)$this->data['databaseRow']['file'][0];
             if ($fileUid < 1) {
                 $resultArray['html'] = 'something went wrong, no valid file uid received (' . $fileUid . ')';
@@ -89,7 +96,7 @@ class FileVariantInfoElement extends FileInfoElement
                         'ajax_tx_filevariants_replaceFileVariant',
                         ['uid' => $this->data['vanillaUid']]
                     );
-                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' . $folder->getCombinedIdentifier() . '" 
+                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' . $folder->getCombinedIdentifier() . '"
 	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
 	 data-file-deny-pattern="' . $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'] . '" data-max-file-size="' . $maxFileSize . '" data-handling-url="' . $path . '"
 	></div>';
@@ -102,7 +109,7 @@ class FileVariantInfoElement extends FileInfoElement
                         'ajax_tx_filevariants_uploadFileVariant',
                         ['uid' => $this->data['vanillaUid']]
                     );
-                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' . $folder->getCombinedIdentifier() . '" 
+                    $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' . $folder->getCombinedIdentifier() . '"
 	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
 	 data-file-deny-pattern="' . $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'] . '" data-max-file-size="' . $maxFileSize . '" data-handling-url="' . $path . '"
 	></div>';

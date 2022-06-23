@@ -8,7 +8,7 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-namespace T3G\AgencyPack\FileVariants\Signal\Slot;
+namespace T3G\AgencyPack\FileVariants\EventListener;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -22,21 +22,19 @@ namespace T3G\AgencyPack\FileVariants\Signal\Slot;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Resource\Event\BeforeFileDeletedEvent;
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class FileDeleteSlot
+final class BeforeFileDeletedEventListener
 {
-
-    /**
-     * @param FileInterface $file
-     */
-    public function handleFileVariantDeletionPreDelete(FileInterface $file)
+    public function __invoke(BeforeFileDeletedEvent $event): void
     {
+        $file = $event->getFile();
+
         if ($file instanceof File) {
             $fileUid = $file->getUid();
             /** @var QueryBuilder $queryBuilder */
@@ -56,34 +54,6 @@ class FileDeleteSlot
                 $queryBuilder->update('sys_file_reference')->set('uid_local', $parentFileUid)->where(
                     $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($referenceUid, \PDO::PARAM_INT))
                 )->execute();
-            }
-        }
-    }
-
-    /**
-     * @param FileInterface $file
-     */
-    public function handleFileVariantDeletionPostDelete(FileInterface $file)
-    {
-        if ($file instanceof File) {
-            // delete file metadata
-            $fileUid = $file->getUid();
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-            $queryBuilder->delete('sys_file_metadata')->where(
-                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
-
-            // delete all file variants
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-            $fileVariants = $queryBuilder->select('uid')->from('sys_file')->where(
-                $queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
-            foreach ($fileVariants->fetchAll(\PDO::FETCH_COLUMN) as $variantUid) {
-                /** @var File $variantFile */
-                $variantFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($variantUid);
-                $variantFile->getStorage()->deleteFile($variantFile);
             }
         }
     }
