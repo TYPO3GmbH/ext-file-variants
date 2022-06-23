@@ -146,12 +146,12 @@ class FileVariantInfoElement extends FileInfoElement
      */
     protected function getDefaultFileUid(): int
     {
-        $l10n_parent = (int)$this->data['databaseRow']['l10n_parent'][0];
+        $l10nParent = $this->data['databaseRow']['l10n_parent'][0]['uid'];
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
         $queryBuilder->select('file')->from('sys_file_metadata')->where(
-            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($l10n_parent, \PDO::PARAM_INT))
+            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($l10nParent, \PDO::PARAM_INT))
         );
         return (int)$queryBuilder->execute()->fetchColumn();
     }
