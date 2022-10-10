@@ -29,7 +29,7 @@ call_user_func(function () {
         // deactivate sys_language_uid = -1
         if (isset($GLOBALS['TCA'][$table]['ctrl']['languageField'])) {
             $languageField = $GLOBALS['TCA'][$table]['ctrl']['languageField'];
-            if (isset($config['columns'][$languageField]['config'])) {
+            if (isset($config['columns'][$languageField])) {
                 $fieldConfig = $config['columns'][$languageField]['config'];
                 if (isset($fieldConfig['items'])) {
                     foreach ($fieldConfig['items'] as $index => $item) {
