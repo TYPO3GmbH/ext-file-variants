@@ -19,7 +19,7 @@ call_user_func(function () {
         //   if ($recordService->isFalConsumingTable($table)) {
         // streamline language sync for all FAL fields
         foreach ($config['columns'] as $fieldName => $fieldConfig) {
-            if (isset($fieldConfig['config']['foreign_table']) && $fieldConfig['config']['foreign_table'] === 'sys_file_reference') {
+            if ($fieldConfig['config']['foreign_table'] ?? null === 'sys_file_reference') {
                 if (isset($fieldConfig['config']['behaviour']['localizationMode'])) {
                     unset($GLOBALS['TCA'][$table]['columns'][$fieldName]['config']['behaviour']['localizationMode']);
                 }
@@ -27,16 +27,12 @@ call_user_func(function () {
         }
         //     }
         // deactivate sys_language_uid = -1
-        if (isset($GLOBALS['TCA'][$table]['ctrl']['languageField'])) {
-            $languageField = $GLOBALS['TCA'][$table]['ctrl']['languageField'];
-            if (isset($config['columns'][$languageField])) {
-                $fieldConfig = $config['columns'][$languageField]['config'];
-                if (isset($fieldConfig['items'])) {
-                    foreach ($fieldConfig['items'] as $index => $item) {
-                        if ((int)$item[1] === -1) {
-                            unset($GLOBALS['TCA'][$table]['columns'][$languageField]['config']['items'][$index]);
-                        }
-                    }
+        $languageField = $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? null;
+        $fieldConfig = $config['columns'][$languageField]['config'] ?? [];
+        if ($languageField && isset($fieldConfig['items'])) {
+            foreach ($fieldConfig['items'] as $index => $item) {
+                if ((int)$item[1] === -1) {
+                    unset($GLOBALS['TCA'][$table]['columns'][$languageField]['config']['items'][$index]);
                 }
             }
         }
