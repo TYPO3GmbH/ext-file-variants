@@ -24,6 +24,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\DataHandler;
  */
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 
@@ -32,6 +33,7 @@ use TYPO3\CMS\Core\DataHandling\DataHandler;
  */
 class DataHandlerHookTest extends TestCase
 {
+    use ProphecyTrait;
 
     /**
      * @test

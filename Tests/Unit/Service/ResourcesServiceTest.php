@@ -10,9 +10,11 @@
 namespace T3G\AgencyPack\FileVariants\Service;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 
 class ResourcesServiceTest extends TestCase
 {
+    use ProphecyTrait;
 
     /**
      * @test
