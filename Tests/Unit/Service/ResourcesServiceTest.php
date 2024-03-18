@@ -10,9 +10,13 @@
 namespace T3G\AgencyPack\FileVariants\Service;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ResourcesServiceTest extends TestCase
 {
+    use ProphecyTrait;
 
     /**
      * @test
@@ -24,8 +28,13 @@ class ResourcesServiceTest extends TestCase
 
         $config = [
             'variantsStorageUid' => 42,
+            'variantsFolder' => '/languageVariants',
         ];
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = $config;
+
+        $resourceFactory = $this->prophesize(ResourceFactory::class);
+        $resourceFactory->getStorageObject(42)->willThrow(\InvalidArgumentException::class);
+        GeneralUtility::setSingletonInstance(ResourceFactory::class, $resourceFactory->reveal());
 
         $subject = new ResourcesService();
         $subject->prepareFileStorageEnvironment();
