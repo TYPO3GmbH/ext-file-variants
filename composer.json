@@ -62,7 +62,8 @@
 	"require-dev": {
 		"friendsofphp/php-cs-fixer": "^2.12",
 		"roave/security-advisories": "dev-master",
-		"typo3/testing-framework": "^6.0"
+		"typo3/testing-framework": "^6.0",
+		"phpspec/prophecy": "^1.19"
 	},
 	"replace": {
 		"t3g/file_variants": "self.version"
