@@ -63,7 +63,8 @@
 		"friendsofphp/php-cs-fixer": "^2.12",
 		"roave/security-advisories": "dev-master",
 		"typo3/testing-framework": "^6.0",
-		"phpspec/prophecy": "^1.19"
+		"phpspec/prophecy": "^1.19",
+		"phpspec/prophecy-phpunit": "^2.2"
 	},
 	"replace": {
 		"t3g/file_variants": "self.version"
