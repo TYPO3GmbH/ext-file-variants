@@ -3,7 +3,6 @@
 	"description": "Prototype for translatable files in TYPO3",
 	"type": "typo3-cms-extension",
 	"license": "GPL-2.0+",
-	"minimum-stability": "dev",
 	"authors": [
 		{
 			"name": "TYPO3 GmbH",
