@@ -25,8 +25,11 @@ namespace T3G\AgencyPack\FileVariants\Tests\Unit\DataHandler;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
+use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class DataHandlerHookTest
@@ -42,6 +45,11 @@ class DataHandlerHookTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionCode(1490476773);
+
+        $extensionConfiguration = $this->prophesize(ExtensionConfiguration::class);
+        $extensionConfiguration->get('file_variants')->willThrow(ExtensionConfigurationExtensionNotConfiguredException::class);
+        GeneralUtility::addInstance(ExtensionConfiguration::class, $extensionConfiguration->reveal());
+
         new DataHandlerHook();
     }
 
@@ -52,9 +60,8 @@ class DataHandlerHookTest extends TestCase
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['foo'];
         $subject = new DataHandlerHook();
-        /** @var DataHandler $dataHandler */
         $dataHandler = $this->prophesize(DataHandler::class);
-        $dataHandler->substNEWwithIDs = [];
+        $dataHandler->reveal()->substNEWwithIDs = [];
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionCode(1489332067);
