@@ -24,10 +24,7 @@
 	},
 	"config": {
 		"discard-changes": true,
-		"bin-dir": "bin",
-		"platform": {
-			"php": "7.0"
-		}
+		"bin-dir": "bin"
 	},
 	"extra": {
 		"typo3/cms": {
@@ -56,7 +53,8 @@
 		"typo3/cms-core": "^10.4 || ^11.5",
 		"typo3/cms-extbase": "^10.4 || ^11.5",
 		"typo3/cms-fluid": "^10.4 || ^11.5",
-		"typo3/cms-install": "^10.4 || ^11.5"
+		"typo3/cms-install": "^10.4 || ^11.5",
+		"php": "^7.4 || ^8.0"
 	},
 	"require-dev": {
 		"friendsofphp/php-cs-fixer": "^2.12",
