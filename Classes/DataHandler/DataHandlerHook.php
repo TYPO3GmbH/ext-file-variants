@@ -179,7 +179,7 @@ class DataHandlerHook
     protected function substNewWithId($id, DataHandler $pObj): int
     {
         if (is_string($id) && strpos($id, 'NEW') !== false) {
-            $id = $pObj->substNEWwithIDs[$id];
+            $id = $pObj->substNEWwithIDs[$id] ?? null;
         }
         if ($id === null) {
             $id = -1;
