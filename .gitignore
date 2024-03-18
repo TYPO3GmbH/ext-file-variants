@@ -13,6 +13,9 @@
 # CGL Fixer
 .php_cs.cache
 
+# PHPUnit
+Build/.phpunit.result.cache
+
 # TYPO3
 /Build/Web
 /file_variants
