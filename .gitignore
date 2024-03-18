@@ -14,11 +14,7 @@
 .php_cs.cache
 
 # TYPO3
-/typo3/
-/typo3temp/
-/typo3conf/
-/uploads/
-/index.php
+/Build/Web
 /file_variants
 
 # Other stuff
