@@ -67,7 +67,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      */
     protected $backendUserFixture = 'PACKAGE:typo3/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!file_exists('file_variants')) {
             symlink('.', 'file_variants');
@@ -104,7 +104,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         mkdir(Environment::getPublicPath() . '/languageVariants/_processed_', 0777, true);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->cleanUpFilesAndRelatedRecords();
         unset($this->actionService);
