@@ -23,8 +23,8 @@ sys_file_storage,,,,,,,,,,,,,,,,,
 ,1,0,1475407099,1475407099,0,0,fileadmin/ (auto-created),This is the local fileadmin/ directory. This storage mount has been created automatically by TYPO3.,Local,"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms>    <data>        <sheet index=""sDEF"">            <language index=""lDEF"">                <field index=""basePath"">                    <value index=""vDEF"">fileadmin/</value>                </field>                <field index=""pathType"">                    <value index=""vDEF"">relative</value>                </field>                <field index=""caseSensitive"">                    <value index=""vDEF"">1</value>                </field>            </language>        </sheet>    </data></T3FlexForms>",1,1,1,1,1,1,NULL
 ,2,0,1489073957,1488270316,1,0,language_variants,,Local,"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms>    <data>        <sheet index=""sDEF"">            <language index=""lDEF"">                <field index=""basePath"">                    <value index=""vDEF"">languageVariants/</value>                </field>                <field index=""pathType"">                    <value index=""vDEF"">relative</value>                </field>                <field index=""caseSensitive"">                    <value index=""vDEF"">1</value>                </field>            </language>        </sheet>    </data></T3FlexForms>",0,1,1,1,1,0,_processed_
 sys_language,,,,,,,,,,,,,,,,,
-,uid,pid,hidden,title,flag,language_isocode,static_lang_isocode,sorting,,,,,,,,,
-,1,0,0,deutsch,de,de,43,256,,,,,,,,,
+,uid,pid,hidden,title,flag,language_isocode,sorting,,,,,,,,,
+,1,0,0,deutsch,de,de,256,,,,,,,,,
 tt_content,,,,,,,,,,,,,,,,,
 ,uid,pid,hidden,deleted,sys_language_uid,CType,header,image,l18n_parent,,,,,,,,
 ,1,1,0,0,0,image,Image,2,0,,,,,,,,
