@@ -73,6 +73,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $this->coreExtensionsToLoad[] = 'extensionmanager';
         $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
 
+        $this->pathsToLinkInTestInstance['typo3conf/ext/file_variants/Tests/Functional/Fixture/Sites'] = 'typo3conf/sites';
+
         parent::setUp();
 
         // make sure there are no leftover files from earlier tests

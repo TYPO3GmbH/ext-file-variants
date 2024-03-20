@@ -1,0 +1,47 @@
+rootPageId: 1
+base: http://localhost/
+languages:
+  - title: English
+    enabled: true
+    languageId: '0'
+    base: /
+    typo3Language: default
+    locale: en_US.UTF-8
+    iso-639-1: en
+    navigationTitle: English
+    hreflang: en-US
+    direction: ltr
+    flag: en-us-gb
+  - title: German
+    enabled: true
+    languageId: '1'
+    base: /de/
+    typo3Language: default
+    locale: de_DE.UTF-8
+    iso-639-1: de
+    navigationTitle: Deutsch
+    hreflang: de-DE
+    direction: ltr
+    flag: de
+  - title: Spanish
+    enabled: true
+    languageId: '2'
+    base: /es/
+    typo3Language: default
+    locale: es_ES.UTF-8
+    iso-639-1: es
+    navigationTitle: Español
+    hreflang: es-ES
+    direction: ltr
+    flag: es
+  - title: Russian
+    enabled: true
+    languageId: '3'
+    base: /ru/
+    typo3Language: default
+    locale: ru_RU.UTF-8
+    iso-639-1: ru
+    navigationTitle: русский
+    hreflang: ru-RU
+    direction: ltr
+    flag: ru
