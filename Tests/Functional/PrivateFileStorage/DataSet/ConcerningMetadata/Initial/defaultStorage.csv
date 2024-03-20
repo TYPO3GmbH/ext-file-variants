@@ -12,7 +12,7 @@ sys_file,,,,,,,,,,,,,,,,,
 ,11,0,0,1,2,0,/cat_1.jpg,jpg,image/jpeg,cat_1.jpg,0,0,,,,,
 sys_file_metadata,,,,,,,,,,,,,,,,,
 ,uid,pid,cruser_id,sys_language_uid,l10n_parent,file,title,,,,,,,,,,
-,11,0,1,0,0,11,NULL,,,,,,,,,,
+,11,0,1,0,0,11,\NULL,,,,,,,,,,
 sys_file_storage,,,,,,,,,,,,,,,,,
 ,uid,pid,tstamp,crdate,cruser_id,deleted,name,description,driver,configuration,is_default,is_browsable,is_public,is_writable,is_online,auto_extract_metadata,processingfolder
 ,1,0,1475407099,1475407099,0,0,fileadmin/ (auto-created),This is the local fileadmin/ directory. This storage mount has been created automatically by TYPO3.,Local,"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms>    <data>        <sheet index=""sDEF"">            <language index=""lDEF"">                <field index=""basePath"">                    <value index=""vDEF"">fileadmin/</value>                </field>                <field index=""pathType"">                    <value index=""vDEF"">relative</value>                </field>                <field index=""caseSensitive"">                    <value index=""vDEF"">1</value>                </field>            </language>        </sheet>    </data></T3FlexForms>",1,1,1,1,1,1,NULL
