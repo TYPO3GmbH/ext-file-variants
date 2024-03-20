@@ -115,6 +115,7 @@ class ConcerningMetadata extends FunctionalTestCase
         $controller = new FileVariantsController();
         $request = new ServerRequest();
 
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/fileadmin/cat_1.jpg');
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_1.jpg');
 
         @mkdir(Environment::getPublicPath() . '/typo3temp/file_variants_uploads/', 0777, true);
@@ -143,6 +144,7 @@ class ConcerningMetadata extends FunctionalTestCase
         $controller = new FileVariantsController();
         $request = new ServerRequest();
 
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/fileadmin/cat_1.jpg');
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_2.jpg');
 
         @mkdir(Environment::getPublicPath() . '/typo3temp/file_variants_uploads/', 0777, true);
@@ -171,6 +173,7 @@ class ConcerningMetadata extends FunctionalTestCase
         $controller = new FileVariantsController();
         $request = new ServerRequest();
 
+        copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/fileadmin/cat_1.jpg');
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_1.jpg');
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_2.jpg');
 
