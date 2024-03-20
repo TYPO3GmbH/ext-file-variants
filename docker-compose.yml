@@ -3,6 +3,11 @@ version: '3'
 services:
   app:
     image: thecodingmachine/php:7.4-v4-cli
+    environment:
+      typo3DatabaseName: typo3
+      typo3DatabaseHost: mysql
+      typo3DatabaseUsername: root
+      typo3DatabasePassword: root
     depends_on:
       mysql:
         condition: service_healthy
