@@ -194,18 +194,17 @@ class ConcerningMetadata extends FunctionalTestCase
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_3.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_3.jpg');
         $file = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject(12);
 
-        $_SERVER['HTTP_HOST'] = 'localhost';
-        $_SERVER['REQUEST_URI'] = '/index.php';
-        $_GET = ['file' => [
-            'delete' => [
-                [
-                    'data' =>
-                        $file->getUid()
-                ]
-            ]
-        ]
-        ];
-        $request = ServerRequestFactory::fromGlobals();
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('get', 'http://localhost/index.php')
+            ->withQueryParams([
+                'data' => [
+                    'delete' => [
+                        [
+                            'data' => $file->getUid(),
+                        ],
+                    ],
+                ],
+            ]);
         $response = GeneralUtility::makeInstance(Response::class);
         /** @var FileController $fileController */
         $fileController = GeneralUtility::makeInstance(FileController::class);
