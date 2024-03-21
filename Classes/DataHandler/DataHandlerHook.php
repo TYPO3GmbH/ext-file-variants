@@ -26,10 +26,10 @@ use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DataHandlerHook
@@ -109,7 +109,7 @@ class DataHandlerHook
 
             if (array_key_exists(
                 'sys_file_reference',
-                    $handledRecords
+                $handledRecords
             ) && is_array($handledRecords['sys_file_reference'])
             ) {
                 $references = $handledRecords['sys_file_reference'];
