@@ -61,13 +61,17 @@
 			"@composer normalize --no-update-lock --dry-run"
 		],
 		"lint": [
-			"@composer:lint"
+			"@composer:lint",
+			"@php:style:lint"
 		],
 		"php:functional:tests": [
 			"phpunit -c Build/FunctionalTests.xml --log-junit logs/phpunit.xml"
 		],
 		"php:style:fix": [
 			"php-cs-fixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml"
+		],
+		"php:style:lint": [
+			"php-cs-fixer fix --config Build/.php_cs.dist --dry-run --diff"
 		],
 		"php:unit:test": [
 			"phpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml"
