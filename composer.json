@@ -56,10 +56,13 @@
 		}
 	},
 	"scripts": {
-        "composer:lint": [
-            "@composer validate --ansi",
-            "@composer normalize --no-update-lock --dry-run"
-        ],
+		"composer:lint": [
+			"@composer validate --ansi",
+			"@composer normalize --no-update-lock --dry-run"
+		],
+		"lint": [
+			"@composer:lint"
+		],
 		"php:functional:tests": [
 			"phpunit -c Build/FunctionalTests.xml --log-junit logs/phpunit.xml"
 		],
