@@ -25,7 +25,8 @@
 		"discard-changes": true,
 		"allow-plugins": {
 			"typo3/class-alias-loader": true,
-			"typo3/cms-composer-installers": true
+			"typo3/cms-composer-installers": true,
+			"ergebnis/composer-normalize": true
 		}
 	},
 	"extra": {
@@ -63,7 +64,8 @@
 		"roave/security-advisories": "dev-master",
 		"typo3/testing-framework": "^6.0",
 		"phpspec/prophecy": "^1.19",
-		"phpspec/prophecy-phpunit": "^2.2"
+		"phpspec/prophecy-phpunit": "^2.2",
+		"ergebnis/composer-normalize": "^2.42"
 	},
 	"replace": {
 		"t3g/file_variants": "self.version"
