@@ -10,7 +10,7 @@
 /logs/
 
 # CGL Fixer
-.php_cs.cache
+.php-cs-fixer.cache
 
 # PHPUnit
 Build/.phpunit.result.cache

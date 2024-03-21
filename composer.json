@@ -21,7 +21,7 @@
 	},
 	"require-dev": {
 		"ergebnis/composer-normalize": "^2.42",
-		"friendsofphp/php-cs-fixer": "^2.12",
+		"friendsofphp/php-cs-fixer": "^3.0",
 		"phpspec/prophecy": "^1.19",
 		"phpspec/prophecy-phpunit": "^2.2",
 		"roave/security-advisories": "dev-master",
@@ -71,7 +71,7 @@
 			"php-cs-fixer fix --config Build/.php_cs.dist --format=junit > logs/php-cs-fixer.xml"
 		],
 		"php:style:lint": [
-			"php-cs-fixer fix --config Build/.php_cs.dist --dry-run --diff"
+			"php-cs-fixer check --config Build/.php_cs.dist --diff"
 		],
 		"php:unit:test": [
 			"phpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml"
