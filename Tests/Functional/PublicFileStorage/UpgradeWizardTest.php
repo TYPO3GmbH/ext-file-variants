@@ -42,9 +42,7 @@ class UpgradeWizardTest extends FunctionalTestCase
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_1.jpg', Environment::getPublicPath() . '/fileadmin/cat_1.jpg');
 
         $subject = new MetaDataRecordsUpdateWizard();
-        $dbQueries = [];
-        $customMessage = '';
-        $subject->performUpdate($dbQueries, $customMessage);
+        $subject->executeUpdate();
 
         $this->importAssertCSVScenario($scenarioName);
     }

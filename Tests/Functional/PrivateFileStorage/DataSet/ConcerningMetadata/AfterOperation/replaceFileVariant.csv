@@ -4,6 +4,6 @@ sys_file,,,,,,,,,,,,
 ,12,0,0,2,2,0,/languageVariants/cat_3.jpg,jpg,image/jpeg,cat_3.jpg,1,11
 sys_file_metadata,,,,,,,,,,,,
 ,uid,pid,cruser_id,sys_language_uid,l10n_parent,file,title,,,,,
-,11,0,1,0,0,11,NULL,,,,,
-,12,0,1,1,11,12,[Translate to deutsch:] NULL,,,,,
+,11,0,1,0,0,11,\NULL,,,,,
+,12,0,1,1,11,12,\NULL,,,,,
 ,13,0,1,0,0,12,,,,,,
