@@ -69,16 +69,16 @@
 			"@php:style:lint"
 		],
 		"php:functional:tests": [
-			"phpunit -c Build/FunctionalTests.xml --log-junit logs/phpunit.xml"
+			"phpunit -c Build/FunctionalTests.xml"
 		],
 		"php:style:fix": [
-			"php-cs-fixer fix --config Build/.php_cs.dist.php --format=junit > logs/php-cs-fixer.xml"
+			"php-cs-fixer fix --config Build/.php_cs.dist.php"
 		],
 		"php:style:lint": [
 			"php-cs-fixer check --config Build/.php_cs.dist.php --diff"
 		],
 		"php:unit:test": [
-			"phpunit -c Build/UnitTests.xml --log-junit logs/phpunit.xml"
+			"phpunit -c Build/UnitTests.xml"
 		],
 		"test": [
 			"@php:unit:test",

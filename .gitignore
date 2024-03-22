@@ -7,7 +7,6 @@
 # Composer
 /composer.lock
 /vendor/
-/logs/
 
 # CGL Fixer
 Build/.php-cs-fixer.cache
