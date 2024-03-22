@@ -10,7 +10,11 @@
 /logs/
 
 # CGL Fixer
-.php_cs.cache
+<<<<<<< HEAD
+.php-cs-fixer.cache
+=======
+Build/.php-cs-fixer.cache
+>>>>>>> ea232cf ([TASK] Move PHP-CS-Fixer cache to Build directory)
 
 # PHPUnit
 Build/.phpunit.result.cache
