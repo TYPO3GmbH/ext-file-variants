@@ -28,6 +28,7 @@ LICENSE file that was distributed with this source code.
 EOF;
 
 return (new PhpCsFixer\Config())
+    ->setCacheFile(__DIR__ . '/.php-cs-fixer.cache')
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR2' => true,
