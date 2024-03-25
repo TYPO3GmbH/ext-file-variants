@@ -25,6 +25,7 @@ namespace T3G\AgencyPack\FileVariants\Service;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -42,7 +43,7 @@ class ResourcesService
     /**
      * make sure upload storage and folder are in place
      */
-    public function prepareFileStorageEnvironment(): FolderInterface
+    public function prepareFileStorageEnvironment(): Folder
     {
         $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('file_variants');
         $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
@@ -118,7 +119,7 @@ class ResourcesService
     public function copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy(
         $sys_language_uid,
         array $metaDataRecord,
-        FolderInterface $folder
+        Folder $folder
     ) {
         $fileUid = (int)$metaDataRecord['file'];
         $parentFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($fileUid);

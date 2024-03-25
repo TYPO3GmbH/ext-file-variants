@@ -35,6 +35,7 @@ use TYPO3\CMS\Core\Database\ReferenceIndex;
 use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -63,7 +64,9 @@ class FileVariantsController
         $fileRecord = $queryBuilder->select('l10n_parent')->from('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeQuery()->fetchAssociative();
 
         $defaultFileObject = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject((int)$fileRecord['l10n_parent']);
-        $copy = $defaultFileObject->copyTo($defaultFileObject->getParentFolder());
+        /** @var Folder */
+        $parentFolder = $defaultFileObject->getParentFolder();
+        $copy = $defaultFileObject->copyTo($parentFolder);
         // this record will be stale after the replace, remove it right away
         $sysFileRecordToBeDeleted = $copy->getUid();
         $path = $this->getAbsolutePathToFile($copy);
