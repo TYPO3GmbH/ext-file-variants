@@ -1,7 +1,7 @@
 pages,,,,,,,,,,,,,,,,,
-,uid,pid,deleted,perms_userid,perms_groupid,perms_user,perms_group,perms_everybody,cruser_id,hidden,title,doktype,media,sys_language_uid,l10n_parent,,
-,1,0,0,1,0,31,27,0,1,0,Functional Tests,1,0,0,0,,
-,2,0,1,1,0,31,27,0,1,0,[DE] Functional Tests,1,0,1,1,,
+,uid,pid,deleted,perms_userid,perms_groupid,perms_user,perms_group,perms_everybody,hidden,title,doktype,media,sys_language_uid,l10n_parent,,
+,1,0,0,1,0,31,27,0,0,Functional Tests,1,0,0,0,,
+,2,0,1,1,0,31,27,0,0,[DE] Functional Tests,1,0,1,1,,
 sys_file,,,,,,,,,,,,,,,,,
 ,uid,pid,missing,storage,type,metadata,identifier,extension,mime_type,name,sys_language_uid,l10n_parent,,,,,
 ,11,0,0,1,2,0,/cat_1.jpg,jpg,image/jpeg,cat_1.jpg,0,0,,,,,
@@ -9,17 +9,17 @@ sys_file,,,,,,,,,,,,,,,,,
 ,15,0,0,1,2,0,/nature_1.jpg,jpg,image/jpeg,nature_1.jpg,0,0,,,,,
 ,16,0,0,2,2,0,/languageVariants/nature_2.jpg,jpg,image/jpeg,nature_2.jpg,1,15,,,,,
 sys_file_metadata,,,,,,,,,,,,,,,,,
-,uid,pid,cruser_id,sys_language_uid,l10n_parent,file,title,,,,,,,,,,
-,11,0,1,0,0,11,\NULL,,,,,,,,,,
-,12,0,1,1,11,12,\NULL,,,,,,,,,,
-,13,0,1,0,0,12,,,,,,,,,,,
-,18,0,1,0,0,15,\NULL,,,,,,,,,,
-,19,0,1,1,11,16,\NULL,,,,,,,,,,
-,20,0,1,0,0,16,,,,,,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,file,title,,,,,,,,,,
+,11,0,0,0,11,\NULL,,,,,,,,,,
+,12,0,1,11,12,\NULL,,,,,,,,,,
+,13,0,0,0,12,,,,,,,,,,,
+,18,0,0,0,15,\NULL,,,,,,,,,,
+,19,0,1,11,16,\NULL,,,,,,,,,,
+,20,0,0,0,16,,,,,,,,,,,
 sys_file_storage,,,,,,,,,,,,,,,,,
-,uid,pid,tstamp,crdate,cruser_id,deleted,name,description,driver,configuration,is_default,is_browsable,is_public,is_writable,is_online,auto_extract_metadata,processingfolder
-,1,0,1475407099,1475407099,0,0,fileadmin/ (auto-created),This is the local fileadmin/ directory. This storage mount has been created automatically by TYPO3.,Local,"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms>    <data>        <sheet index=""sDEF"">            <language index=""lDEF"">                <field index=""basePath"">                    <value index=""vDEF"">fileadmin/</value>                </field>                <field index=""pathType"">                    <value index=""vDEF"">relative</value>                </field>                <field index=""caseSensitive"">                    <value index=""vDEF"">1</value>                </field>            </language>        </sheet>    </data></T3FlexForms>",1,1,1,1,1,1,NULL
-,2,0,1489073957,1488270316,1,0,language_variants,,Local,"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms>    <data>        <sheet index=""sDEF"">            <language index=""lDEF"">                <field index=""basePath"">                    <value index=""vDEF"">languageVariants/</value>                </field>                <field index=""pathType"">                    <value index=""vDEF"">relative</value>                </field>                <field index=""caseSensitive"">                    <value index=""vDEF"">1</value>                </field>            </language>        </sheet>    </data></T3FlexForms>",0,1,1,1,1,0,_processed_
+,uid,pid,tstamp,crdate,deleted,name,description,driver,configuration,is_default,is_browsable,is_public,is_writable,is_online,auto_extract_metadata,processingfolder
+,1,0,1475407099,1475407099,0,fileadmin/ (auto-created),This is the local fileadmin/ directory. This storage mount has been created automatically by TYPO3.,Local,"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms>    <data>        <sheet index=""sDEF"">            <language index=""lDEF"">                <field index=""basePath"">                    <value index=""vDEF"">fileadmin/</value>                </field>                <field index=""pathType"">                    <value index=""vDEF"">relative</value>                </field>                <field index=""caseSensitive"">                    <value index=""vDEF"">1</value>                </field>            </language>        </sheet>    </data></T3FlexForms>",1,1,1,1,1,1,NULL
+,2,0,1489073957,1488270316,0,language_variants,,Local,"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes"" ?><T3FlexForms>    <data>        <sheet index=""sDEF"">            <language index=""lDEF"">                <field index=""basePath"">                    <value index=""vDEF"">languageVariants/</value>                </field>                <field index=""pathType"">                    <value index=""vDEF"">relative</value>                </field>                <field index=""caseSensitive"">                    <value index=""vDEF"">1</value>                </field>            </language>        </sheet>    </data></T3FlexForms>",0,1,1,1,1,0,_processed_
 sys_language,,,,,,,,,,,,,,,,,
 ,uid,pid,hidden,title,flag,language_isocode,sorting,,,,,,,,,,
 ,1,0,0,deutsch,de,de,256,,,,,,,,,,

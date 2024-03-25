@@ -3,7 +3,7 @@ sys_file,,,,,,,,,,,,
 ,11,0,0,1,2,0,/cat_1.jpg,jpg,image/jpeg,cat_1.jpg,0,0
 ,12,0,0,1,2,0,/languageVariants/cat_1.jpg,jpg,image/jpeg,cat_1.jpg,1,11
 sys_file_metadata,,,,,,,,,,,,
-,uid,pid,cruser_id,sys_language_uid,l10n_parent,file,title,,,,,
-,11,0,1,0,0,11,\NULL,,,,,
-,12,0,1,1,11,12,\NULL,,,,,
-,13,0,1,0,0,12,,,,,,
+,uid,pid,sys_language_uid,l10n_parent,file,title,,,,,,
+,11,0,0,0,11,\NULL,,,,,,
+,12,0,1,11,12,\NULL,,,,,,
+,13,0,0,0,12,,,,,,,
