@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Ssch\TYPO3Rector\Set\Typo3SetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -13,4 +14,7 @@ return RectorConfig::configure()
     ])
     ->withRootFiles()
     ->withPhpSets()
+    ->withSets([
+        Typo3SetList::TYPO3_11,
+    ])
 ;
