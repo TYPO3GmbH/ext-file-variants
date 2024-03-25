@@ -95,6 +95,9 @@
 		"php:rector:lint": [
 			"rector --dry-run --no-progress-bar"
 		],
+		"php:static:lint": [
+			"phpstan --configuration=Build/phpstan.neon analyse"
+		],
 		"php:style:fix": [
 			"php-cs-fixer fix --config Build/.php-cs-fixer.dist.php"
 		],
