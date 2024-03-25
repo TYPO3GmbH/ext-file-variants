@@ -24,6 +24,8 @@
 		"friendsofphp/php-cs-fixer": "^3.0",
 		"phpspec/prophecy": "^1.19",
 		"phpspec/prophecy-phpunit": "^2.2",
+		"rector/rector": "^1.0",
+		"ssch/typo3-rector": "^2.2",
 		"typo3/testing-framework": "^6.0"
 	},
 	"replace": {
@@ -66,10 +68,17 @@
 		],
 		"lint": [
 			"@composer:lint",
+			"@php:rector:lint",
 			"@php:style:lint"
 		],
 		"php:functional:tests": [
 			"phpunit -c Build/FunctionalTests.xml"
+		],
+		"php:rector:fix": [
+			"rector"
+		],
+		"php:rector:lint": [
+			"rector --dry-run --no-progress-bar"
 		],
 		"php:style:fix": [
 			"php-cs-fixer fix --config Build/.php_cs.dist.php"

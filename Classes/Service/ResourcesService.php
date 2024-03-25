@@ -29,6 +29,7 @@ use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Core\Resource\ResourceStorageInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
 
@@ -48,7 +49,7 @@ class ResourcesService
         /** @var ResourcesService $resourcesService */
         $targetFolder = $extensionConfiguration['variantsFolder'];
         try {
-            /** @var \TYPO3\CMS\Core\Resource\ResourceStorageInterface storage */
+            /** @var ResourceStorageInterface storage */
             $storage = $this->retrieveStorageObject($storageUid);
 
             if (!$storage->hasFolder($targetFolder)) {
@@ -56,7 +57,7 @@ class ResourcesService
             } else {
                 $folder = $storage->getFolder($targetFolder);
             }
-        } catch (\InvalidArgumentException $exception) {
+        } catch (\InvalidArgumentException) {
             throw new \RuntimeException(
                 'storage with uid ' . $storageUid . ' is not available. Create it and check the given uid in extension configuration.',
                 1490480372
@@ -66,7 +67,6 @@ class ResourcesService
     }
 
     /**
-     * @param int $uid
      * @return ResourceStorage
      */
     protected function retrieveStorageObject(int $uid): ResourceStorage
@@ -79,7 +79,7 @@ class ResourcesService
         } else {
             try {
                 $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject($uid);
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 throw new \InvalidArgumentException('Storage with uid ' . $uid . ' is not available. Create it and/or adapt the extension configuration.', 1490480372);
             }
         }
@@ -88,9 +88,6 @@ class ResourcesService
     }
 
     /**
-     * @param int $fileUid
-     * @param int $width
-     * @param int $height
      * @param $css_class
      * @return string generatedHtml
      */
@@ -102,7 +99,7 @@ class ResourcesService
         $content = '';
         if ($file->isMissing()) {
             $content .= '<span class="label label-danger label-space-right">'
-                . htmlspecialchars(LocalizationUtility::translate(
+                . htmlspecialchars((string) LocalizationUtility::translate(
                     'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:warning.file_missing',
                     'core'
                 ))
@@ -119,8 +116,6 @@ class ResourcesService
 
     /**
      * @param int $sys_language_uid
-     * @param array $metaDataRecord
-     * @param FolderInterface $folder
      */
     public function copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy(
         $sys_language_uid,
@@ -186,7 +181,6 @@ class ResourcesService
      * Filters away irrelevant tables and checks for free mode in tt_content records
      * everything else is a valid reference in context of file variants update
      *
-     * @param int $uid
      * @return bool
      */
     protected function isValidReference(int $uid): bool

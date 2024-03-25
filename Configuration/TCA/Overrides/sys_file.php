@@ -1,5 +1,7 @@
 <?php
 
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 /*
  * This file is part of the package t3g/file_variants.
  *
@@ -7,13 +9,13 @@
  * LICENSE file that was distributed with this source code.
  */
 
-defined('TYPO3_MODE') or die();
+defined('TYPO3') or die();
 
 call_user_func(function () {
     $tempColumns = [
         'sys_language_uid' => [
             'label' => 'LLL:EXT:core/Resources/Private/Language/locallang_general.xlf:LGL.language',
-            'config' => version_compare(\TYPO3\CMS\Core\Utility\VersionNumberUtility::getCurrentTypo3Version(), '11', '>') ? [
+            'config' => version_compare(VersionNumberUtility::getCurrentTypo3Version(), '11', '>') ? [
                 'type' => 'language',
             ] : [
                 'type' => 'select',
@@ -54,8 +56,8 @@ call_user_func(function () {
         ],
     ];
 
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('sys_file', $tempColumns);
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('sys_file', 'sys_language_uid, l10n_parent');
+    ExtensionManagementUtility::addTCAcolumns('sys_file', $tempColumns);
+    ExtensionManagementUtility::addToAllTCAtypes('sys_file', 'sys_language_uid, l10n_parent');
 
     $GLOBALS['TCA']['sys_file']['ctrl']['languageField'] = 'sys_language_uid';
     $GLOBALS['TCA']['sys_file']['ctrl']['transOrigPointerField'] = 'l10n_parent';

@@ -47,7 +47,7 @@ class MetaDataRecordsUpdateWizard implements UpgradeWizardInterface
      */
     public function getIdentifier(): string
     {
-        return __CLASS__;
+        return self::class;
     }
 
     /**

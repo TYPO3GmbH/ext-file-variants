@@ -41,7 +41,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class FileVariantsController
 {
     /**
-     * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
     public function ajaxResetFileVariant(ServerRequestInterface $request): ResponseInterface
@@ -101,7 +100,7 @@ class FileVariantsController
                 ->getQueryBuilderForTable('sys_file_metadata');
             $queryBuilder->delete('sys_file_metadata')->where(
                 $queryBuilder->expr()
-                    ->in('uid', $metadataRecordsToBeDeleted, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+                    ->in('uid', $metadataRecordsToBeDeleted)
             )->execute();
         }
 
@@ -116,7 +115,6 @@ class FileVariantsController
     }
 
     /**
-     * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
     public function ajaxReplaceFileVariant(ServerRequestInterface $request): ResponseInterface
@@ -125,7 +123,6 @@ class FileVariantsController
     }
 
     /**
-     * @param ServerRequestInterface $request
      * @return ResponseInterface
      */
     public function ajaxUploadFileVariant(ServerRequestInterface $request): ResponseInterface
@@ -181,7 +178,6 @@ class FileVariantsController
     /**
      * Returns an absolute file path to the given File resource
      *
-     * @param File $file
      * @return string
      */
     protected function getAbsolutePathToFile(File $file): string
