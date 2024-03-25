@@ -4,6 +4,7 @@ services:
   app:
     image: thecodingmachine/php:${PHP_VERSION:-8.1}-v4-cli
     environment:
+      PHP_EXTENSION_INTL: 1
       TYPO3_VERSION: ${TYPO3_VERSION:-^11.5}
       typo3DatabaseName: typo3
       typo3DatabaseHost: mysql
