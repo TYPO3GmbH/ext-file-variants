@@ -20,6 +20,7 @@
 		"typo3/cms-install": "^11.5"
 	},
 	"require-dev": {
+		"armin/editorconfig-cli": "^1.8",
 		"ergebnis/composer-normalize": "^2.42",
 		"friendsofphp/php-cs-fixer": "^3.0",
 		"phpspec/prophecy": "^1.19",
