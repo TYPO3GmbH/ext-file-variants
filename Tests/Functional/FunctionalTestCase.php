@@ -22,6 +22,8 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use Prophecy\PhpUnit\ProphecyTrait;
+use T3G\AgencyPack\FileVariants\Tests\Functional\DataHandling\PermissiveActionService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
@@ -37,6 +39,7 @@ use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\ActionService;
   */
 abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functional\FunctionalTestCase
 {
+    use ProphecyTrait;
 
     /**
      * @var string
@@ -57,7 +60,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      */
     protected $backendUser;
     /**
-     * @var ActionService
+     * @var PermissiveActionService
      */
     protected $actionService;
 
@@ -66,7 +69,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      *
      * @var non-empty-string
      */
-    protected $backendUserFixture = 'PACKAGE:typo3/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
+    protected string $backendUserFixture = 'PACKAGE:typo3/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
 
     protected function setUp(): void
     {
@@ -93,7 +96,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             $fileMetadataPermissionAspect->reveal()
         );
 
-        $this->actionService = new ActionService();
+        $this->actionService = new PermissiveActionService();
 
         // done to prevent an error during processing
         // it makes no difference here whether file filters apply to the data set
