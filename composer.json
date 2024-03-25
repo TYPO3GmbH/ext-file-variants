@@ -20,6 +20,7 @@
 		"typo3/cms-install": "^11.5"
 	},
 	"require-dev": {
+		"armin/editorconfig-cli": "^1.8",
 		"ergebnis/composer-normalize": "^2.42",
 		"friendsofphp/php-cs-fixer": "^3.0",
 		"phpspec/prophecy": "^1.19",
@@ -67,10 +68,17 @@
 			"@composer validate --ansi",
 			"@composer normalize --no-update-lock --dry-run"
 		],
+		"editorconfig:fix": [
+			"ec --fix --no-progress --no-interaction"
+		],
+		"editorconfig:lint": [
+			"ec --no-progress --no-interaction"
+		],
 		"lint": [
 			"@composer:lint",
 			"@php:rector:lint",
-			"@php:style:lint"
+			"@php:style:lint",
+			"@editorconfig:lint"
 		],
 		"php:functional:tests": [
 			"phpunit -c Build/FunctionalTests.xml"
