@@ -67,6 +67,7 @@
 		],
 		"lint": [
 			"@composer:lint",
+			"@php:rector:lint",
 			"@php:style:lint"
 		],
 		"php:functional:tests": [
