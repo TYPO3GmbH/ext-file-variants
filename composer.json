@@ -68,6 +68,12 @@
 			"@composer validate --ansi",
 			"@composer normalize --no-update-lock --dry-run"
 		],
+		"editorconfig:fix": [
+			"ec --fix --no-progress --no-interaction"
+		],
+		"editorconfig:lint": [
+			"ec --no-progress --no-interaction"
+		],
 		"lint": [
 			"@composer:lint",
 			"@php:rector:lint",
