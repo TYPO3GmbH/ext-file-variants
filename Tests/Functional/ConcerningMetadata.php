@@ -27,7 +27,6 @@ use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use TYPO3\CMS\Backend\Controller\File\FileController;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
-use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -126,7 +125,7 @@ class ConcerningMetadata extends FunctionalTestCase
         $folder = $storage->getFolder('languageVariants');
         $newFile = $storage->addFile($localFilePath, $folder);
         $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
-        $controller->ajaxUploadFileVariant($request, new Response());
+        $controller->ajaxUploadFileVariant($request);
 
         $this->importAssertCSVScenario($scenarioName);
     }
@@ -155,7 +154,7 @@ class ConcerningMetadata extends FunctionalTestCase
         $folder = $storage->getFolder('languageVariants');
         $newFile = $storage->addFile($localFilePath, $folder);
         $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
-        $controller->ajaxReplaceFileVariant($request, new Response());
+        $controller->ajaxReplaceFileVariant($request);
 
         $this->importAssertCSVScenario($scenarioName);
     }
@@ -178,7 +177,7 @@ class ConcerningMetadata extends FunctionalTestCase
         copy(Environment::getPublicPath() . '/typo3conf/ext/file_variants/Tests/Functional/Fixture/TestFiles/cat_2.jpg', Environment::getPublicPath() . '/languageVariants/languageVariants/cat_2.jpg');
 
         $request = $request->withQueryParams(['uid' => 12]);
-        $controller->ajaxResetFileVariant($request, new Response());
+        $controller->ajaxResetFileVariant($request);
 
         $this->importAssertCSVScenario($scenarioName);
     }
@@ -208,10 +207,9 @@ class ConcerningMetadata extends FunctionalTestCase
                     ],
                 ],
             ]);
-        $response = GeneralUtility::makeInstance(Response::class);
         /** @var FileController $fileController */
         $fileController = GeneralUtility::makeInstance(FileController::class);
-        $fileController->mainAction($request, $response);
+        $fileController->mainAction($request);
 
         $this->importAssertCSVScenario($scenarioName);
     }

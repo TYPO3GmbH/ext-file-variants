@@ -24,7 +24,6 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
 
 use TYPO3\CMS\Backend\Controller\File\FileController;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -60,10 +59,9 @@ class ConcerningFileReferences extends FunctionalTestCase
                     ],
                 ],
             ]);
-        $response = GeneralUtility::makeInstance(Response::class);
         /** @var FileController $fileController */
         $fileController = GeneralUtility::makeInstance(FileController::class);
-        $fileController->mainAction($request, $response);
+        $fileController->mainAction($request);
 
         $this->importAssertCSVScenario($scenarioName);
     }

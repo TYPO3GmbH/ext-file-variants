@@ -58,10 +58,7 @@ class DataHandlerHook
      *
      * replaces the uid of the default language sys_file record uid with the translated one
      *
-     * @param string $status
-     * @param string $table
      * @param $id
-     * @param array $fieldArray
      */
     public function processDatamap_postProcessFieldArray(string $status, string $table, $id, array &$fieldArray)
     {
@@ -85,17 +82,14 @@ class DataHandlerHook
     }
 
     /**
-     * @param string $command
-     * @param string $table
      * @param string|int $id recordUid
      * @param mixed $value Command Value
-     * @param DataHandler $pObj
      */
     public function processCmdmap_postProcess(
         string $command,
         string $table,
         $id,
-        $value,
+        mixed $value,
         DataHandler $pObj
     ) {
 
@@ -173,12 +167,11 @@ class DataHandlerHook
 
     /**
      * @param string|int $id
-     * @param DataHandler $pObj
      * @return int
      */
     protected function substNewWithId($id, DataHandler $pObj): int
     {
-        if (is_string($id) && strpos($id, 'NEW') !== false) {
+        if (is_string($id) && str_contains($id, 'NEW')) {
             $id = $pObj->substNEWwithIDs[$id] ?? null;
         }
         if ($id === null) {
@@ -188,8 +181,6 @@ class DataHandlerHook
     }
 
     /**
-     * @param int $sys_language_uid
-     * @param int $currentFileId
      * @return int
      */
     protected function findLanguageVariantForLanguageAndParentFile(int $sys_language_uid, int $currentFileId): int

@@ -22,6 +22,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
@@ -52,7 +53,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      */
     protected $expectedErrorLogEntries = 0;
     /**
-     * @var \TYPO3\CMS\Core\Authentication\BackendUserAuthentication
+     * @var BackendUserAuthentication
      */
     protected $backendUser;
     /**
@@ -137,7 +138,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                     }
                     $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
                 }
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // sometimes, there is no folder to empty. Let's ignore that.
             }
             $this->actionService->deleteRecords($recordsToDelete);
@@ -182,9 +183,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         }
     }
 
-    /**
-     * @param string $scenarioName
-     */
     protected function importCsvScenario(string $scenarioName = '')
     {
         $scenarioFileName = $this->scenarioDataSetDirectory . $scenarioName . '.csv';
@@ -192,9 +190,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $this->importCSVDataSet($scenarioFileName);
     }
 
-    /**
-     * @param string $scenarioName
-     */
     protected function importAssertCSVScenario(string $scenarioName = '')
     {
         $scenarioFileName = $this->assertionDataSetDirectory . $scenarioName . '.csv';
