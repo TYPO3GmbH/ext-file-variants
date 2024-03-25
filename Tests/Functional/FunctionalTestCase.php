@@ -130,13 +130,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                 foreach ($files as $file) {
                     $storage->deleteFile($file);
                     $recordsToDelete['sys_file'][] = $file->getUid();
-                    if (method_exists($file, 'getMetaData')) {
-                        $metadata = $file->getMetaData();
-                    } else {
-                        // @extensionScannerIgnoreLine
-                        $metadata = $file->_getMetaData();
-                    }
-                    $recordsToDelete['sys_file_metadata'][] = (int)$metadata['uid'];
+                    $fileMetadata = $file->getMetaData()->get();
+                    $recordsToDelete['sys_file_metadata'][] = (int)$fileMetadata['uid'];
                 }
             } catch (\Exception) {
                 // sometimes, there is no folder to empty. Let's ignore that.
