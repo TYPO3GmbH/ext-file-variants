@@ -9,10 +9,9 @@ declare(strict_types=1);
  * LICENSE file that was distributed with this source code.
  */
 
-use Ssch\TYPO3Rector\TYPO312\v0\MigrateQueryBuilderExecuteRector;
-
 use Rector\Config\RectorConfig;
 use Ssch\TYPO3Rector\Set\Typo3SetList;
+use Ssch\TYPO3Rector\TYPO312\v3\MigrateItemsIndexedKeysToAssociativeRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -25,8 +24,9 @@ return RectorConfig::configure()
     ->withPhpSets()
     ->withSets([
         Typo3SetList::TYPO3_11,
+        Typo3SetList::TYPO3_12,
     ])
-    ->withRules([
-        MigrateQueryBuilderExecuteRector::class
+    ->withSkip([
+        MigrateItemsIndexedKeysToAssociativeRector::class,
     ])
 ;

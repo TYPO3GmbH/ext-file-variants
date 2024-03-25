@@ -22,6 +22,7 @@ namespace T3G\AgencyPack\FileVariants\Controller;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Database\Connection;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Form\FormDataCompiler;
@@ -61,7 +62,7 @@ class FileVariantsController
 
         $fileUid = (int)$formData['databaseRow']['file'][0];
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-        $fileRecord = $queryBuilder->select('l10n_parent')->from('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeQuery()->fetchAssociative();
+        $fileRecord = $queryBuilder->select('l10n_parent')->from('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, Connection::PARAM_INT)))->executeQuery()->fetchAssociative();
 
         $defaultFileObject = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject((int)$fileRecord['l10n_parent']);
         /** @var Folder */
@@ -76,7 +77,7 @@ class FileVariantsController
         $file->rename($defaultFileObject->getName(), DuplicationBehavior::RENAME);
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
         $queryBuilder->delete('sys_file')->where($queryBuilder->expr()
-            ->eq('uid', $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT)))->executeStatement();
+            ->eq('uid', $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, Connection::PARAM_INT)))->executeStatement();
 
         // metadata records for copied file are not needed, either
         /** @var QueryBuilder $queryBuilder */
@@ -84,7 +85,7 @@ class FileVariantsController
             ->getQueryBuilderForTable('sys_file_metadata');
         $metadataRecordsToBeDeleted = $queryBuilder->select('uid')->from('sys_file_metadata')->where($queryBuilder->expr()->eq(
             'file',
-            $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT)
+            $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, Connection::PARAM_INT)
         ))->executeQuery()->fetchFirstColumn();
         if (count($metadataRecordsToBeDeleted) > 0) {
             /** @var QueryBuilder $queryBuilder */
@@ -121,7 +122,7 @@ class FileVariantsController
         $metadataUid = (int)$request->getQueryParams()['uid'];
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $currentFileUid = $queryBuilder->select('file')->from('sys_file_metadata')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($metadataUid, \PDO::PARAM_INT)))->executeQuery()->fetchOne();
+        $currentFileUid = $queryBuilder->select('file')->from('sys_file_metadata')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($metadataUid, Connection::PARAM_INT)))->executeQuery()->fetchOne();
 
         $currentFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($currentFileUid);
         $uploadedFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($uploadedFileUid);
@@ -130,11 +131,11 @@ class FileVariantsController
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-        $queryBuilder->delete('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT)))->executeStatement();
+        $queryBuilder->delete('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uploadedFileUid, Connection::PARAM_INT)))->executeStatement();
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->delete('sys_file_metadata')->where($queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT)))->executeStatement();
+        $queryBuilder->delete('sys_file_metadata')->where($queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($uploadedFileUid, Connection::PARAM_INT)))->executeStatement();
 
         $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);

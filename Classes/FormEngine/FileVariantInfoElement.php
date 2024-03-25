@@ -156,6 +156,6 @@ class FileVariantInfoElement extends FileInfoElement
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        return (int)$queryBuilder->select('file')->from('sys_file_metadata')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($l10nParent, \PDO::PARAM_INT)))->executeQuery()->fetchOne();
+        return (int)$queryBuilder->select('file')->from('sys_file_metadata')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($l10nParent, Connection::PARAM_INT)))->executeQuery()->fetchOne();
     }
 }

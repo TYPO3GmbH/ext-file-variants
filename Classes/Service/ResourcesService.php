@@ -22,6 +22,7 @@ namespace T3G\AgencyPack\FileVariants\Service;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -134,7 +135,7 @@ class ResourcesService
             ->set('sys_language_uid', (int)$sys_language_uid)
             ->set('l10n_parent', $fileUid)->where($queryBuilder->expr()->eq(
             'uid',
-            $queryBuilder->createNamedParameter($translatedFileUid, \PDO::PARAM_INT)
+            $queryBuilder->createNamedParameter($translatedFileUid, Connection::PARAM_INT)
         ))->executeStatement();
 
         // update the translated metadata file to use the translation variant of the original file
@@ -142,14 +143,14 @@ class ResourcesService
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
         $queryBuilder->update('sys_file_metadata')->set('file', $translatedFileUid)->where($queryBuilder->expr()->eq(
             'uid',
-            $queryBuilder->createNamedParameter((int)$metaDataRecord['uid'], \PDO::PARAM_INT)
+            $queryBuilder->createNamedParameter((int)$metaDataRecord['uid'], Connection::PARAM_INT)
         ))->executeStatement();
 
         // find the references that must use the translation variant now
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
         $references = $queryBuilder->select('uid')
-            ->from('sys_file_reference')->where($queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter((int)$sys_language_uid, \PDO::PARAM_INT)), $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeQuery();
+            ->from('sys_file_reference')->where($queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter((int)$sys_language_uid, Connection::PARAM_INT)), $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, Connection::PARAM_INT)))->executeQuery();
         $filteredReferences = [];
         while ($reference = $references->fetchAssociative()) {
             $uid = $reference['uid'];
@@ -161,7 +162,7 @@ class ResourcesService
         foreach ($filteredReferences as $reference) {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
             $queryBuilder->update('sys_file_reference')
-                ->set('uid_local', $translatedFileUid)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, \PDO::PARAM_INT)))->executeStatement();
+                ->set('uid_local', $translatedFileUid)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, Connection::PARAM_INT)))->executeStatement();
         }
     }
 
@@ -175,7 +176,7 @@ class ResourcesService
     {
         $isValid = true;
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
-        $sysFileReferenceRecord = $queryBuilder->select('tablenames', 'uid_foreign')->from('sys_file_reference')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))->executeQuery()->fetchAssociative();
+        $sysFileReferenceRecord = $queryBuilder->select('tablenames', 'uid_foreign')->from('sys_file_reference')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)))->executeQuery()->fetchAssociative();
         $irrelevantTableNames = ['pages', 'sys_file_metadata', 'sys_file'];
         if (in_array($sysFileReferenceRecord['tablenames'], $irrelevantTableNames)) {
             $isValid = false;

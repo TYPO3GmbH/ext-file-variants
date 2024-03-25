@@ -22,6 +22,7 @@ namespace T3G\AgencyPack\FileVariants\FormEngine\FieldWizard;
  *
  * The TYPO3 project - inspiring people to share!
  */
+use TYPO3\CMS\Core\Database\Connection;
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -52,7 +53,7 @@ class FileVariantsOverviewWizard extends AbstractNode
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
             $translations = $queryBuilder->select('file', 'sys_language_uid')->from('sys_file_metadata')->where($queryBuilder->expr()->eq(
                 'l10n_parent',
-                $queryBuilder->createNamedParameter((int)$this->data['databaseRow']['uid'], \PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter((int)$this->data['databaseRow']['uid'], Connection::PARAM_INT)
             ))->executeQuery();
             while ($translation = $translations->fetchAssociative()) {
                 $siteLanguage = $this->findSiteLanguageById((int)$translation['sys_language_uid']);
