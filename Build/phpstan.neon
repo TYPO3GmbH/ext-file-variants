@@ -1,0 +1,10 @@
+parameters:
+	level: 0
+
+	paths:
+		- ../ext_emconf.php
+		- ../ext_localconf.php
+		- ../rector.php
+		- ../Classes
+		- ../Configuration
+		- ../Tests
