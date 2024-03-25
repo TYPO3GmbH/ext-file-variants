@@ -77,7 +77,8 @@
 		"lint": [
 			"@composer:lint",
 			"@php:rector:lint",
-			"@php:style:lint"
+			"@php:style:lint",
+			"@editorconfig:lint"
 		],
 		"php:functional:tests": [
 			"phpunit -c Build/FunctionalTests.xml"
