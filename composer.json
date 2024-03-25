@@ -82,6 +82,7 @@
 		],
 		"lint": [
 			"@composer:lint",
+			"@php:static:lint",
 			"@php:rector:lint",
 			"@php:style:lint",
 			"@editorconfig:lint"
