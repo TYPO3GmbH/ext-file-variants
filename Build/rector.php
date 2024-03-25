@@ -16,10 +16,10 @@ use Ssch\TYPO3Rector\Set\Typo3SetList;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__ . '/Build/*.php',
-        __DIR__ . '/Classes',
-        __DIR__ . '/Configuration',
-        __DIR__ . '/Tests',
+        __DIR__ . '/*.php',
+        __DIR__ . '/../Classes',
+        __DIR__ . '/../Configuration',
+        __DIR__ . '/../Tests',
     ])
     ->withRootFiles()
     ->withPhpSets()

@@ -4,7 +4,7 @@ parameters:
 	paths:
 		- ../ext_emconf.php
 		- ../ext_localconf.php
-		- ../rector.php
+		- rector.php
 		- ../Classes
 		- ../Configuration
 		- ../Tests

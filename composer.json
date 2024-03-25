@@ -91,10 +91,10 @@
 			"phpunit -c Build/FunctionalTests.xml"
 		],
 		"php:rector:fix": [
-			"rector"
+			"rector --config=Build/rector.php"
 		],
 		"php:rector:lint": [
-			"rector --dry-run --no-progress-bar"
+			"rector --config=Build/rector.php --dry-run --no-progress-bar"
 		],
 		"php:static:lint": [
 			"phpstan --configuration=Build/phpstan.neon analyse"
