@@ -19,7 +19,7 @@ call_user_func(function () {
         //   if ($recordService->isFalConsumingTable($table)) {
         // streamline language sync for all FAL fields
         foreach ($config['columns'] as $fieldName => $fieldConfig) {
-            if ($fieldConfig['config']['foreign_table'] ?? null === 'sys_file_reference') {
+            if (($fieldConfig['config']['foreign_table'] ?? null) === 'sys_file_reference') {
                 if (isset($fieldConfig['config']['behaviour']['localizationMode'])) {
                     unset($GLOBALS['TCA'][$table]['columns'][$fieldName]['config']['behaviour']['localizationMode']);
                 }

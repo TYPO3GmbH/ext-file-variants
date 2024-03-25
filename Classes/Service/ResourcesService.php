@@ -25,6 +25,7 @@ namespace T3G\AgencyPack\FileVariants\Service;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\FolderInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -42,14 +43,12 @@ class ResourcesService
     /**
      * make sure upload storage and folder are in place
      */
-    public function prepareFileStorageEnvironment(): FolderInterface
+    public function prepareFileStorageEnvironment(): Folder
     {
         $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('file_variants');
         $storageUid = (int)$extensionConfiguration['variantsStorageUid'];
-        /** @var ResourcesService $resourcesService */
         $targetFolder = $extensionConfiguration['variantsFolder'];
         try {
-            /** @var ResourceStorageInterface storage */
             $storage = $this->retrieveStorageObject($storageUid);
 
             if (!$storage->hasFolder($targetFolder)) {
@@ -120,7 +119,7 @@ class ResourcesService
     public function copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy(
         $sys_language_uid,
         array $metaDataRecord,
-        FolderInterface $folder
+        Folder $folder
     ) {
         $fileUid = (int)$metaDataRecord['file'];
         $parentFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($fileUid);
@@ -133,35 +132,26 @@ class ResourcesService
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
         $queryBuilder->update('sys_file')
             ->set('sys_language_uid', (int)$sys_language_uid)
-            ->set('l10n_parent', $fileUid)
-            ->where(
-                $queryBuilder->expr()->eq(
-                    'uid',
-                    $queryBuilder->createNamedParameter($translatedFileUid, \PDO::PARAM_INT)
-                )
-            )->execute();
+            ->set('l10n_parent', $fileUid)->where($queryBuilder->expr()->eq(
+            'uid',
+            $queryBuilder->createNamedParameter($translatedFileUid, \PDO::PARAM_INT)
+        ))->executeStatement();
 
         // update the translated metadata file to use the translation variant of the original file
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->update('sys_file_metadata')->set('file', $translatedFileUid)->where(
-            $queryBuilder->expr()->eq(
-                'uid',
-                $queryBuilder->createNamedParameter((int)$metaDataRecord['uid'], \PDO::PARAM_INT)
-            )
-        )->execute();
+        $queryBuilder->update('sys_file_metadata')->set('file', $translatedFileUid)->where($queryBuilder->expr()->eq(
+            'uid',
+            $queryBuilder->createNamedParameter((int)$metaDataRecord['uid'], \PDO::PARAM_INT)
+        ))->executeStatement();
 
         // find the references that must use the translation variant now
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
         $references = $queryBuilder->select('uid')
-            ->from('sys_file_reference')
-            ->where(
-                $queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter((int)$sys_language_uid, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
+            ->from('sys_file_reference')->where($queryBuilder->expr()->eq('sys_language_uid', $queryBuilder->createNamedParameter((int)$sys_language_uid, \PDO::PARAM_INT)), $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeQuery();
         $filteredReferences = [];
-        while ($reference = $references->fetch()) {
+        while ($reference = $references->fetchAssociative()) {
             $uid = $reference['uid'];
             if ($this->isValidReference($uid)) {
                 $filteredReferences[] = $uid;
@@ -171,9 +161,7 @@ class ResourcesService
         foreach ($filteredReferences as $reference) {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
             $queryBuilder->update('sys_file_reference')
-                ->set('uid_local', $translatedFileUid)
-                ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, \PDO::PARAM_INT)))
-                ->execute();
+                ->set('uid_local', $translatedFileUid)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($reference, \PDO::PARAM_INT)))->executeStatement();
         }
     }
 
@@ -187,10 +175,7 @@ class ResourcesService
     {
         $isValid = true;
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
-        $queryBuilder->select('tablenames', 'uid_foreign')->from('sys_file_reference')->where(
-            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT))
-        );
-        $sysFileReferenceRecord = $queryBuilder->execute()->fetch();
+        $sysFileReferenceRecord = $queryBuilder->select('tablenames', 'uid_foreign')->from('sys_file_reference')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, \PDO::PARAM_INT)))->executeQuery()->fetchAssociative();
         $irrelevantTableNames = ['pages', 'sys_file_metadata', 'sys_file'];
         if (in_array($sysFileReferenceRecord['tablenames'], $irrelevantTableNames)) {
             $isValid = false;
