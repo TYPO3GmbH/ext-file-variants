@@ -22,15 +22,16 @@ namespace T3G\AgencyPack\FileVariants\FormEngine;
  *
  * The TYPO3 project - inspiring people to share!
  */
-use T3G\AgencyPack\FileVariants\Service\ResourcesService;
-use TYPO3\CMS\Backend\Form\Element\FileInfoElement;
-use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Resource\Folder;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
+use TYPO3\CMS\Backend\Form\Element\FileInfoElement;
+use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 
 /**
  * Description
@@ -68,6 +69,7 @@ class FileVariantInfoElement extends FileInfoElement
 
                 /** @var ResourcesService $resourcesService */
                 $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
+                /** @var Folder */
                 $folder = $resourcesService->prepareFileStorageEnvironment();
 
                 /** @var UriBuilder $uriBuilder */
@@ -138,13 +140,10 @@ class FileVariantInfoElement extends FileInfoElement
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-        $queryBuilder->select('sha1')->from('sys_file')->where(
-            $queryBuilder->expr()->in(
-                'uid',
-                $queryBuilder->createNamedParameter([$fileUid, $defaultFileUid], Connection::PARAM_INT_ARRAY)
-            )
-        );
-        $sha1s = $queryBuilder->execute()->fetchAll();
+        $sha1s = $queryBuilder->select('sha1')->from('sys_file')->where($queryBuilder->expr()->in(
+            'uid',
+            $queryBuilder->createNamedParameter([$fileUid, $defaultFileUid], Connection::PARAM_INT_ARRAY)
+        ))->executeQuery()->fetchAllAssociative();
         return $sha1s[0]['sha1'] === $sha1s[1]['sha1'];
     }
 
@@ -157,9 +156,6 @@ class FileVariantInfoElement extends FileInfoElement
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->select('file')->from('sys_file_metadata')->where(
-            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($l10nParent, \PDO::PARAM_INT))
-        );
-        return (int)$queryBuilder->execute()->fetchColumn();
+        return (int)$queryBuilder->select('file')->from('sys_file_metadata')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($l10nParent, \PDO::PARAM_INT)))->executeQuery()->fetchOne();
     }
 }

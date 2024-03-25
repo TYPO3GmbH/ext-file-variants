@@ -39,21 +39,15 @@ final class BeforeFileDeletedEventListener
             $fileUid = $file->getUid();
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-            $parentFileUid = (int)$queryBuilder->select('l10n_parent')->from('sys_file')->where(
-                $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute()->fetchColumn();
+            $parentFileUid = (int)$queryBuilder->select('l10n_parent')->from('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeQuery()->fetchOne();
 
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
-            $references = $queryBuilder->select('uid')->from('sys_file_reference')->where(
-                $queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
-            foreach ($references->fetchAll(\PDO::FETCH_COLUMN) as $referenceUid) {
+            $references = $queryBuilder->select('uid')->from('sys_file_reference')->where($queryBuilder->expr()->eq('uid_local', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeQuery();
+            foreach ($references->fetchFirstColumn() as $referenceUid) {
                 /** @var QueryBuilder $queryBuilder */
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_reference');
-                $queryBuilder->update('sys_file_reference')->set('uid_local', $parentFileUid)->where(
-                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($referenceUid, \PDO::PARAM_INT))
-                )->execute();
+                $queryBuilder->update('sys_file_reference')->set('uid_local', $parentFileUid)->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($referenceUid, \PDO::PARAM_INT)))->executeStatement();
             }
         }
     }

@@ -102,16 +102,12 @@ class MetaDataRecordsUpdateWizard implements UpgradeWizardInterface
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file_metadata');
-        $translatedMetadataRecords = $queryBuilder->count('uid')->from('sys_file_metadata')->where(
-            $queryBuilder->expr()->gt('sys_language_uid', 0)
-        )->execute()->fetchColumn();
+        $translatedMetadataRecords = $queryBuilder->count('uid')->from('sys_file_metadata')->where($queryBuilder->expr()->gt('sys_language_uid', 0))->executeQuery()->fetchOne();
 
         // check for sys_file records in sys_language_uid > 0
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file');
-        $translatedFileRecords = $queryBuilder->count('uid')->from('sys_file')->where(
-            $queryBuilder->expr()->gt('sys_language_uid', 0)
-        )->execute()->fetchColumn();
+        $translatedFileRecords = $queryBuilder->count('uid')->from('sys_file')->where($queryBuilder->expr()->gt('sys_language_uid', 0))->executeQuery()->fetchOne();
 
         if ($translatedMetadataRecords > 0 && ($translatedMetadataRecords > $translatedFileRecords)) {
             $execute = true;
@@ -140,11 +136,9 @@ class MetaDataRecordsUpdateWizard implements UpgradeWizardInterface
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file_metadata');
-        $translatedFileMetadataRecords = $queryBuilder->select('*')->from('sys_file_metadata')->where(
-            $queryBuilder->expr()->gt('sys_language_uid', 0)
-        )->execute();
+        $translatedFileMetadataRecords = $queryBuilder->select('*')->from('sys_file_metadata')->where($queryBuilder->expr()->gt('sys_language_uid', 0))->executeQuery();
 
-        while ($metaDataRecord = $translatedFileMetadataRecords->fetch()) {
+        while ($metaDataRecord = $translatedFileMetadataRecords->fetchAssociative()) {
             $resourcesService->copyOriginalFileAndUpdateAllConsumingReferencesToUseTheCopy(
                 $metaDataRecord['sys_language_uid'],
                 $metaDataRecord,

@@ -44,8 +44,8 @@ class FileVariantsOverviewWizard extends AbstractNode
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_language');
         $languages = [];
-        $languageRecords = $queryBuilder->select('uid', 'title', 'language_isocode')->from('sys_language')->execute();
-        while ($language = $languageRecords->fetch()) {
+        $languageRecords = $queryBuilder->select('uid', 'title', 'language_isocode')->from('sys_language')->executeQuery();
+        while ($language = $languageRecords->fetchAssociative()) {
             $languages[(int)$language['uid']] = $language['title'] . ' (' . $language['language_isocode'] . ')';
         }
 
@@ -55,13 +55,11 @@ class FileVariantsOverviewWizard extends AbstractNode
             $result['html'] .= '<div class="variants-preview">';
             $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-            $translations = $queryBuilder->select('file', 'sys_language_uid')->from('sys_file_metadata')->where(
-                $queryBuilder->expr()->eq(
-                    'l10n_parent',
-                    $queryBuilder->createNamedParameter((int)$this->data['databaseRow']['uid'], \PDO::PARAM_INT)
-                )
-            )->execute();
-            while ($translation = $translations->fetch()) {
+            $translations = $queryBuilder->select('file', 'sys_language_uid')->from('sys_file_metadata')->where($queryBuilder->expr()->eq(
+                'l10n_parent',
+                $queryBuilder->createNamedParameter((int)$this->data['databaseRow']['uid'], \PDO::PARAM_INT)
+            ))->executeQuery();
+            while ($translation = $translations->fetchAssociative()) {
                 $result['html'] .= '<p class="t3-sysfile-translation">';
                 $result['html'] .= '<span>' . $languages[(int)$translation['sys_language_uid']] . '</span>';
                 $result['html'] .= $resourcesService->generatePreviewImageHtml((int)$translation['file'], 't3-tceforms-sysfile-translation-imagepreview');

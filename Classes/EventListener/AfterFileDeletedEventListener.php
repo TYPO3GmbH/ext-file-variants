@@ -41,17 +41,13 @@ final class AfterFileDeletedEventListener
             $fileUid = $file->getUid();
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-            $queryBuilder->delete('sys_file_metadata')->where(
-                $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
+            $queryBuilder->delete('sys_file_metadata')->where($queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeStatement();
 
             // delete all file variants
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-            $fileVariants = $queryBuilder->select('uid')->from('sys_file')->where(
-                $queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-            )->execute();
-            foreach ($fileVariants->fetchAll(\PDO::FETCH_COLUMN) as $variantUid) {
+            $fileVariants = $queryBuilder->select('uid')->from('sys_file')->where($queryBuilder->expr()->eq('l10n_parent', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeQuery();
+            foreach ($fileVariants->fetchFirstColumn() as $variantUid) {
                 /** @var File $variantFile */
                 $variantFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($variantUid);
                 $variantFile->getStorage()->deleteFile($variantFile);

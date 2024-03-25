@@ -50,7 +50,6 @@ class FileVariantsController
         $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
         $nodeFactory = GeneralUtility::makeInstance(NodeFactory::class);
-        /** @var FormResultCompiler $formResultCompiler */
         $formDataCompilerInput = [
             'tableName' => 'sys_file_metadata',
             'vanillaUid' => $uid,
@@ -60,13 +59,9 @@ class FileVariantsController
         $formData['renderType'] = 'fileInfo';
 
         $fileUid = (int)$formData['databaseRow']['file'][0];
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-        $queryBuilder->select('l10n_parent')->from('sys_file')->where(
-            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT))
-        );
+        $fileRecord = $queryBuilder->select('l10n_parent')->from('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, \PDO::PARAM_INT)))->executeQuery()->fetchAssociative();
 
-        $fileRecord = $queryBuilder->execute()->fetch();
         $defaultFileObject = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject((int)$fileRecord['l10n_parent']);
         $copy = $defaultFileObject->copyTo($defaultFileObject->getParentFolder());
         // this record will be stale after the replace, remove it right away
@@ -76,32 +71,24 @@ class FileVariantsController
         $file = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($fileUid);
         $file->getStorage()->replaceFile($file, $path);
         $file->rename($defaultFileObject->getName(), DuplicationBehavior::RENAME);
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-        $queryBuilder->delete('sys_file')->where(
-            $queryBuilder->expr()
-                ->eq('uid', $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT))
-        )->execute();
+        $queryBuilder->delete('sys_file')->where($queryBuilder->expr()
+            ->eq('uid', $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT)))->executeStatement();
 
         // metadata records for copied file are not needed, either
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->select('uid')->from('sys_file_metadata')->where(
-            $queryBuilder->expr()->eq(
-                'file',
-                $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT)
-            )
-        );
-        $metadataRecordsToBeDeleted = $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
+        $metadataRecordsToBeDeleted = $queryBuilder->select('uid')->from('sys_file_metadata')->where($queryBuilder->expr()->eq(
+            'file',
+            $queryBuilder->createNamedParameter($sysFileRecordToBeDeleted, \PDO::PARAM_INT)
+        ))->executeQuery()->fetchFirstColumn();
         if (count($metadataRecordsToBeDeleted) > 0) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
                 ->getQueryBuilderForTable('sys_file_metadata');
-            $queryBuilder->delete('sys_file_metadata')->where(
-                $queryBuilder->expr()
-                    ->in('uid', $metadataRecordsToBeDeleted)
-            )->execute();
+            $queryBuilder->delete('sys_file_metadata')->where($queryBuilder->expr()
+                ->in('uid', $metadataRecordsToBeDeleted))->executeStatement();
         }
 
         //        /** @var $refIndexObj ReferenceIndex */
@@ -131,10 +118,7 @@ class FileVariantsController
         $metadataUid = (int)$request->getQueryParams()['uid'];
 
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->select('file')->from('sys_file_metadata')->where(
-            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($metadataUid, \PDO::PARAM_INT))
-        );
-        $currentFileUid = $queryBuilder->execute()->fetchColumn();
+        $currentFileUid = $queryBuilder->select('file')->from('sys_file_metadata')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($metadataUid, \PDO::PARAM_INT)))->executeQuery()->fetchOne();
 
         $currentFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($currentFileUid);
         $uploadedFile = GeneralUtility::makeInstance(ResourceFactory::class)->getFileObject($uploadedFileUid);
@@ -143,24 +127,15 @@ class FileVariantsController
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
-        $queryBuilder->delete('sys_file')->where(
-            $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT))
-        )->execute();
+        $queryBuilder->delete('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT)))->executeStatement();
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
-        $queryBuilder->delete('sys_file_metadata')->where(
-            $queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT))
-        )->execute();
-
-        /** @var $refIndexObj ReferenceIndex */
-        //        $refIndexObj = GeneralUtility::makeInstance(ReferenceIndex::class);
-        //        $refIndexObj->updateIndex(false);
+        $queryBuilder->delete('sys_file_metadata')->where($queryBuilder->expr()->eq('file', $queryBuilder->createNamedParameter($uploadedFileUid, \PDO::PARAM_INT)))->executeStatement();
 
         $formDataGroup = GeneralUtility::makeInstance(TcaDatabaseRecord::class);
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
         $nodeFactory = GeneralUtility::makeInstance(NodeFactory::class);
-        /** @var FormResultCompiler $formResultCompiler */
         $formDataCompilerInput = [
             'tableName' => 'sys_file_metadata',
             'vanillaUid' => $metadataUid,

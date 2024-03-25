@@ -119,8 +119,8 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     {
         // find all storages used
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_storage');
-        $result = $queryBuilder->select('*')->from('sys_file_storage')->execute();
-        while ($storageUid = $result->fetch()['uid']) {
+        $result = $queryBuilder->select('*')->from('sys_file_storage')->executeQuery();
+        while ($storageUid = $result->fetchAssociative()['uid']) {
             // find files in storage
             $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject($storageUid);
             $recordsToDelete = ['sys_file' => [], 'sys_file_metadata' => []];
@@ -155,21 +155,17 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $queryBuilder->getRestrictions()->removeAll();
         $statement = $queryBuilder
             ->select('*')
-            ->from('sys_log')
-            ->where(
-                $queryBuilder->expr()->in(
-                    'error',
-                    $queryBuilder->createNamedParameter([1, 2], Connection::PARAM_INT_ARRAY)
-                )
-            )
-            ->execute();
+            ->from('sys_log')->where($queryBuilder->expr()->in(
+            'error',
+            $queryBuilder->createNamedParameter([1, 2], Connection::PARAM_INT_ARRAY)
+        ))->executeQuery();
 
         $actualErrorLogEntries = $statement->rowCount();
         if ($actualErrorLogEntries === $this->expectedErrorLogEntries) {
             $this->assertSame($this->expectedErrorLogEntries, $actualErrorLogEntries);
         } else {
             $failureMessage = 'Expected ' . $this->expectedErrorLogEntries . ' entries in sys_log, but got ' . $actualErrorLogEntries . LF;
-            while ($entry = $statement->fetch()) {
+            while ($entry = $statement->fetchAssociative()) {
                 $entryData = unserialize($entry['log_data']);
                 $entryMessage = vsprintf($entry['details'], $entryData);
                 $failureMessage .= '* ' . $entryMessage . LF;

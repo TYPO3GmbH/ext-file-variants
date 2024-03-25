@@ -22,15 +22,16 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  *
  * The TYPO3 project - inspiring people to share!
  */
-use T3G\AgencyPack\FileVariants\Controller\FileVariantsController;
-use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
-use TYPO3\CMS\Backend\Controller\File\FileController;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Http\ServerRequest;
-use TYPO3\CMS\Core\Http\ServerRequestFactory;
-use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+use TYPO3\CMS\Core\Http\ServerRequestFactory;
+use TYPO3\CMS\Backend\Controller\File\FileController;
+use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
+use T3G\AgencyPack\FileVariants\Controller\FileVariantsController;
 
 /**
  * Class ConcerningMetadata
@@ -45,7 +46,6 @@ class ConcerningMetadata extends FunctionalTestCase
     {
         $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['file_variants'] = ['variantsStorageUid' => 42];
         $subject = new DataHandlerHook();
-        /** @var DataHandler $dataHandler */
         $dataHandler = $this->prophesize(DataHandler::class);
 
         $this->expectException(\RuntimeException::class);
@@ -123,6 +123,7 @@ class ConcerningMetadata extends FunctionalTestCase
 
         $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject(2);
         $folder = $storage->getFolder('languageVariants');
+        /** @var File */
         $newFile = $storage->addFile($localFilePath, $folder);
         $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
         $controller->ajaxUploadFileVariant($request);
@@ -152,6 +153,7 @@ class ConcerningMetadata extends FunctionalTestCase
 
         $storage = GeneralUtility::makeInstance(ResourceFactory::class)->getStorageObject(2);
         $folder = $storage->getFolder('languageVariants');
+        /** @var File */
         $newFile = $storage->addFile($localFilePath, $folder);
         $request = $request->withQueryParams(['file' => $newFile->getUid(), 'uid' => 12]);
         $controller->ajaxReplaceFileVariant($request);
