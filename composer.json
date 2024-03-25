@@ -25,6 +25,7 @@
 		"phpspec/prophecy": "^1.19",
 		"phpspec/prophecy-phpunit": "^2.2",
 		"rector/rector": "^1.0",
+		"ssch/typo3-rector": "^2.2",
 		"typo3/testing-framework": "^6.0"
 	},
 	"replace": {
