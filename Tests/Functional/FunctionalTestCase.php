@@ -23,6 +23,7 @@ namespace T3G\AgencyPack\FileVariants\Tests\Functional;
  * The TYPO3 project - inspiring people to share!
  */
 use Prophecy\PhpUnit\ProphecyTrait;
+use T3G\AgencyPack\FileVariants\Tests\Functional\DataHandling\PermissiveActionService;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
@@ -59,7 +60,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      */
     protected $backendUser;
     /**
-     * @var ActionService
+     * @var PermissiveActionService
      */
     protected $actionService;
 
@@ -95,7 +96,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             $fileMetadataPermissionAspect->reveal()
         );
 
-        $this->actionService = new ActionService();
+        $this->actionService = new PermissiveActionService();
 
         // done to prevent an error during processing
         // it makes no difference here whether file filters apply to the data set
