@@ -24,7 +24,8 @@
 		"friendsofphp/php-cs-fixer": "^3.0",
 		"phpspec/prophecy": "^1.19",
 		"phpspec/prophecy-phpunit": "^2.2",
-		"typo3/testing-framework": "^6.0"
+		"typo3/testing-framework": "^6.0",
+		"rector/rector": "^1.0"
 	},
 	"replace": {
 		"t3g/file_variants": "self.version"
