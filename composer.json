@@ -26,6 +26,7 @@
 		"phpspec/prophecy-phpunit": "^2.2",
 		"rector/rector": "^1.0",
 		"ssch/typo3-rector": "^2.2",
+		"typo3/coding-standards": "^0.7.1",
 		"typo3/testing-framework": "^6.0"
 	},
 	"replace": {
@@ -81,10 +82,10 @@
 			"rector --dry-run --no-progress-bar"
 		],
 		"php:style:fix": [
-			"php-cs-fixer fix --config Build/.php_cs.dist.php"
+			"php-cs-fixer fix --config Build/.php-cs-fixer.dist.php"
 		],
 		"php:style:lint": [
-			"php-cs-fixer check --config Build/.php_cs.dist.php --diff"
+			"php-cs-fixer check --config Build/.php-cs-fixer.dist.php --diff"
 		],
 		"php:unit:test": [
 			"phpunit -c Build/UnitTests.xml"
