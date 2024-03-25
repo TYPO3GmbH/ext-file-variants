@@ -97,9 +97,9 @@ class FileVariantInfoElement extends FileInfoElement
                         ['uid' => $this->data['vanillaUid']]
                     );
                     $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' . $folder->getCombinedIdentifier() . '"
-	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
-	 data-file-deny-pattern="' . $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'] . '" data-max-file-size="' . $maxFileSize . '" data-handling-url="' . $path . '"
-	></div>';
+     data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
+     data-file-deny-pattern="' . $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'] . '" data-max-file-size="' . $maxFileSize . '" data-handling-url="' . $path . '"
+    ></div>';
                 } else {
                     $resultArray['html'] = '<div class="t3-sysfile-wrapper">' . $resultArray['html'] . '</div>';
 
@@ -110,9 +110,9 @@ class FileVariantInfoElement extends FileInfoElement
                         ['uid' => $this->data['vanillaUid']]
                     );
                     $resultArray['html'] .= '<div class="t3js-filevariants-drag-uploader" data-target-folder="' . $folder->getCombinedIdentifier() . '"
-	 data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
-	 data-file-deny-pattern="' . $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'] . '" data-max-file-size="' . $maxFileSize . '" data-handling-url="' . $path . '"
-	></div>';
+     data-dropzone-trigger=".dropzone" data-dropzone-target=".t3js-module-body h1:first"
+     data-file-deny-pattern="' . $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext'] . '" data-max-file-size="' . $maxFileSize . '" data-handling-url="' . $path . '"
+    ></div>';
                 }
             }
         }
