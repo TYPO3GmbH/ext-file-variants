@@ -50,7 +50,8 @@
 			"typo3/class-alias-loader": true,
 			"typo3/cms-composer-installers": true
 		},
-		"discard-changes": true
+		"discard-changes": true,
+		"sort-packages": true
 	},
 	"extra": {
 		"typo3/cms": {
