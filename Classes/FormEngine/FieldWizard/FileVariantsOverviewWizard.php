@@ -25,6 +25,8 @@ namespace T3G\AgencyPack\FileVariants\FormEngine\FieldWizard;
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 use TYPO3\CMS\Backend\Form\AbstractNode;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -42,13 +44,6 @@ class FileVariantsOverviewWizard extends AbstractNode
     {
         $result = $this->initializeResultArray();
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_language');
-        $languages = [];
-        $languageRecords = $queryBuilder->select('uid', 'title', 'language_isocode')->from('sys_language')->executeQuery();
-        while ($language = $languageRecords->fetchAssociative()) {
-            $languages[(int)$language['uid']] = $language['title'] . ' (' . $language['language_isocode'] . ')';
-        }
-
         // no parent - we are in default language
         $parentField = (int)$this->data['databaseRow']['l10n_parent'][0];
         if ($parentField === 0) {
@@ -60,8 +55,9 @@ class FileVariantsOverviewWizard extends AbstractNode
                 $queryBuilder->createNamedParameter((int)$this->data['databaseRow']['uid'], \PDO::PARAM_INT)
             ))->executeQuery();
             while ($translation = $translations->fetchAssociative()) {
+                $siteLanguage = $this->findSiteLanguageById((int)$translation['sys_language_uid']);
                 $result['html'] .= '<p class="t3-sysfile-translation">';
-                $result['html'] .= '<span>' . $languages[(int)$translation['sys_language_uid']] . '</span>';
+                $result['html'] .= '<span>' . $siteLanguage->getTitle() . '</span>';
                 $result['html'] .= $resourcesService->generatePreviewImageHtml((int)$translation['file'], 't3-tceforms-sysfile-translation-imagepreview');
                 $result['html'] .= '</p>';
             }
@@ -71,5 +67,18 @@ class FileVariantsOverviewWizard extends AbstractNode
         $result['stylesheetFiles'][] = 'EXT:file_variants/Resources/Public/Css/FileVariantInfoElement.css';
 
         return $result;
+    }
+
+    private function findSiteLanguageById(int $siteLanguageId): SiteLanguage
+    {
+        foreach (GeneralUtility::makeInstance(SiteFinder::class)->getAllSites() as $site) {
+            try {
+                return $site->getLanguageById($siteLanguageId);
+            } catch (\InvalidArgumentException) {
+                continue;
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('No site language with ID "%d"', $siteLanguageId), 1711465624);
     }
 }
