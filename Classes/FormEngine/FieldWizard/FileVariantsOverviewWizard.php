@@ -46,7 +46,7 @@ class FileVariantsOverviewWizard extends AbstractNode
         $result = $this->initializeResultArray();
 
         // no parent - we are in default language
-        $parentField = (int)$this->data['databaseRow']['l10n_parent'][0];
+        $parentField = (int)($this->data['databaseRow']['l10n_parent'][0] ?? 0);
         if ($parentField === 0) {
             $result['html'] .= '<div class="variants-preview">';
             $resourcesService = GeneralUtility::makeInstance(ResourcesService::class);

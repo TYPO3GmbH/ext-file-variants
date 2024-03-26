@@ -49,7 +49,7 @@ class FileVariantInfoElement extends FileInfoElement
         $languageUid = $this->data['databaseRow']['sys_language_uid'];
 
         if ($languageUid > 0) {
-            $fileUid = (int)$this->data['databaseRow']['file'][0];
+            $fileUid = (int)($this->data['databaseRow']['file'][0] ?? 0);
             if ($fileUid < 1) {
                 $resultArray['html'] = 'something went wrong, no valid file uid received (' . $fileUid . ')';
             } else {
@@ -124,7 +124,7 @@ class FileVariantInfoElement extends FileInfoElement
      */
     protected function areRelatedFilesEqual(): bool
     {
-        $fileUid = (int)$this->data['databaseRow']['file'][0];
+        $fileUid = (int)($this->data['databaseRow']['file'][0] ?? 0);
         $defaultFileUid = $this->getDefaultFileUid();
 
         // this file has not been copied upon metadata translation. Probably we talk stale data.
@@ -147,7 +147,7 @@ class FileVariantInfoElement extends FileInfoElement
      */
     protected function getDefaultFileUid(): int
     {
-        $l10nParent = $this->data['databaseRow']['l10n_parent'][0]['uid'];
+        $l10nParent = $this->data['databaseRow']['l10n_parent'][0]['uid'] ?? 0;
 
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file_metadata');
