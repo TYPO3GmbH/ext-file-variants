@@ -34,6 +34,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\ReferenceIndex;
 use TYPO3\CMS\Core\Http\HtmlResponse;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\Folder;
@@ -53,10 +54,14 @@ class FileVariantsController
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
         $nodeFactory = GeneralUtility::makeInstance(NodeFactory::class);
         $formDataCompilerInput = [
+            'request' => $request,
             'tableName' => 'sys_file_metadata',
             'vanillaUid' => $uid,
             'command' => 'edit',
         ];
+        if ((new Typo3Version())->getMajorVersion() < 12) {
+            unset($formDataCompilerInput['request']);
+        }
         $formData = $formDataCompiler->compile($formDataCompilerInput);
         $formData['renderType'] = 'fileInfo';
 
@@ -141,10 +146,14 @@ class FileVariantsController
         $formDataCompiler = GeneralUtility::makeInstance(FormDataCompiler::class, $formDataGroup);
         $nodeFactory = GeneralUtility::makeInstance(NodeFactory::class);
         $formDataCompilerInput = [
+            'request' => $request,
             'tableName' => 'sys_file_metadata',
             'vanillaUid' => $metadataUid,
             'command' => 'edit',
         ];
+        if ((new Typo3Version())->getMajorVersion() < 12) {
+            unset($formDataCompilerInput['request']);
+        }
         $formData = $formDataCompiler->compile($formDataCompilerInput);
         $formData['renderType'] = 'fileInfo';
 
