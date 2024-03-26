@@ -65,7 +65,7 @@ class FileVariantsController
         $formData = $formDataCompiler->compile($formDataCompilerInput);
         $formData['renderType'] = 'fileInfo';
 
-        $fileUid = (int)$formData['databaseRow']['file'][0];
+        $fileUid = (int)($formData['databaseRow']['file'][0] ?? 0);
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
         $fileRecord = $queryBuilder->select('l10n_parent')->from('sys_file')->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($fileUid, Connection::PARAM_INT)))->executeQuery()->fetchAssociative();
 
