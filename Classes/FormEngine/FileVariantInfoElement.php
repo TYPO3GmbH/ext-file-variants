@@ -29,7 +29,6 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Backend\Form\Element\FileInfoElement;
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 
@@ -48,10 +47,6 @@ class FileVariantInfoElement extends FileInfoElement
     {
         $resultArray = parent::render();
         $languageUid = $this->data['databaseRow']['sys_language_uid'];
-
-        if (version_compare(VersionNumberUtility::getCurrentTypo3Version(), '11', '<')) {
-            $languageUid = (int)$languageUid[0];
-        }
 
         if ($languageUid > 0) {
             $fileUid = (int)$this->data['databaseRow']['file'][0];
