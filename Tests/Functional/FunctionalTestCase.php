@@ -64,13 +64,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
      */
     protected $actionService;
 
-    /**
-     * The fixture which is used when initializing a backend user
-     *
-     * @var non-empty-string
-     */
-    protected string $backendUserFixture = 'PACKAGE:typo3/testing-framework/Resources/Core/Functional/Fixtures/be_users.xml';
-
     protected function setUp(): void
     {
         $this->coreExtensionsToLoad[] = 'fluid';
@@ -89,7 +82,9 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
 
         Bootstrap::initializeLanguageObject();
 
-        $this->backendUser = $this->setUpBackendUserFromFixture(1);
+        $this->importCSVDataSet(__DIR__ . '/Fixture/be_users.csv');
+        $this->backendUser = $this->setUpBackendUser(1);
+
         $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
         GeneralUtility::setSingletonInstance(
             FileMetadataPermissionsAspect::class,
