@@ -29,6 +29,7 @@ use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Page\JavaScriptModuleInstruction;
 use TYPO3\CMS\Backend\Form\Element\FileInfoElement;
 use T3G\AgencyPack\FileVariants\Service\ResourcesService;
 
@@ -54,12 +55,8 @@ class FileVariantInfoElement extends FileInfoElement
                 $resultArray['html'] = 'something went wrong, no valid file uid received (' . $fileUid . ')';
             } else {
                 GeneralUtility::makeInstance(PageRenderer::class)->addInlineLanguageLabelFile('EXT:file_variants/Resources/Private/Language/locallang.xlf');
-                $resultArray['requireJsModules'][] = [
-                    'TYPO3/CMS/FileVariants/FileVariantsDragUploader' => 'function(fileVariantsDragUploader){fileVariantsDragUploader.initialize()}'
-                ];
-                $resultArray['requireJsModules'][] = [
-                    'TYPO3/CMS/FileVariants/FileVariants' => 'function(FileVariants){FileVariants.initialize()}'
-                ];
+                $resultArray['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS('TYPO3/CMS/FileVariants/FileVariantsDragUploader')->invoke('initialize');
+                $resultArray['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS('TYPO3/CMS/FileVariants/FileVariants')->invoke('initialize');
                 $resultArray['stylesheetFiles'][] = 'EXT:file_variants/Resources/Public/Css/FileVariantInfoElement.css';
 
                 /** @var ResourcesService $resourcesService */
