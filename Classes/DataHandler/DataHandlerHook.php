@@ -82,7 +82,6 @@ class DataHandlerHook
 
     /**
      * @param string|int $id recordUid
-     * @param mixed $value Command Value
      */
     public function processCmdmap_postProcess(
         string $command,
