@@ -58,7 +58,12 @@ class FileVariantsController
             'vanillaUid' => $uid,
             'command' => 'edit',
         ];
-        $formData = $formDataCompiler->compile($formDataCompilerInput);
+        $typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
+        if ($typo3Version->getMajorVersion() < 13) {
+            $formData = $formDataCompiler->compile($formDataCompilerInput);
+        } else {
+            $formData = $formDataCompiler->compile($formDataCompilerInput, $formDataGroup);
+        }
         $formData['renderType'] = 'fileInfo';
 
         $fileUid = (int)($formData['databaseRow']['file'][0] ?? 0);
@@ -147,7 +152,12 @@ class FileVariantsController
             'vanillaUid' => $metadataUid,
             'command' => 'edit',
         ];
-        $formData = $formDataCompiler->compile($formDataCompilerInput);
+        $typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
+        if ($typo3Version->getMajorVersion() < 13) {
+            $formData = $formDataCompiler->compile($formDataCompilerInput);
+        } else {
+            $formData = $formDataCompiler->compile($formDataCompilerInput, $formDataGroup);
+        }
         $formData['renderType'] = 'fileInfo';
 
         $formResult = $nodeFactory->create($formData)->render();
