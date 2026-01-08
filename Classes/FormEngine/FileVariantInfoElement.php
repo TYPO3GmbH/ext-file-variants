@@ -22,6 +22,8 @@ namespace T3G\AgencyPack\FileVariants\FormEngine;
  *
  * The TYPO3 project - inspiring people to share!
  */
+
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Database\Connection;
@@ -55,8 +57,18 @@ class FileVariantInfoElement extends FileInfoElement
                 $resultArray['html'] = 'something went wrong, no valid file uid received (' . $fileUid . ')';
             } else {
                 GeneralUtility::makeInstance(PageRenderer::class)->addInlineLanguageLabelFile('EXT:file_variants/Resources/Private/Language/locallang.xlf');
-                $resultArray['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS('TYPO3/CMS/FileVariants/FileVariantsDragUploader')->invoke('initialize');
-                $resultArray['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS('TYPO3/CMS/FileVariants/FileVariants')->invoke('initialize');
+                $typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
+                if ($typo3Version->getMajorVersion() < 12) {
+                    $resultArray['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS('TYPO3/CMS/FileVariants/FileVariantsDragUploader')->invoke('initialize');
+                    $resultArray['requireJsModules'][] = JavaScriptModuleInstruction::forRequireJS('TYPO3/CMS/FileVariants/FileVariants')->invoke('initialize');
+                } else {
+                    $resultArray['javaScriptModules'][] = JavaScriptModuleInstruction::create(
+                        '@t3g/file_variants/FileVariantsDragUploader.js'
+                    )->invoke('initialize');
+                    $resultArray['javaScriptModules'][] = JavaScriptModuleInstruction::create(
+                        '@t3g/file_variants/FileVariants.js'
+                    )->invoke('initialize');
+                }
                 $resultArray['stylesheetFiles'][] = 'EXT:file_variants/Resources/Public/Css/FileVariantInfoElement.css';
 
                 /** @var ResourcesService $resourcesService */

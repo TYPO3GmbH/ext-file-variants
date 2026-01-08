@@ -19,8 +19,8 @@ define(['jquery',
     'TYPO3/CMS/Backend/Notification',
     'TYPO3/CMS/Backend/FormEngine'
 ], function ($, Notification) {
+  var percentagePerFile = 1;
 
-    var percentagePerFile = 1;
 
     /*
      * part 1: a generic jQuery plugin "$.fileVariantsDragUploader"
