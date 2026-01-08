@@ -54,7 +54,6 @@ class FileVariants
         if (e.target.name === 'no') {
           Modal.dismiss();
         } else if (e.target.name === 'yes') {
-          console.log('FileVariants: yes (remove), url=' + url);
           $('#t3js-fileinfo').load(url, function () {
             $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
           });

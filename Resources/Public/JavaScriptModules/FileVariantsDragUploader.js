@@ -43,12 +43,7 @@ class FileVariantsDragUploader {
   };
 
   processFileVariantUpload(file, url) {
-
-    console.log('processFileVariantUpload');
-
     var ajaxurl = url + '&file=' + encodeURIComponent(file.uid);
-
-    console.log('processFileVariantUpload ajaxurl=' + ajaxurl);
 
     $('#t3js-fileinfo').load(ajaxurl, function () {
       $('.t3js-filevariants-drag-uploader').fileVariantsDragUploader();
