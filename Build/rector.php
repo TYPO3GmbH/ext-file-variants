@@ -25,6 +25,7 @@ return RectorConfig::configure()
     ->withSets([
         Typo3SetList::TYPO3_11,
         Typo3SetList::TYPO3_12,
+        Typo3SetList::TYPO3_13,
     ])
     ->withSkip([
         MigrateItemsIndexedKeysToAssociativeRector::class,
