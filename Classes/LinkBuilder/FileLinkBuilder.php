@@ -22,6 +22,7 @@ use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\Folder;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Http\UrlProcessorInterface;
 use TYPO3\CMS\Frontend\Typolink\AbstractTypolinkBuilder;
@@ -55,8 +56,18 @@ class FileLinkBuilder extends AbstractTypolinkBuilder
         }
 
         // is file, check if languageVariant exists
-        if ($fileOrFolderObject instanceof FileInterface && $this->typoScriptFrontendController->getLanguage()->getLanguageId() > 0) {
-            $languageId = $this->typoScriptFrontendController->getLanguage()->getLanguageId();
+        $languageId = 0;
+        $request = $this->contentObjectRenderer->getRequest();
+        if ($request) {
+            /**
+             * @var SiteLanguage|null
+             */
+            $language = $request->getAttribute('language');
+            if ($language) {
+                $languageId = $language->getLanguageId();
+            }
+        }
+        if ($fileOrFolderObject instanceof FileInterface && $languageId > 0) {
             $properties = $fileOrFolderObject->getProperties();
             $fileUid = (int)($properties['uid'] ?? 0);
             $metadata = $fileOrFolderObject->getMetaData();
