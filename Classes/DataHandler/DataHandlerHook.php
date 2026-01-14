@@ -107,8 +107,7 @@ class DataHandlerHook
             if (array_key_exists(
                 'sys_file_reference',
                 $handledRecords
-            ) && is_array($handledRecords['sys_file_reference'])
-            ) {
+            )) {
                 $references = $handledRecords['sys_file_reference'];
 
                 foreach ($references as $reference) {
