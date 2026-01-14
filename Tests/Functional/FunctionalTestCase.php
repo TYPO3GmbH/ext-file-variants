@@ -29,6 +29,7 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -80,7 +81,9 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             system('rm -rf ' . escapeshellarg(Environment::getPublicPath() . '/languageVariants'));
         }
 
-        Bootstrap::initializeLanguageObject();
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/be_users.csv');
+        $backendUser = $this->setUpBackendUser(1);
+        $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
 
         $this->importCSVDataSet(__DIR__ . '/Fixture/be_users.csv');
         $this->backendUser = $this->setUpBackendUser(1);
