@@ -68,7 +68,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     protected function setUp(): void
     {
         $this->coreExtensionsToLoad[] = 'fluid';
-        $this->coreExtensionsToLoad[] = 'extensionmanager';
         $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
 
         $this->pathsToLinkInTestInstance['typo3conf/ext/file_variants/Tests/Functional/Fixture/Sites'] = 'typo3conf/sites';
