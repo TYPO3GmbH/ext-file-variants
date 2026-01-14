@@ -22,8 +22,6 @@ return RectorConfig::configure()
     ])
     ->withRootFiles()
     ->withPhpSets()
-    // minimum version for TYPO3 v12 is 8.1
-    ->withPhpVersion(PhpVersion::PHP_81)
     ->withSets([
         Typo3SetList::TYPO3_12,
     ])
