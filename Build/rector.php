@@ -23,7 +23,6 @@ return RectorConfig::configure()
     ->withRootFiles()
     ->withPhpSets()
     ->withSets([
-        Typo3SetList::TYPO3_11,
         Typo3SetList::TYPO3_12,
     ])
     ->withSkip([
