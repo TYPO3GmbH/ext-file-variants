@@ -10,6 +10,7 @@
 use T3G\AgencyPack\FileVariants\DataHandler\DataHandlerHook;
 use T3G\AgencyPack\FileVariants\FormEngine\FileVariantInfoElement;
 use T3G\AgencyPack\FileVariants\FormEngine\FieldWizard\FileVariantsOverviewWizard;
+use T3G\AgencyPack\FileVariants\LinkBuilder\FileLinkBuilder;
 use T3G\AgencyPack\FileVariants\Updates\MetaDataRecordsUpdateWizard;
 /*
  * This file is part of the package t3g/file_variants.
@@ -38,6 +39,9 @@ call_user_func(function () {
         'priority' => 40,
         'class' => FileVariantsOverviewWizard::class,
     ];
+
+    // Link Builder
+    $GLOBALS['TYPO3_CONF_VARS']['FE']['typolinkBuilder']['file'] = FileLinkBuilder::class;
 
     // Upgrade Wizard
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/install']['update'][MetaDataRecordsUpdateWizard::class] = MetaDataRecordsUpdateWizard::class;
