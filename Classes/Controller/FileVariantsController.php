@@ -147,7 +147,6 @@ class FileVariantsController
             'vanillaUid' => $metadataUid,
             'command' => 'edit',
         ];
-        $typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
         $formData = $formDataCompiler->compile($formDataCompilerInput, $formDataGroup);
         $formData['renderType'] = 'fileInfo';
 
