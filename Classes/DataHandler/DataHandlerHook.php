@@ -63,7 +63,8 @@ class DataHandlerHook
      */
     public function processDatamap_postProcessFieldArray(string $status, string $table, $id, array &$fieldArray)
     {
-        if ($table === 'sys_file_reference' && isset($fieldArray['sys_language_uid']) && (int)$fieldArray['sys_language_uid'] > 0) {
+        if ($table === 'sys_file_reference' && isset($fieldArray['sys_language_uid']) && (int)$fieldArray['sys_language_uid'] > 0
+            && isset($fieldArray['l10n_parent']) && (int)$fieldArray['l10n_parent'] > 0) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
             $parentFile = (int)$queryBuilder
@@ -73,7 +74,11 @@ class DataHandlerHook
                 $queryBuilder->createNamedParameter((int)$fieldArray['l10n_parent'], Connection::PARAM_INT)
             ))->executeQuery()
                 ->fetchOne();
-            $fileVariantUid = $this->findLanguageVariantForLanguageAndParentFile((int)$fieldArray['sys_language_uid'], $parentFile);
+            $fileVariantUid = 0;
+            if ($parentFile > 0) {
+                $fileVariantUid = $this->findLanguageVariantForLanguageAndParentFile((int)$fieldArray['sys_language_uid'],
+                    $parentFile);
+            }
             if ($fileVariantUid > 0) {
                 $fieldArray['uid_local'] = $fileVariantUid;
             }

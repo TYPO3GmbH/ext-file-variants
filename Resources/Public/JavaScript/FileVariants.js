@@ -52,7 +52,7 @@ define([
                         name: 'yes'
                     }
                 ]);
-                modal.on('button.clicked', function(e) {
+                modal.addEventListener('button.clicked', function(e) {
                     if (e.target.name === 'no') {
                         Modal.dismiss();
                     } else if (e.target.name === 'yes') {
