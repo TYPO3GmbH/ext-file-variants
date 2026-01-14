@@ -64,7 +64,7 @@ class DataHandlerHook
     public function processDatamap_postProcessFieldArray(string $status, string $table, $id, array &$fieldArray)
     {
         if ($table === 'sys_file_reference' && isset($fieldArray['sys_language_uid']) && (int)$fieldArray['sys_language_uid'] > 0
-            && isset($fieldArray['l10n_parent']) &&  (int)$fieldArray['l10n_parent'] > 0) {
+            && isset($fieldArray['l10n_parent']) && (int)$fieldArray['l10n_parent'] > 0) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
             $parentFile = (int)$queryBuilder
