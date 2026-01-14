@@ -164,16 +164,13 @@ class FileVariantsController
     protected function getAbsolutePathToFile(File $file): string
     {
         $storage = $file->getStorage();
-        if (!$storage->isPublic()) {
-            // manually create a possibly valid file path from the storage configuration
-            $storageConfiguration = $storage->getConfiguration();
-            if ($storageConfiguration['pathType'] == 'absolute') {
-                $path = realpath($storageConfiguration['basePath']) . $file->getIdentifier();
-            } else {
-                $path = realpath(Environment::getPublicPath() . '/' . $storageConfiguration['basePath']) . $file->getIdentifier();
-            }
+
+        // manually create a possibly valid file path from the storage configuration
+        $storageConfiguration = $storage->getConfiguration();
+        if ($storageConfiguration['pathType'] == 'absolute') {
+            $path = realpath($storageConfiguration['basePath']) . $file->getIdentifier();
         } else {
-            $path = Environment::getPublicPath() . '/' . $file->getPublicUrl();
+            $path = realpath(Environment::getPublicPath() . '/' . $storageConfiguration['basePath']) . $file->getIdentifier();
         }
 
         return $path;
