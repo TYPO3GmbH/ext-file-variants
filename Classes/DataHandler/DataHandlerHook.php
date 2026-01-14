@@ -179,9 +179,6 @@ class DataHandlerHook
      */
     protected function findLanguageVariantForLanguageAndParentFile(int $sys_language_uid, int $currentFileId): int
     {
-        if ($currentFileId === 0) {
-            return 0;
-        }
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_file');
         $fileRecord = $queryBuilder->select('sys_language_uid', 'l10n_parent')->from('sys_file')->where($queryBuilder->expr()->eq(
             'uid',
