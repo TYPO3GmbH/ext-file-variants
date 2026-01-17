@@ -29,8 +29,10 @@ use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\ActionService;
 
@@ -67,7 +69,6 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     protected function setUp(): void
     {
         $this->coreExtensionsToLoad[] = 'fluid';
-        $this->coreExtensionsToLoad[] = 'extensionmanager';
         $this->testExtensionsToLoad[] = 'typo3conf/ext/file_variants';
 
         $this->pathsToLinkInTestInstance['typo3conf/ext/file_variants/Tests/Functional/Fixture/Sites'] = 'typo3conf/sites';
@@ -80,16 +81,27 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             system('rm -rf ' . escapeshellarg(Environment::getPublicPath() . '/languageVariants'));
         }
 
-        Bootstrap::initializeLanguageObject();
+        $this->importCSVDataSet(__DIR__ . '/Fixtures/be_users.csv');
+        $backendUser = $this->setUpBackendUser(1);
+        $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->createFromUserPreferences($backendUser);
 
         $this->importCSVDataSet(__DIR__ . '/Fixture/be_users.csv');
         $this->backendUser = $this->setUpBackendUser(1);
 
         $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
-        GeneralUtility::setSingletonInstance(
-            FileMetadataPermissionsAspect::class,
-            $fileMetadataPermissionAspect->reveal()
-        );
+        $obj = $fileMetadataPermissionAspect->reveal();
+        if ($obj instanceof SingletonInterface) {
+            GeneralUtility::setSingletonInstance(
+                FileMetadataPermissionsAspect::class,
+                $obj
+            );
+        } else {
+            // since TYPO3 v13 FileMetadataPermissionsAspect no longer implements SingletonInstance
+            GeneralUtility::addInstance(
+                FileMetadataPermissionsAspect::class,
+                $obj
+            );
+        }
 
         $this->actionService = new PermissiveActionService();
 

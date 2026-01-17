@@ -58,7 +58,7 @@ class FileVariantsController
             'vanillaUid' => $uid,
             'command' => 'edit',
         ];
-        $formData = $formDataCompiler->compile($formDataCompilerInput);
+        $formData = $formDataCompiler->compile($formDataCompilerInput, $formDataGroup);
         $formData['renderType'] = 'fileInfo';
 
         $fileUid = (int)($formData['databaseRow']['file'][0] ?? 0);
@@ -147,7 +147,7 @@ class FileVariantsController
             'vanillaUid' => $metadataUid,
             'command' => 'edit',
         ];
-        $formData = $formDataCompiler->compile($formDataCompilerInput);
+        $formData = $formDataCompiler->compile($formDataCompilerInput, $formDataGroup);
         $formData['renderType'] = 'fileInfo';
 
         $formResult = $nodeFactory->create($formData)->render();
