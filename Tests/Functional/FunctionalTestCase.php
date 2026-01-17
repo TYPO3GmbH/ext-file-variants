@@ -32,6 +32,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Resource\Security\FileMetadataPermissionsAspect;
+use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\ActionService;
 
@@ -88,10 +89,19 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $this->backendUser = $this->setUpBackendUser(1);
 
         $fileMetadataPermissionAspect = $this->prophesize(FileMetadataPermissionsAspect::class);
-        GeneralUtility::setSingletonInstance(
-            FileMetadataPermissionsAspect::class,
-            $fileMetadataPermissionAspect->reveal()
-        );
+        $obj = $fileMetadataPermissionAspect->reveal();
+        if ($obj instanceof SingletonInterface) {
+            GeneralUtility::setSingletonInstance(
+                FileMetadataPermissionsAspect::class,
+                $obj
+            );
+        } else {
+            // since TYPO3 v13 FileMetadataPermissionsAspect no longer implements SingletonInstance
+            GeneralUtility::addInstance(
+                FileMetadataPermissionsAspect::class,
+                $obj
+            );
+        }
 
         $this->actionService = new PermissiveActionService();
 
